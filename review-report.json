@@ -1,0 +1,321 @@
+{
+  "asset_count": 30,
+  "missing": [],
+  "images": [
+    {
+      "label": "ronix gold logo",
+      "file": "assets/ronix_gold_logo.webp",
+      "group": "logo",
+      "size": [
+        1227,
+        1227
+      ]
+    },
+    {
+      "label": "steel roof shed c hero",
+      "file": "assets/steel_roof_shed_c_hero.webp",
+      "group": "Steel Roof Shed C",
+      "size": [
+        2047,
+        927
+      ]
+    },
+    {
+      "label": "roof shed curved skylight",
+      "file": "assets/roof_shed_curved_skylight.webp",
+      "group": "Steel Roof Shed C",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "roof shed steel bracing",
+      "file": "assets/roof_shed_steel_bracing.webp",
+      "group": "Steel Roof Shed C",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "roof shed connection details",
+      "file": "assets/roof_shed_connection_details.webp",
+      "group": "Steel Roof Shed C",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "roof shed full 3d drawing",
+      "file": "assets/roof_shed_full_3d_drawing.webp",
+      "group": "Steel Roof Shed C",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "roof shed side details",
+      "file": "assets/roof_shed_side_details.webp",
+      "group": "Steel Roof Shed C",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "skylight building c main",
+      "file": "assets/skylight_building_c_main.webp",
+      "group": "Skylight Building C",
+      "size": [
+        2047,
+        927
+      ]
+    },
+    {
+      "label": "skylight building c drawing",
+      "file": "assets/skylight_building_c_drawing.webp",
+      "group": "Skylight Building C",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "skylight building c model",
+      "file": "assets/skylight_building_c_model.webp",
+      "group": "Skylight Building C",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "entrance steel main",
+      "file": "assets/entrance_steel_main.webp",
+      "group": "Entrance Steel",
+      "size": [
+        2047,
+        927
+      ]
+    },
+    {
+      "label": "entrance steel side",
+      "file": "assets/entrance_steel_side.webp",
+      "group": "Entrance Steel",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "entrance steel full",
+      "file": "assets/entrance_steel_full.webp",
+      "group": "Entrance Steel",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "entrance steel pdf view",
+      "file": "assets/entrance_steel_pdf_view.webp",
+      "group": "Entrance Steel",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "entrance steel detail",
+      "file": "assets/entrance_steel_detail.webp",
+      "group": "Entrance Steel",
+      "size": [
+        1800,
+        815
+      ]
+    },
+    {
+      "label": "mezzanine 3d model",
+      "file": "assets/mezzanine_3d_model.webp",
+      "group": "Steel Mezzanine Floor",
+      "size": [
+        1192,
+        728
+      ]
+    },
+    {
+      "label": "mezzanine installation one",
+      "file": "assets/mezzanine_installation_one.webp",
+      "group": "Steel Mezzanine Floor",
+      "size": [
+        1467,
+        1100
+      ]
+    },
+    {
+      "label": "mezzanine installation two",
+      "file": "assets/mezzanine_installation_two.webp",
+      "group": "Steel Mezzanine Floor",
+      "size": [
+        1467,
+        1100
+      ]
+    },
+    {
+      "label": "mezzanine stairs site",
+      "file": "assets/mezzanine_stairs_site.webp",
+      "group": "Steel Mezzanine Floor",
+      "size": [
+        1467,
+        1100
+      ]
+    },
+    {
+      "label": "mezzanine shop drawing",
+      "file": "assets/mezzanine_shop_drawing.webp",
+      "group": "Steel Mezzanine Floor",
+      "size": [
+        1483,
+        829
+      ]
+    },
+    {
+      "label": "mezzanine finished stairs",
+      "file": "assets/mezzanine_finished_stairs.webp",
+      "group": "Steel Mezzanine Floor",
+      "size": [
+        825,
+        1100
+      ]
+    },
+    {
+      "label": "remote steel shed structural design",
+      "file": "assets/remote_steel_shed_structural_design.webp",
+      "group": "Remote Steel Shed",
+      "size": [
+        645,
+        506
+      ]
+    },
+    {
+      "label": "remote steel shed site one",
+      "file": "assets/remote_steel_shed_site_one.webp",
+      "group": "Remote Steel Shed",
+      "size": [
+        1040,
+        780
+      ]
+    },
+    {
+      "label": "remote steel shed site two",
+      "file": "assets/remote_steel_shed_site_two.webp",
+      "group": "Remote Steel Shed",
+      "size": [
+        1040,
+        780
+      ]
+    },
+    {
+      "label": "remote steel shed erection",
+      "file": "assets/remote_steel_shed_erection.webp",
+      "group": "Remote Steel Shed",
+      "size": [
+        1040,
+        780
+      ]
+    },
+    {
+      "label": "remote steel shed drawing",
+      "file": "assets/remote_steel_shed_drawing.webp",
+      "group": "Remote Steel Shed",
+      "size": [
+        1280,
+        579
+      ]
+    },
+    {
+      "label": "petropel real profile cover",
+      "file": "assets/petropel_real_profile_cover.webp",
+      "group": "PETROPEL Landmark",
+      "size": [
+        1819,
+        1134
+      ]
+    },
+    {
+      "label": "petropel about slide",
+      "file": "assets/petropel_about_slide.webp",
+      "group": "PETROPEL Landmark",
+      "size": [
+        1300,
+        900
+      ]
+    },
+    {
+      "label": "petropel steel upper shed",
+      "file": "assets/petropel_steel_upper_shed.webp",
+      "group": "PETROPEL Landmark",
+      "size": [
+        1526,
+        852
+      ]
+    },
+    {
+      "label": "petropel pbd image",
+      "file": "assets/petropel_pbd_image.webp",
+      "group": "PETROPEL Landmark",
+      "size": [
+        1300,
+        900
+      ]
+    },
+    {
+      "label": "additional portfolio 1",
+      "file": "assets/additional_portfolio_1.webp",
+      "group": "Portfolio Gallery",
+      "size": [
+        1800,
+        613
+      ]
+    },
+    {
+      "label": "additional portfolio 2",
+      "file": "assets/additional_portfolio_2.webp",
+      "group": "Portfolio Gallery",
+      "size": [
+        770,
+        578
+      ]
+    },
+    {
+      "label": "additional portfolio 3",
+      "file": "assets/additional_portfolio_3.webp",
+      "group": "Portfolio Gallery",
+      "size": [
+        965,
+        673
+      ]
+    },
+    {
+      "label": "additional portfolio 4",
+      "file": "assets/additional_portfolio_4.webp",
+      "group": "Portfolio Gallery",
+      "size": [
+        1208,
+        1100
+      ]
+    },
+    {
+      "label": "additional portfolio 5",
+      "file": "assets/additional_portfolio_5.webp",
+      "group": "Portfolio Gallery",
+      "size": [
+        1030,
+        418
+      ]
+    }
+  ]
+}

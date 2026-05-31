@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RONIX Steel Engineering | Premium Portfolio V2</title>
+<meta name="description" content="RONIX Steel Engineering: structural design, shop drawings, fabrication and site installation." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=Playfair+Display:wght@800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:#030303; --ink:#0d0d0d; --white:#fff; --soft:#ece7de;
+  --muted:#bdb7ac; --gold:#d5a141; --gold2:#ffe29a; --bronze:#7a511d;
+  --line:rgba(255,255,255,.14); --glass:rgba(255,255,255,.08);
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--black);color:#fff;font-family:Inter,Arial,sans-serif;overflow-x:hidden} a{color:inherit;text-decoration:none} img{display:block;max-width:100%} ::selection{background:var(--gold);color:#000}
+body:before{content:"";position:fixed;inset:-25%;z-index:-4;background:radial-gradient(circle at 20% 6%,rgba(213,161,65,.22),transparent 25%),radial-gradient(circle at 80% 40%,rgba(255,255,255,.10),transparent 22%),linear-gradient(145deg,#000,#14110b 45%,#020202);}
+.flow-lines{position:fixed;inset:0;pointer-events:none;z-index:-2;opacity:.8;overflow:hidden}
+.flow-lines span{position:absolute;border:1px solid rgba(213,161,65,.34);border-radius:50%;filter:drop-shadow(0 0 24px rgba(213,161,65,.16));animation:morph 12s ease-in-out infinite}
+.flow-lines span:nth-child(1){width:900px;height:460px;left:-260px;top:80px;transform:rotate(-18deg)}
+.flow-lines span:nth-child(2){width:820px;height:360px;right:-230px;top:42%;transform:rotate(21deg);animation-delay:-4s}
+.flow-lines span:nth-child(3){width:620px;height:310px;left:24%;bottom:-120px;transform:rotate(-8deg);animation-delay:-7s}
+@keyframes morph{50%{border-radius:44% 56% 61% 39%/42% 36% 64% 58%;transform:translateY(-22px) rotate(7deg) scale(1.04)}}
+header{position:fixed;top:0;left:0;right:0;z-index:50;padding:18px clamp(18px,4vw,66px);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(0,0,0,.86),rgba(0,0,0,.18),rgba(0,0,0,0));backdrop-filter:blur(12px)}
+.brand{display:flex;align-items:center;gap:14px;font-weight:900;letter-spacing:.14em;text-transform:uppercase} .brand img{width:58px;height:58px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(213,161,65,.55))}
+nav{display:flex;gap:24px;font-size:13px;color:#ddd;font-weight:800;letter-spacing:.08em;text-transform:uppercase} nav a:hover{color:var(--gold2)}
+.header-wa{padding:12px 18px;border-radius:999px;background:rgba(213,161,65,.12);border:1px solid rgba(213,161,65,.55);color:var(--gold2);font-weight:900}
+.hero{position:relative;min-height:100vh;display:grid;place-items:center;padding:128px 22px 80px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:-1} .hero-bg img{width:100%;height:100%;object-fit:cover;filter:contrast(1.1) saturate(.86) brightness(.56);transform:scale(1.04)}
+.hero-bg:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 55% 45%,rgba(0,0,0,.12),rgba(0,0,0,.76) 70%),linear-gradient(90deg,rgba(0,0,0,.92),rgba(0,0,0,.32),rgba(0,0,0,.92));}
+.hero-grid{width:min(1240px,100%);display:grid;grid-template-columns:1fr .85fr;gap:56px;align-items:center}
+.kicker{margin:0 0 14px;color:var(--gold2);font-size:12px;letter-spacing:.28em;font-weight:900;text-transform:uppercase}
+.hero h1{font-size:clamp(54px,8.3vw,126px);line-height:.82;margin:0;text-transform:uppercase;font-weight:900;letter-spacing:-.075em}
+.hero h1 span{display:block;color:transparent;background:linear-gradient(95deg,#fff,var(--gold2) 38%,var(--gold) 68%,#8b5d20);-webkit-background-clip:text;background-clip:text}
+.hero-sub{font-size:clamp(18px,2.35vw,32px);font-weight:900;margin:30px 0 16px;color:#fff;letter-spacing:.01em}
+.hero-copy{max-width:700px;color:#ded8ce;font-size:17px;line-height:1.85;margin:0}
+.actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px} .btn{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:16px 24px;border:1px solid rgba(255,255,255,.18);font-weight:900;transition:.25s}
+.btn.primary{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#0b0b0b;box-shadow:0 18px 55px rgba(213,161,65,.28)} .btn:hover{transform:translateY(-2px)} .btn.ghost{background:rgba(255,255,255,.07);backdrop-filter:blur(10px)}
+.logo-orbit{position:relative;display:grid;place-items:center;min-height:480px} .logo-orbit:before,.logo-orbit:after{content:"";position:absolute;border:1px solid rgba(213,161,65,.54);border-radius:45% 55% 62% 38%/45% 35% 65% 55%;box-shadow:0 0 90px rgba(213,161,65,.16);animation:orbit 9s ease-in-out infinite}
+.logo-orbit:before{width:min(520px,86vw);aspect-ratio:1} .logo-orbit:after{width:min(650px,95vw);height:360px;transform:rotate(-18deg);animation-delay:-4s}
+.logo-orbit img{width:min(420px,78vw);filter:drop-shadow(0 26px 55px rgba(0,0,0,.68)) drop-shadow(0 0 28px rgba(213,161,65,.65));z-index:2}
+@keyframes orbit{50%{border-radius:59% 41% 42% 58%/55% 62% 38% 45%;transform:rotate(9deg) scale(1.04)}}
+section{padding:96px clamp(18px,4vw,72px)} .section-head{width:min(980px,100%);margin:0 auto 58px;text-align:center} h2{font-size:clamp(36px,5.2vw,76px);line-height:.95;letter-spacing:-.055em;margin:0 0 16px;font-weight:900} .section-head p{color:#cfc8bd;line-height:1.8;font-size:17px;margin:0}
+.about{background:#f6f0e5;color:#090909;position:relative;overflow:hidden} .about:before{content:"";position:absolute;right:-260px;top:-170px;width:760px;height:380px;border:2px solid rgba(213,161,65,.36);border-radius:50%;transform:rotate(-18deg)}
+.about-grid{width:min(1180px,100%);margin:auto;display:grid;grid-template-columns:.92fr 1.08fr;gap:56px;align-items:center} .about-logo{min-height:460px;background:#070707;border-radius:42% 58% 50% 50%/43% 38% 62% 57%;display:grid;place-items:center;position:relative;box-shadow:0 28px 90px rgba(0,0,0,.24);overflow:hidden} .about-logo:after{content:"";position:absolute;inset:28px;border:1px solid rgba(213,161,65,.36);border-radius:60% 40% 46% 54%/52% 44% 56% 48%} .about-logo img{width:min(360px,80%);z-index:1}
+.about p{font-size:18px;line-height:1.9;color:#25221e} .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px} .stat{background:#fff;border:1px solid #e4d8c6;border-radius:24px;padding:22px;box-shadow:0 12px 35px rgba(0,0,0,.06)} .stat strong{display:block;font-size:32px;font-weight:900} .stat span{display:block;color:#6b6258;font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:900;margin-top:4px}
+.services{background:#080808} .service-grid{width:min(1180px,100%);margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:16px} .service{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:34px;padding:30px;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.025));min-height:220px} .service:after{content:"";position:absolute;width:220px;height:110px;border:1px solid rgba(213,161,65,.40);border-radius:50%;right:-70px;bottom:-50px;transform:rotate(-24deg)} .service b{font-size:22px} .service p{color:#cfc8bd;line-height:1.75}
+.projects{background:#050505;position:relative} .projects:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(213,161,65,.05),transparent 20%,rgba(213,161,65,.04));pointer-events:none} .project-list{width:min(1280px,100%);margin:auto;display:grid;gap:42px}
+.project-card{display:grid;grid-template-columns:1.05fr .95fr;gap:0;min-height:560px;border:1px solid rgba(255,255,255,.13);border-radius:46px;overflow:hidden;background:linear-gradient(145deg,#121212,#070707);box-shadow:0 30px 100px rgba(0,0,0,.45)} .project-card.reverse{grid-template-columns:.95fr 1.05fr} .project-card.reverse .project-visual{order:2}
+.project-visual{position:relative;min-height:520px;background:#111;overflow:hidden} .project-visual img{width:100%;height:100%;object-fit:cover;transition:transform .8s ease, filter .8s ease;filter:contrast(1.03) saturate(.95)} .project-card:hover .project-visual img{transform:scale(1.045)}
+.organic-frame:after{content:"";position:absolute;inset:18px;border:1px solid rgba(213,161,65,.45);border-radius:58% 42% 60% 40%/38% 48% 52% 62%;pointer-events:none;mix-blend-mode:screen} .visual-label{position:absolute;left:24px;top:24px;background:linear-gradient(135deg,var(--gold2),var(--gold));color:#090909;padding:11px 16px;border-radius:999px;font-weight:1000;box-shadow:0 12px 35px rgba(0,0,0,.26)}
+.project-info{padding:46px;display:flex;flex-direction:column;justify-content:center} .eyebrow{margin:0;color:var(--gold2);font-size:12px;letter-spacing:.2em;font-weight:900;text-transform:uppercase} .project-info h3{font-size:clamp(34px,4.6vw,68px);line-height:.88;letter-spacing:-.06em;margin:10px 0 10px;font-weight:900} .project-info h4{font-size:20px;color:#fff;margin:0 0 18px} .project-info p{color:#cfc8bd;line-height:1.8;font-size:16px}
+.scope-list{display:flex;flex-wrap:wrap;gap:9px;margin:20px 0} .scope-list span{border:1px solid rgba(213,161,65,.42);background:rgba(213,161,65,.08);color:#f7e0a5;border-radius:999px;padding:9px 12px;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+.thumb-strip{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px} .thumb{width:78px;height:58px;border:1px solid rgba(255,255,255,.18);border-radius:15px;overflow:hidden;background:#111;padding:0;cursor:pointer;transition:.2s} .thumb img{width:100%;height:100%;object-fit:cover} .thumb:hover{transform:translateY(-3px);border-color:var(--gold2)}
+.process{background:#f6f0e5;color:#080808} .process-grid{width:min(1180px,100%);margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:16px} .step{padding:30px;border-radius:34px;background:#fff;border:1px solid #e3d6c2;position:relative;overflow:hidden} .step:before{content:attr(data-num);position:absolute;right:18px;top:10px;font-size:76px;font-weight:900;color:rgba(213,161,65,.18)} .step b{font-size:21px} .step p{color:#4d453b;line-height:1.7}
+.gallery{background:#111} .gallery-grid{width:min(1280px,100%);margin:auto;columns:4 250px;column-gap:16px} .gallery-tile{break-inside:avoid;margin:0 0 16px;position:relative;border-radius:26px;overflow:hidden;border:1px solid rgba(255,255,255,.10);background:#050505} .gallery-tile img{width:100%;transition:.35s;cursor:pointer} .gallery-tile:hover img{transform:scale(1.035);filter:brightness(1.08)} .gallery-tile figcaption{position:absolute;left:10px;right:10px;bottom:10px;background:rgba(0,0,0,.58);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:8px 10px;font-size:11px;color:#e9ddc7;font-weight:800;opacity:0;transform:translateY(8px);transition:.25s} .gallery-tile:hover figcaption{opacity:1;transform:none}
+.contact{background:radial-gradient(circle at 70% 30%,rgba(213,161,65,.22),transparent 30%),#040404} .contact-card{width:min(1080px,100%);margin:auto;border:1px solid rgba(213,161,65,.34);border-radius:46px;padding:46px;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:center;background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.03))} .contact-list{display:grid;gap:10px;color:#ddd;margin-top:18px} .contact-list b{color:var(--gold2)} footer{background:#000;color:#8f887f;padding:28px;text-align:center} .floating-wa{position:fixed;right:22px;bottom:22px;z-index:70;background:#25d366;color:#06160b;border-radius:999px;padding:15px 20px;font-weight:1000;box-shadow:0 18px 45px rgba(37,211,102,.34)}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:100;display:none;place-items:center;padding:24px} .lightbox.open{display:grid} .lightbox img{max-width:min(1280px,96vw);max-height:88vh;border-radius:24px;box-shadow:0 20px 80px #000} .close{position:absolute;top:20px;right:24px;width:48px;height:48px;border:0;border-radius:999px;background:#fff;color:#000;font-size:28px;cursor:pointer}
+.reveal{opacity:0;transform:translateY(30px);transition:all .8s ease} .reveal.visible{opacity:1;transform:none}
+@media(max-width:980px){nav{display:none}.hero-grid,.about-grid,.contact-card{grid-template-columns:1fr}.hero{text-align:center}.actions{justify-content:center}.logo-orbit{min-height:360px}.project-card,.project-card.reverse{grid-template-columns:1fr}.project-card.reverse .project-visual{order:0}.service-grid,.stats,.process-grid{grid-template-columns:1fr 1fr}.project-info{padding:32px}}
+@media(max-width:580px){header{padding:12px 16px}.brand span{display:none}.brand img{width:50px;height:50px}.header-wa{padding:10px 13px}section{padding:70px 16px}.hero h1{font-size:58px}.logo-orbit img{width:280px}.service-grid,.stats,.process-grid{grid-template-columns:1fr}.project-visual{min-height:310px}.project-card{border-radius:32px}.contact-card{padding:28px;border-radius:32px}.floating-wa{left:16px;right:16px;text-align:center}}
+</style>
+</head>
+<body>
+<div class="flow-lines"><span></span><span></span><span></span></div>
+<header>
+  <a class="brand" href="#home"><img src="assets/ronix_gold_logo.webp" alt="RONIX logo"><span>RONIX</span></a>
+  <nav><a href="#about">About</a><a href="#services">Services</a><a href="#projects">Projects</a><a href="#gallery">Gallery</a><a href="#contact">Contact</a></nav>
+  <a class="header-wa" href="https://wa.me/message/4NNAFN6AHFZLO1" target="_blank" rel="noopener">WhatsApp</a>
+</header>
+<main>
+<section class="hero" id="home">
+  <div class="hero-bg"><img src="assets/steel_roof_shed_c_hero.webp" alt="RONIX complex steel roof shed"></div>
+  <div class="hero-grid">
+    <div class="hero-text reveal visible">
+      <p class="kicker">Premium Steel Engineering</p>
+      <h1><span>RONIX</span>Steel Engineering</h1>
+      <p class="hero-sub">Shop Drawings • Fabrication • Supply • Site Installation</p>
+      <p class="hero-copy">A high-impact portfolio for real steel projects — organized by project story, not just images. Each work shows the journey from engineering and shop drawings to fabrication and site execution.</p>
+      <div class="actions"><a class="btn primary" href="#projects">View Featured Projects</a><a class="btn ghost" href="https://wa.me/message/4NNAFN6AHFZLO1" target="_blank" rel="noopener">Start WhatsApp Chat</a></div>
+    </div>
+    <div class="logo-orbit reveal visible"><img src="assets/ronix_gold_logo.webp" alt="RONIX gold logo"></div>
+  </div>
+</section>
+<section class="about" id="about">
+  <div class="about-grid reveal">
+    <div class="about-logo"><img src="assets/ronix_gold_logo.webp" alt="RONIX logo large"></div>
+    <div>
+      <p class="kicker">About Ronix</p>
+      <h2>Strength with flow. Precision with simplicity.</h2>
+      <p>RONIX presents steel work as a complete engineering process: structural design, detailed shop drawings, fabrication coordination and site installation. The visual identity uses a 20% Zaha Hadid-inspired flow — elegant curves, strong proportions and premium black-gold contrast — while keeping the industrial steel character clear.</p>
+      <div class="stats"><div class="stat"><strong>6</strong><span>Project Types</span></div><div class="stat"><strong>4</strong><span>Core Services</span></div><div class="stat"><strong>100%</strong><span>Real Images</span></div><div class="stat"><strong>V2</strong><span>Reviewed Layout</span></div></div>
+    </div>
+  </div>
+</section>
+<section class="services" id="services">
+  <div class="section-head reveal"><p class="kicker">Core Workflow</p><h2>From engineering to site.</h2><p>No tool names, no unnecessary noise — only the services clients understand and value.</p></div>
+  <div class="service-grid">
+    <div class="service reveal"><b>Structural Design</b><p>Practical steel systems, load paths, member coordination and buildable solutions.</p></div>
+    <div class="service reveal"><b>Shop Drawings</b><p>Fabrication drawings, assembly drawings, erection drawings and clear project documentation.</p></div>
+    <div class="service reveal"><b>Fabrication Support</b><p>Material lists, connection details and production-ready drawing packages.</p></div>
+    <div class="service reveal"><b>Site Installation</b><p>Execution coordination, alignment logic and site-oriented steel detailing.</p></div>
+  </div>
+</section>
+<section class="projects" id="projects">
+  <div class="section-head reveal"><p class="kicker">Featured Projects</p><h2>Separated like a real portfolio.</h2><p>Each project has a main image, scope, project story and supporting images — not a crowded image dump.</p></div>
+  <div class="project-list">
+    
+    <article class="project-card" data-accent="Complex Geometry">
+      <div class="project-visual organic-frame">
+        <img class="main-project-img" src="assets/steel_roof_shed_c_hero.webp" alt="Steel Roof Shed (C)">
+        <div class="visual-label">Complex Geometry</div>
+      </div>
+      <div class="project-info">
+        <p class="eyebrow">Hero Project</p>
+        <h3>Steel Roof Shed (C)</h3>
+        <h4>Complex Roof Shed with Curved Skylight</h4>
+        <p>A complex steel roof system with curved skylight geometry, pipe bracing, secondary framing and fabrication-ready details. This project is the visual hero because it shows engineering complexity and architectural flow together.</p>
+        <div class="scope-list"><span>Structural Design</span><span>Shop Drawings</span><span>3D Steel Modeling</span><span>Fabrication Details</span></div>
+        <div class="thumb-strip"><button class="thumb" data-full="assets/steel_roof_shed_c_hero.webp"><img src="assets/steel_roof_shed_c_hero.webp" alt="project detail"></button><button class="thumb" data-full="assets/roof_shed_curved_skylight.webp"><img src="assets/roof_shed_curved_skylight.webp" alt="project detail"></button><button class="thumb" data-full="assets/roof_shed_steel_bracing.webp"><img src="assets/roof_shed_steel_bracing.webp" alt="project detail"></button><button class="thumb" data-full="assets/roof_shed_connection_details.webp"><img src="assets/roof_shed_connection_details.webp" alt="project detail"></button><button class="thumb" data-full="assets/roof_shed_full_3d_drawing.webp"><img src="assets/roof_shed_full_3d_drawing.webp" alt="project detail"></button><button class="thumb" data-full="assets/roof_shed_side_details.webp"><img src="assets/roof_shed_side_details.webp" alt="project detail"></button></div>
+      </div>
+    </article>
+    <article class="project-card reverse" data-accent="Skylights">
+      <div class="project-visual organic-frame">
+        <img class="main-project-img" src="assets/skylight_building_c_main.webp" alt="Skylight of Building C">
+        <div class="visual-label">Skylights</div>
+      </div>
+      <div class="project-info">
+        <p class="eyebrow">Architectural Steel</p>
+        <h3>Skylight of Building C</h3>
+        <h4>Curved Skylight Steel Structure</h4>
+        <p>A clean architectural skylight package showing curved frames, coordinated steel members and clear drawing output for fabrication and installation.</p>
+        <div class="scope-list"><span>Shop Drawings</span><span>3D Steel Modeling</span><span>Fabrication Drawings</span></div>
+        <div class="thumb-strip"><button class="thumb" data-full="assets/skylight_building_c_main.webp"><img src="assets/skylight_building_c_main.webp" alt="project detail"></button><button class="thumb" data-full="assets/skylight_building_c_drawing.webp"><img src="assets/skylight_building_c_drawing.webp" alt="project detail"></button><button class="thumb" data-full="assets/skylight_building_c_model.webp"><img src="assets/skylight_building_c_model.webp" alt="project detail"></button></div>
+      </div>
+    </article>
+    <article class="project-card" data-accent="Special Structures">
+      <div class="project-visual organic-frame">
+        <img class="main-project-img" src="assets/entrance_steel_main.webp" alt="Entrance Steel Canopy">
+        <div class="visual-label">Special Structures</div>
+      </div>
+      <div class="project-info">
+        <p class="eyebrow">Architectural Entrance</p>
+        <h3>Entrance Steel Canopy</h3>
+        <h4>Special Entrance Steel Feature</h4>
+        <p>A custom entrance steel structure with an architectural shape. It demonstrates Ronix’s ability to handle decorative and functional steel, not only industrial sheds.</p>
+        <div class="scope-list"><span>Shop Drawings</span><span>3D Steel Modeling</span><span>Fabrication Drawings</span><span>Site Coordination</span></div>
+        <div class="thumb-strip"><button class="thumb" data-full="assets/entrance_steel_main.webp"><img src="assets/entrance_steel_main.webp" alt="project detail"></button><button class="thumb" data-full="assets/entrance_steel_side.webp"><img src="assets/entrance_steel_side.webp" alt="project detail"></button><button class="thumb" data-full="assets/entrance_steel_full.webp"><img src="assets/entrance_steel_full.webp" alt="project detail"></button><button class="thumb" data-full="assets/entrance_steel_pdf_view.webp"><img src="assets/entrance_steel_pdf_view.webp" alt="project detail"></button><button class="thumb" data-full="assets/entrance_steel_detail.webp"><img src="assets/entrance_steel_detail.webp" alt="project detail"></button></div>
+      </div>
+    </article>
+    <article class="project-card reverse" data-accent="Mezzanine">
+      <div class="project-visual organic-frame">
+        <img class="main-project-img" src="assets/mezzanine_3d_model.webp" alt="Steel Mezzanine Floor">
+        <div class="visual-label">Mezzanine</div>
+      </div>
+      <div class="project-info">
+        <p class="eyebrow">From Design To Reality</p>
+        <h3>Steel Mezzanine Floor</h3>
+        <h4>Mezzanine, Stairs & Internal Steel Works</h4>
+        <p>A full-cycle project: engineering model, shop drawings, fabrication and real installation inside the building. It proves that the workflow is connected from drawing to site.</p>
+        <div class="scope-list"><span>Structural Design</span><span>Shop Drawings</span><span>Fabrication</span><span>Site Installation</span></div>
+        <div class="thumb-strip"><button class="thumb" data-full="assets/mezzanine_3d_model.webp"><img src="assets/mezzanine_3d_model.webp" alt="project detail"></button><button class="thumb" data-full="assets/mezzanine_installation_one.webp"><img src="assets/mezzanine_installation_one.webp" alt="project detail"></button><button class="thumb" data-full="assets/mezzanine_installation_two.webp"><img src="assets/mezzanine_installation_two.webp" alt="project detail"></button><button class="thumb" data-full="assets/mezzanine_stairs_site.webp"><img src="assets/mezzanine_stairs_site.webp" alt="project detail"></button><button class="thumb" data-full="assets/mezzanine_shop_drawing.webp"><img src="assets/mezzanine_shop_drawing.webp" alt="project detail"></button><button class="thumb" data-full="assets/mezzanine_finished_stairs.webp"><img src="assets/mezzanine_finished_stairs.webp" alt="project detail"></button></div>
+      </div>
+    </article>
+    <article class="project-card" data-accent="Industrial">
+      <div class="project-visual organic-frame">
+        <img class="main-project-img" src="assets/remote_steel_shed_structural_design.webp" alt="Remote Steel Shed">
+        <div class="visual-label">Industrial</div>
+      </div>
+      <div class="project-info">
+        <p class="eyebrow">Industrial Steel</p>
+        <h3>Remote Steel Shed</h3>
+        <h4>Steel Shed Design & Site Execution</h4>
+        <p>A practical steel shed project showing analysis, fabrication preparation and actual on-site erection. Strong for proving field capability and delivery experience.</p>
+        <div class="scope-list"><span>Structural Design</span><span>Shop Drawings</span><span>Fabrication</span><span>Site Installation</span></div>
+        <div class="thumb-strip"><button class="thumb" data-full="assets/remote_steel_shed_structural_design.webp"><img src="assets/remote_steel_shed_structural_design.webp" alt="project detail"></button><button class="thumb" data-full="assets/remote_steel_shed_site_one.webp"><img src="assets/remote_steel_shed_site_one.webp" alt="project detail"></button><button class="thumb" data-full="assets/remote_steel_shed_site_two.webp"><img src="assets/remote_steel_shed_site_two.webp" alt="project detail"></button><button class="thumb" data-full="assets/remote_steel_shed_erection.webp"><img src="assets/remote_steel_shed_erection.webp" alt="project detail"></button><button class="thumb" data-full="assets/remote_steel_shed_drawing.webp"><img src="assets/remote_steel_shed_drawing.webp" alt="project detail"></button></div>
+      </div>
+    </article>
+    <article class="project-card reverse" data-accent="Landmark Projects">
+      <div class="project-visual organic-frame">
+        <img class="main-project-img" src="assets/petropel_real_profile_cover.webp" alt="PETROPEL & Major Steel Works">
+        <div class="visual-label">Landmark Projects</div>
+      </div>
+      <div class="project-info">
+        <p class="eyebrow">Landmark Works</p>
+        <h3>PETROPEL & Major Steel Works</h3>
+        <h4>Large Scale Steel Structures</h4>
+        <p>Large-scale steel works from Ronix profile including landmark steel structures and major construction references. This section supports credibility and scale.</p>
+        <div class="scope-list"><span>Engineering</span><span>Shop Drawings</span><span>Fabrication</span><span>Installation</span></div>
+        <div class="thumb-strip"><button class="thumb" data-full="assets/petropel_real_profile_cover.webp"><img src="assets/petropel_real_profile_cover.webp" alt="project detail"></button><button class="thumb" data-full="assets/petropel_about_slide.webp"><img src="assets/petropel_about_slide.webp" alt="project detail"></button><button class="thumb" data-full="assets/petropel_steel_upper_shed.webp"><img src="assets/petropel_steel_upper_shed.webp" alt="project detail"></button><button class="thumb" data-full="assets/petropel_pbd_image.webp"><img src="assets/petropel_pbd_image.webp" alt="project detail"></button></div>
+      </div>
+    </article>
+  </div>
+</section>
+<section class="process">
+  <div class="section-head reveal"><p class="kicker">Project Story</p><h2>The client sees the full journey.</h2><p>This is the strongest sales message: Ronix can take the project from first engineering idea to real steel on site.</p></div>
+  <div class="process-grid reveal">
+    <div class="step" data-num="01"><b>Structural Design</b><p>The steel logic is defined clearly before drawings start.</p></div>
+    <div class="step" data-num="02"><b>Shop Drawings</b><p>Fabrication, assembly and erection drawings are prepared for real execution.</p></div>
+    <div class="step" data-num="03"><b>Fabrication</b><p>Steel members and connections are detailed with manufacturing in mind.</p></div>
+    <div class="step" data-num="04"><b>Site Installation</b><p>Projects are presented with real execution images to build trust immediately.</p></div>
+  </div>
+</section>
+<section class="gallery" id="gallery">
+  <div class="section-head reveal"><p class="kicker">Visual Gallery</p><h2>Real project images, cleaner rhythm.</h2><p>Gallery images are secondary. The main selling happens inside the separated project sections above.</p></div>
+  <div class="gallery-grid reveal"><figure class="gallery-tile"><img src="assets/steel_roof_shed_c_hero.webp" loading="lazy" alt="Ronix project asset"><figcaption>Steel Roof Shed C Hero</figcaption></figure><figure class="gallery-tile"><img src="assets/roof_shed_curved_skylight.webp" loading="lazy" alt="Ronix project asset"><figcaption>Roof Shed Curved Skylight</figcaption></figure><figure class="gallery-tile"><img src="assets/roof_shed_steel_bracing.webp" loading="lazy" alt="Ronix project asset"><figcaption>Roof Shed Steel Bracing</figcaption></figure><figure class="gallery-tile"><img src="assets/roof_shed_connection_details.webp" loading="lazy" alt="Ronix project asset"><figcaption>Roof Shed Connection Details</figcaption></figure><figure class="gallery-tile"><img src="assets/roof_shed_full_3d_drawing.webp" loading="lazy" alt="Ronix project asset"><figcaption>Roof Shed Full 3D Drawing</figcaption></figure><figure class="gallery-tile"><img src="assets/roof_shed_side_details.webp" loading="lazy" alt="Ronix project asset"><figcaption>Roof Shed Side Details</figcaption></figure><figure class="gallery-tile"><img src="assets/skylight_building_c_main.webp" loading="lazy" alt="Ronix project asset"><figcaption>Skylight Building C Main</figcaption></figure><figure class="gallery-tile"><img src="assets/skylight_building_c_drawing.webp" loading="lazy" alt="Ronix project asset"><figcaption>Skylight Building C Drawing</figcaption></figure><figure class="gallery-tile"><img src="assets/skylight_building_c_model.webp" loading="lazy" alt="Ronix project asset"><figcaption>Skylight Building C Model</figcaption></figure><figure class="gallery-tile"><img src="assets/entrance_steel_main.webp" loading="lazy" alt="Ronix project asset"><figcaption>Entrance Steel Main</figcaption></figure><figure class="gallery-tile"><img src="assets/entrance_steel_side.webp" loading="lazy" alt="Ronix project asset"><figcaption>Entrance Steel Side</figcaption></figure><figure class="gallery-tile"><img src="assets/entrance_steel_full.webp" loading="lazy" alt="Ronix project asset"><figcaption>Entrance Steel Full</figcaption></figure><figure class="gallery-tile"><img src="assets/entrance_steel_pdf_view.webp" loading="lazy" alt="Ronix project asset"><figcaption>Entrance Steel Pdf View</figcaption></figure><figure class="gallery-tile"><img src="assets/entrance_steel_detail.webp" loading="lazy" alt="Ronix project asset"><figcaption>Entrance Steel Detail</figcaption></figure><figure class="gallery-tile"><img src="assets/mezzanine_3d_model.webp" loading="lazy" alt="Ronix project asset"><figcaption>Mezzanine 3D Model</figcaption></figure><figure class="gallery-tile"><img src="assets/mezzanine_installation_one.webp" loading="lazy" alt="Ronix project asset"><figcaption>Mezzanine Installation One</figcaption></figure><figure class="gallery-tile"><img src="assets/mezzanine_installation_two.webp" loading="lazy" alt="Ronix project asset"><figcaption>Mezzanine Installation Two</figcaption></figure><figure class="gallery-tile"><img src="assets/mezzanine_stairs_site.webp" loading="lazy" alt="Ronix project asset"><figcaption>Mezzanine Stairs Site</figcaption></figure><figure class="gallery-tile"><img src="assets/mezzanine_shop_drawing.webp" loading="lazy" alt="Ronix project asset"><figcaption>Mezzanine Shop Drawing</figcaption></figure><figure class="gallery-tile"><img src="assets/mezzanine_finished_stairs.webp" loading="lazy" alt="Ronix project asset"><figcaption>Mezzanine Finished Stairs</figcaption></figure><figure class="gallery-tile"><img src="assets/remote_steel_shed_structural_design.webp" loading="lazy" alt="Ronix project asset"><figcaption>Remote Steel Shed Structural Design</figcaption></figure><figure class="gallery-tile"><img src="assets/remote_steel_shed_site_one.webp" loading="lazy" alt="Ronix project asset"><figcaption>Remote Steel Shed Site One</figcaption></figure><figure class="gallery-tile"><img src="assets/remote_steel_shed_site_two.webp" loading="lazy" alt="Ronix project asset"><figcaption>Remote Steel Shed Site Two</figcaption></figure><figure class="gallery-tile"><img src="assets/remote_steel_shed_erection.webp" loading="lazy" alt="Ronix project asset"><figcaption>Remote Steel Shed Erection</figcaption></figure><figure class="gallery-tile"><img src="assets/remote_steel_shed_drawing.webp" loading="lazy" alt="Ronix project asset"><figcaption>Remote Steel Shed Drawing</figcaption></figure><figure class="gallery-tile"><img src="assets/petropel_real_profile_cover.webp" loading="lazy" alt="Ronix project asset"><figcaption>Petropel Real Profile Cover</figcaption></figure><figure class="gallery-tile"><img src="assets/petropel_about_slide.webp" loading="lazy" alt="Ronix project asset"><figcaption>Petropel About Slide</figcaption></figure><figure class="gallery-tile"><img src="assets/petropel_steel_upper_shed.webp" loading="lazy" alt="Ronix project asset"><figcaption>Petropel Steel Upper Shed</figcaption></figure><figure class="gallery-tile"><img src="assets/petropel_pbd_image.webp" loading="lazy" alt="Ronix project asset"><figcaption>Petropel Pbd Image</figcaption></figure></div>
+</section>
+<section class="contact" id="contact">
+  <div class="contact-card reveal"><div><p class="kicker">Contact</p><h2>Let’s build your next steel structure.</h2><div class="contact-list"><span><b>Phone / WhatsApp:</b> +20 114 918 5161</span><span><b>Email:</b> 3amertarrab@gmail.com</span><span><b>Address:</b> Cairo, Egypt</span></div></div><a class="btn primary" href="https://wa.me/message/4NNAFN6AHFZLO1" target="_blank" rel="noopener">Open WhatsApp Chat</a></div>
+</section>
+</main>
+<a class="floating-wa" href="https://wa.me/message/4NNAFN6AHFZLO1" target="_blank" rel="noopener">WhatsApp +20 114 918 5161</a>
+<footer>© RONIX Steel Engineering — Design • Shop Drawings • Fabrication • Site Installation</footer>
+<div class="lightbox" id="lightbox"><button class="close" aria-label="Close">×</button><img src="" alt="Expanded project image"></div>
+<script>
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+const lb=document.getElementById('lightbox'), lbImg=lb.querySelector('img');
+document.querySelectorAll('.thumb, .gallery-tile img, .main-project-img').forEach(el=>el.addEventListener('click',()=>{const src=el.dataset.full || el.src || (el.querySelector('img')&&el.querySelector('img').src); if(src){lbImg.src=src; lb.classList.add('open')}}));
+lb.querySelector('.close').onclick=()=>lb.classList.remove('open'); lb.addEventListener('click',e=>{if(e.target===lb)lb.classList.remove('open')});
+</script>
+</body>
+</html>
