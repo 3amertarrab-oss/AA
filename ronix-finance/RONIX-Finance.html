@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-jZxna9rI3P13iz5l6HDiNj2pu9CtL2a1FjrcNKM6Ghg=' 'sha256-N/k8M1Pdqep0RCdR/kLgw8ujHkrh2zXvycVM42rAUl0='; style-src 'sha256-ZzOfW95R9f2WY0y3sD9R6AAfaAsHpXlktgdf4QWWr5o='; connect-src 'none'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>RONIX | الدفعات والتحصيلات والمطالبات</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2212%22%20fill%3D%22%2310151e%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2246%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-weight%3D%22bold%22%20font-size%3D%2242%22%20fill%3D%22%23f3c36c%22%3ER%3C%2Ftext%3E%3C%2Fsvg%3E%0A">
+<style>:root{font-family:Tahoma,Arial,sans-serif;color:#e9edf4;background:#10151e;--panel:#1a2230;--muted:#b6c2d3;--line:#38475d;--gold:#f3c36c;--good:#83e0bd;--danger:#ffb5b5}*{box-sizing:border-box}body{margin:0;line-height:1.7}header,main,footer{max-width:1440px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;align-items:center;gap:24px;border-bottom:1px solid var(--line)}h1{font-size:clamp(22px,3vw,32px);margin:8px 0}h2{font-size:21px;margin:0 0 8px}p{margin:4px 0;color:var(--muted)}.brand{font-family:Arial,sans-serif;font-weight:900;letter-spacing:2px;font-size:22px;color:var(--gold)}.brand span{font-size:12px;color:var(--muted)}button,select,input,textarea{font:inherit;border:1px solid #718199;border-radius:9px;background:#101926;color:#f3f6fb;padding:10px 12px;max-width:100%}button{cursor:pointer;min-height:44px}button:hover{border-color:var(--gold)}button:disabled{opacity:.6;cursor:not-allowed}.primary{background:var(--gold);color:#19202b;border-color:var(--gold);font-weight:bold}.danger{color:#ffd8d8;background:#652b33;border-color:#bb6c74}.header-actions{display:flex;gap:8px;flex-wrap:wrap;max-width:520px}.notice{background:#243049;border:1px solid #647a9b;border-radius:12px;padding:14px;margin-bottom:20px}.toolbar{display:flex;align-items:end;gap:16px;flex-wrap:wrap;background:var(--panel);padding:18px;border:1px solid var(--line);border-radius:12px;margin-bottom:26px}.field{display:flex;flex-direction:column;gap:6px;min-width:180px}.field label{font-size:14px;color:#d8e0eb}.field small{font-size:12px;color:var(--muted)}.field input,.field select{width:100%}#saved-at{font-size:12px;color:var(--muted);margin:auto 0}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.card{padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow-wrap:anywhere}.card strong{display:block;font-size:clamp(17px,2vw,25px);margin:6px 0;direction:ltr;text-align:right;unicode-bidi:plaintext}.card span{color:var(--muted);font-size:13px}.card.positive strong{color:var(--good)}.card.warning strong{color:var(--gold)}.explain{font-size:13px;margin:12px 0}.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:28px 0}.tabs a{color:var(--gold);padding:9px 14px;border:1px solid var(--line);border-radius:9px;text-decoration:none}.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin:20px 0;scroll-margin-top:16px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}.section-head p{font-size:13px}.table-wrap{overflow-x:auto;border-radius:8px}table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}th,td{padding:13px 10px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}th{background:#111b29;color:#cbd6e5}td small{display:block;color:var(--muted);font-size:12px;white-space:normal;max-width:260px}td .money{direction:ltr;display:inline-block;unicode-bidi:plaintext}.row-actions{display:flex;gap:6px}.row-actions button{padding:6px 10px;font-size:12px}.empty{text-align:center;color:var(--muted);padding:28px}.badge{border-radius:20px;padding:4px 9px;display:inline-block;font-size:12px;background:#253f4c;color:#d1f8ef}.badge.overdue{background:#5c2c35;color:#ffd0d0}.badge.partial{background:#514329;color:#ffdf9a}.badge.paid{background:#1a4e3e;color:#bdf2d9}.muted{color:var(--muted);font-size:13px}footer{text-align:center;color:var(--muted);font-size:12px}.error{background:#4e2530;color:#ffd8df;border:1px solid #c0808e;border-radius:8px;padding:12px;white-space:pre-line}#message{padding:14px;border-radius:8px;margin:12px 0;background:#1e493e;color:#d1ffee;border:1px solid #578776}#message.error{background:#4e2530;color:#ffd8df}dialog{color:#ecf1f8;background:#1a2230;border:1px solid #6a7c96;border-radius:14px;width:min(740px,94vw);max-height:90dvh;padding:24px;overflow:auto}dialog::backdrop{background:rgba(0,0,0,.75)}body:has(dialog[open]){overflow:hidden}.dialog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.dialog-head button{font-size:26px;padding:0 12px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field.wide{grid-column:1/-1}.dialog-actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}#form-error{margin-top:14px}.skip{position:absolute;right:12px;top:-80px;background:var(--gold);color:#111;padding:10px;z-index:10}.skip:focus{top:12px}:focus-visible{outline:3px solid #ffe19f;outline-offset:3px}[hidden]{display:none!important}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}@media(max-width:900px){header{align-items:start;flex-direction:column}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){header,main,footer{padding:16px}.panel{padding:12px}.form-grid{grid-template-columns:1fr}.field{min-width:0}.section-head{align-items:start;flex-direction:column}.toolbar .field{width:100%}.cards{gap:8px}.card{padding:12px}.card strong{font-size:16px}.header-actions button{flex:1}.header-actions{width:100%}.dialog-actions button{flex:1}}@media print{body{background:white;color:black}header,main,footer{max-width:none;padding:0}.header-actions,.toolbar button,.notice,.tabs,.row-actions,button,dialog,#audit,#message{display:none!important}.toolbar,.panel,.card{background:white;border:1px solid #bbb;break-inside:avoid}.cards{grid-template-columns:repeat(4,1fr)}p,.muted,.card span,th,td small{color:#333}.card strong,.card.positive strong,.card.warning strong{color:black}th{background:#eee}.table-wrap{overflow:visible}table{white-space:normal;font-size:9px}.badge,.badge.overdue,.badge.partial,.badge.paid{background:white;color:black;border:1px solid #aaa}footer{color:#333}th,td{padding:6px}#projects th:last-child,#projects td:last-child,#claims th:last-child,#claims td:last-child,#transactions th:last-child,#transactions td:last-child{display:none}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+
+</head>
+<body>
+<a class="skip" href="#main">انتقل للمحتوى</a>
+<header><div><span class="brand">RONIX <span>FINANCE</span></span><h1>الدفعات والتحصيلات والمطالبات</h1><p>حسابات مشاريعك بوضوح — نسخة محلية للتجربة</p></div><div class="header-actions"><button id="backup" class="primary">تنزيل نسخة احتياطية</button><button id="restore">استيراد نسخة</button><button id="csv">تصدير CSV</button><button id="print">طباعة الكشف</button></div></header>
+<main id="main">
+<div class="notice"><strong>بياناتك تُحفظ في هذا المتصفح فقط.</strong> نزّل نسخة احتياطية لنقلها لجهاز آخر أو قبل مسح بيانات المتصفح. لا توجد مزامنة بين الأجهزة.</div>
+<noscript><p class="error">يلزم تفعيل JavaScript لتشغيل الحسابات والحفظ.</p></noscript>
+<div id="message" role="status" aria-live="polite" hidden></div>
+<section class="toolbar" aria-label="فلترة الكشف"><div class="field"><label for="currency-filter">عملة الكشف</label><select id="currency-filter"><option value="EGP">جنيه مصري EGP</option><option value="SAR">ريال سعودي SAR</option><option value="AED">درهم إماراتي AED</option><option value="USD">دولار أمريكي USD</option><option value="EUR">يورو EUR</option></select></div><div class="field"><label for="project-filter">المشروع</label><select id="project-filter"><option value="">كل مشاريع العملة</option></select></div><span id="saved-at">لم تُسجل بيانات بعد</span><button id="demo">تجربة ببيانات مثال</button><button id="clear-demo" class="danger" hidden>إزالة مشروع المثال</button></section>
+<section aria-labelledby="summary-title"><h2 id="summary-title">ملخص الحسابات <span id="scope" class="muted"></span></h2><div id="summary" class="cards"></div><p class="explain">المطالبة ليست حركة نقدية. صافي التدفق النقدي = التحصيلات − الدفعات. المستحقات تُحسب لكل مشروع وجهة على حدة، دون مقاصة رصيد جهة مع أخرى.</p></section>
+<nav class="tabs" aria-label="أقسام الحسابات"><a href="#projects">المشاريع</a><a href="#claims">المطالبات</a><a href="#transactions">التحصيلات والدفعات</a><a href="#statement">كشف الجهات</a><a href="#audit">سجل التعديلات</a></nav>
+<section id="projects" class="panel"><div class="section-head"><div><h2>المشاريع</h2><p>لكل مشروع عملة مستقلة؛ لا تُجمع العملات المختلفة.</p></div><button data-new="projects" class="primary">إضافة مشروع</button></div><div class="table-wrap" tabindex="0" role="region" aria-label="قائمة المشاريع القابلة للتمرير"><table><caption class="sr-only">قائمة المشاريع</caption><thead><tr><th>المشروع</th><th>العميل / الجهة</th><th>العملة</th><th>قيمة العقد المرجعية</th><th>الإجراءات</th></tr></thead><tbody id="projects-body"></tbody></table></div></section>
+<section id="claims" class="panel"><div class="section-head"><div><h2>المطالبات</h2><p>سجّل القيمة النهائية المستحقة، شاملة الضرائب أو الاستقطاعات التي احتسبتها خارج الأداة.</p></div><button data-new="claims" class="primary">إضافة مطالبة</button></div><div class="table-wrap" tabindex="0" role="region" aria-label="قائمة المطالبات القابلة للتمرير"><table><caption class="sr-only">مطالبات العملة والمشروع المختارين</caption><thead><tr><th>رقم / جهة</th><th>المشروع</th><th>الاتجاه</th><th>الإصدار / الاستحقاق</th><th>قيمة المطالبة</th><th>المسدد المرتبط</th><th>المتبقي المرتبط</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody id="claims-body"></tbody></table></div><p class="explain">حالة المطالبة تعتمد على الحركات المرتبطة بها فقط. الدفعة المقدمة تخفّض رصيد الجهة، وتبقى غير مخصصة حتى تربطها بمطالبة.</p></section>
+<section id="transactions" class="panel"><div class="section-head"><div><h2>التحصيلات والدفعات</h2><p>التحصيل مبلغ دخل فعليًا، والدفعة مبلغ خرج فعليًا. يمكن تسجيل دفعات مقدمة دون مطالبة.</p></div><button data-new="transactions" class="primary">إضافة حركة نقدية</button></div><div class="table-wrap" tabindex="0" role="region" aria-label="قائمة الحركات النقدية القابلة للتمرير"><table><caption class="sr-only">الحركات النقدية</caption><thead><tr><th>التاريخ / المرجع</th><th>المشروع / الجهة</th><th>نوع الحركة</th><th>المبلغ</th><th>المطالبة المرتبطة</th><th>ملاحظات</th><th>الإجراءات</th></tr></thead><tbody id="transactions-body"></tbody></table></div></section>
+<section id="statement" class="panel"><div class="section-head"><div><h2>كشف الجهات</h2><p>الالتزامات والأرصدة المقدمة منفصلة لكل جهة داخل المشروع.</p></div></div><div class="table-wrap" tabindex="0" role="region" aria-label="كشف الجهات القابل للتمرير"><table><caption class="sr-only">كشف أرصدة الجهات</caption><thead><tr><th>المشروع / الجهة</th><th>مطالبات لنا</th><th>تحصيلات</th><th>مستحق لنا</th><th>رصيد عميل مقدم</th><th>مطالبات علينا</th><th>دفعات</th><th>مستحق علينا</th><th>مقدم مدفوع</th></tr></thead><tbody id="statement-body"></tbody></table></div></section>
+<section id="audit" class="panel"><div class="section-head"><div><h2>سجل التعديلات المحلي</h2><p>آخر 50 عملية؛ النسخة الاحتياطية تتضمن السجل كاملًا. هذا السجل محلي وقابل للتعديل بملف البيانات.</p></div></div><div class="table-wrap" tabindex="0" role="region" aria-label="سجل التعديلات القابل للتمرير"><table><thead><tr><th>الوقت</th><th>العملية</th><th>نوع السجل</th><th>المرجع</th></tr></thead><tbody id="audit-body"></tbody></table></div></section>
+</main>
+<footer>RONIX Finance · إصدار تجريبي 1.0 · حسابات مالية بمنزلتين عشريتين · لا تحليل أو تصميم إنشائي</footer>
+<dialog id="editor" aria-labelledby="editor-title"><form id="editor-form"><div class="dialog-head"><h2 id="editor-title">إضافة سجل</h2><button type="button" class="close-dialog" aria-label="إغلاق">×</button></div><input type="hidden" name="recordId"><input type="hidden" name="kind"><div id="form-fields" class="form-grid"></div><div id="form-error" class="error" role="alert" hidden></div><div class="dialog-actions"><button type="submit" class="primary">حفظ السجل</button><button type="button" class="close-dialog">إلغاء</button></div></form></dialog>
+<dialog id="confirm" aria-labelledby="confirm-title"><h2 id="confirm-title">تأكيد العملية</h2><p id="confirm-text"></p><div class="dialog-actions"><button id="confirm-yes" class="danger">تأكيد</button><button id="confirm-no">إلغاء</button></div></dialog>
+<input id="import-file" type="file" accept="application/json,.json" hidden>
+<script>(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.FinanceCore = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  const CURRENCIES = ['EGP', 'SAR', 'AED', 'USD', 'EUR'];
+  const MAX_CENTS = 1000000000000;
+  const fail = message => { throw new Error(message); };
+  function parseAmount(value, allowZero = false) {
+    let text = String(value).trim().replace(/[٠-٩]/g, c => String(c.charCodeAt(0) - 1632)).replace(/[۰-۹]/g, c => String(c.charCodeAt(0) - 1776)).replace(/٫/g, '.').replace(/٬/g, ',');
+    if (text.includes(',')) {
+      if (!/^\d{1,3}(,\d{3})+(\.\d{1,2})?$/.test(text)) fail('اكتب الكسور بنقطة، مثل 1250.50. فواصل الآلاف يجب أن تكون مثل 1,250.50.');
+      text = text.replace(/,/g, '');
+    }
+    if (!/^\d+(\.\d{1,2})?$/.test(text)) fail('أدخل مبلغًا موجبًا بمنزلتين عشريتين كحد أقصى.');
+    const [whole, decimal = ''] = text.split('.');
+    const cents = Number(whole) * 100 + Number(decimal.padEnd(2, '0'));
+    if (!Number.isSafeInteger(cents) || cents > MAX_CENTS || cents < (allowZero ? 0 : 1)) fail('المبلغ خارج النطاق المسموح. الحد الأقصى للحركة 10 مليارات من العملة.');
+    return cents;
+  }
+  function decimalString(cents) {
+    if (!Number.isSafeInteger(cents)) fail('المبلغ يتجاوز الدقة المسموحة.');
+    const value = BigInt(cents);
+    const absolute = value < 0n ? -value : value;
+    return `${value < 0n ? '-' : ''}${absolute / 100n}.${String(absolute % 100n).padStart(2, '0')}`;
+  }
+  function add(values) {
+    return values.reduce((sum, value) => {
+      const next = sum + value;
+      if (!Number.isSafeInteger(next)) fail('إجمالي الأرقام يتجاوز دقة الحساب المسموحة.');
+      return next;
+    }, 0);
+  }
+  function dateValid(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value) || value < '1900-01-01' || value > '2200-12-31') return false;
+    return new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) === value;
+  }
+  function shortText(value, name, max = 300, optional = false) {
+    if (typeof value !== 'string' || value.length > max || (!optional && !value.trim())) fail('حقل غير صحيح: ' + name);
+  }
+  function amountValid(value, allowZero = false) {
+    if (!Number.isSafeInteger(value) || value < (allowZero ? 0 : 1) || value > MAX_CENTS) fail('مبلغ محفوظ غير صحيح.');
+  }
+  function allocated(state, claimId, excludedTransactionId = '') {
+    return add(state.transactions.filter(t => t.claimId === claimId && t.id !== excludedTransactionId).map(t => t.amountCents));
+  }
+  function validate(state) {
+    if (!state || state.schemaVersion !== 1 || !Array.isArray(state.projects) || !Array.isArray(state.claims) || !Array.isArray(state.transactions) || !Array.isArray(state.audit)) fail('ملف النسخة الاحتياطية لا يطابق تنسيق الإصدار 1.');
+    if (state.projects.length + state.claims.length + state.transactions.length > 20000 || state.audit.length > 100000) fail('الملف أكبر من سعة هذه النسخة المحلية.');
+    const all = [...state.projects, ...state.claims, ...state.transactions];
+    const ids = new Set();
+    for (const row of all) {
+      if (!row || typeof row.id !== 'string' || !/^[\w-]{1,100}$/.test(row.id) || ids.has(row.id)) fail('رقم سجل مكرر أو غير صحيح.');
+      ids.add(row.id);
+    }
+    const projects = new Map(state.projects.map(p => [p.id, p]));
+    const claims = new Map(state.claims.map(c => [c.id, c]));
+    for (const project of state.projects) {
+      shortText(project.name, 'المشروع', 120);
+      shortText(project.client, 'العميل / الجهة', 120);
+      if (!CURRENCIES.includes(project.currency)) fail('عملة غير مدعومة.');
+      amountValid(project.contractCents, true);
+    }
+    const references = new Set();
+    for (const claim of state.claims) {
+      if (!projects.has(claim.projectId) || !['in', 'out'].includes(claim.direction)) fail('مشروع المطالبة أو اتجاهها غير صحيح.');
+      shortText(claim.number, 'رقم المطالبة', 100);
+      shortText(claim.party, 'جهة المطالبة', 120);
+      shortText(claim.note, 'ملاحظات المطالبة', 1000, true);
+      if (!dateValid(claim.date) || !dateValid(claim.dueDate) || claim.dueDate < claim.date) fail('تواريخ المطالبة غير صحيحة؛ الاستحقاق لا يسبق الإصدار.');
+      amountValid(claim.amountCents);
+      const key = JSON.stringify([claim.projectId, claim.direction, claim.party.trim().toLowerCase(), claim.number.trim().toLowerCase()]);
+      if (references.has(key)) fail('رقم المطالبة مكرر لنفس المشروع والجهة والاتجاه.');
+      references.add(key);
+    }
+    const transactionReferences = new Set();
+    for (const transaction of state.transactions) {
+      if (!projects.has(transaction.projectId) || !['in', 'out'].includes(transaction.direction)) fail('مشروع الحركة أو اتجاهها غير صحيح.');
+      shortText(transaction.reference, 'مرجع الحركة', 100);
+      shortText(transaction.party, 'جهة الحركة', 120);
+      const transactionKey = JSON.stringify([transaction.projectId, transaction.direction, transaction.party.trim().toLowerCase(), transaction.reference.trim().toLowerCase()]);
+      if (transactionReferences.has(transactionKey)) fail('مرجع الحركة مكرر لنفس المشروع والجهة والاتجاه. راجع السجل قبل تكرار التحصيل أو الدفع.');
+      transactionReferences.add(transactionKey);
+      shortText(transaction.party, 'جهة الحركة', 120);
+      shortText(transaction.note, 'ملاحظات الحركة', 1000, true);
+      if (!dateValid(transaction.date)) fail('تاريخ الحركة غير صحيح.');
+      amountValid(transaction.amountCents);
+      if (transaction.claimId !== null) {
+        const claim = claims.get(transaction.claimId);
+        if (!claim || claim.projectId !== transaction.projectId || claim.direction !== transaction.direction || claim.party.trim().toLowerCase() !== transaction.party.trim().toLowerCase()) fail('يجب ربط الحركة بمطالبة لنفس المشروع والاتجاه والجهة.');
+      }
+    }
+    for (const claim of state.claims) {
+      if (allocated(state, claim.id) > claim.amountCents) fail('المبلغ المرتبط يتجاوز رصيد المطالبة. سجّل الزيادة كحركة غير مخصصة.');
+    }
+    for (const entry of state.audit) {
+      if (!entry || typeof entry.at !== 'string' || typeof entry.action !== 'string' || typeof entry.kind !== 'string' || typeof entry.recordId !== 'string') fail('سجل التعديلات غير صحيح.');
+    }
+    for (const currency of CURRENCIES) summary(state, currency);
+    return state;
+  }
+  function empty() { return {schemaVersion: 1, projects: [], claims: [], transactions: [], audit: []}; }
+  function clone(value) { return JSON.parse(JSON.stringify(value)); }
+  function saveRecord(state, kind, record, timestamp = new Date().toISOString()) {
+    if (!['projects', 'claims', 'transactions'].includes(kind)) fail('نوع سجل غير صحيح.');
+    const next = clone(state);
+    const index = next[kind].findIndex(row => row.id === record.id);
+    const before = index < 0 ? null : next[kind][index];
+    if (kind === 'projects' && before && before.currency !== record.currency && [...state.claims, ...state.transactions].some(row => row.projectId === record.id)) fail('لا يمكن تغيير عملة مشروع له حركات أو مطالبات.');
+    if (index < 0) next[kind].push(clone(record)); else next[kind][index] = clone(record);
+    next.audit.push({at: timestamp, action: before ? 'edit' : 'add', kind, recordId: record.id, before, after: clone(record)});
+    return validate(next);
+  }
+  function deleteRecord(state, kind, id, timestamp = new Date().toISOString()) {
+    if (!['projects', 'claims', 'transactions'].includes(kind)) fail('نوع سجل غير صحيح.');
+    const record = state[kind].find(row => row.id === id);
+    if (!record) fail('السجل غير موجود.');
+    if (kind === 'projects' && [...state.claims, ...state.transactions].some(row => row.projectId === id)) fail('لا يمكن حذف مشروع له مطالبات أو حركات.');
+    if (kind === 'claims' && state.transactions.some(t => t.claimId === id)) fail('فك ارتباط الحركات أو صححها قبل حذف المطالبة.');
+    const next = clone(state);
+    next[kind] = next[kind].filter(row => row.id !== id);
+    next.audit.push({at: timestamp, action: 'delete', kind, recordId: id, before: clone(record), after: null});
+    return validate(next);
+  }
+  function summary(state, currency, projectId = '') {
+    const ids = new Set(state.projects.filter(p => p.currency === currency && (!projectId || p.id === projectId)).map(p => p.id));
+    const claims = state.claims.filter(c => ids.has(c.projectId));
+    const transactions = state.transactions.filter(t => ids.has(t.projectId));
+    const sum = (rows, direction) => add(rows.filter(r => r.direction === direction).map(r => r.amountCents));
+    const claimedIn = sum(claims, 'in'), claimedOut = sum(claims, 'out');
+    const collected = sum(transactions, 'in'), paid = sum(transactions, 'out');
+    const groups = new Map();
+    for (const row of [...claims, ...transactions]) {
+      const key = JSON.stringify([row.projectId, row.party.trim().toLowerCase()]);
+      if (!groups.has(key)) groups.set(key, {in: 0, out: 0});
+    }
+    for (const claim of claims) {
+      const group = groups.get(JSON.stringify([claim.projectId, claim.party.trim().toLowerCase()]));
+      group[claim.direction] = add([group[claim.direction], claim.amountCents]);
+    }
+    for (const transaction of transactions) {
+      const group = groups.get(JSON.stringify([transaction.projectId, transaction.party.trim().toLowerCase()]));
+      group[transaction.direction] = add([group[transaction.direction], -transaction.amountCents]);
+    }
+    const receivableDue = add([...groups.values()].map(g => Math.max(0, g.in)));
+    const customerCredit = add([...groups.values()].map(g => Math.max(0, -g.in)));
+    const payableDue = add([...groups.values()].map(g => Math.max(0, g.out)));
+    const supplierAdvance = add([...groups.values()].map(g => Math.max(0, -g.out)));
+    return {claimedIn, claimedOut, collected, paid, receivableDue, customerCredit, payableDue, supplierAdvance, receivableNet: add([claimedIn, -collected]), payableNet: add([claimedOut, -paid]), cashFlow: add([collected, -paid]), unallocatedIn: sum(transactions.filter(t => t.claimId === null), 'in'), unallocatedOut: sum(transactions.filter(t => t.claimId === null), 'out')};
+  }
+  function claimStatus(state, claim, today) {
+    const settled = allocated(state, claim.id);
+    const balance = claim.amountCents - settled;
+    return {settled, balance, status: balance === 0 ? 'paid' : claim.dueDate < today ? 'overdue' : settled > 0 ? 'partial' : 'open'};
+  }
+  function csvCell(value) {
+    let text = String(value ?? '');
+    if (/^[\s]*[=+\-@\t\r\n]/.test(text)) text = "'" + text;
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+  return {CURRENCIES, MAX_CENTS, parseAmount, decimalString, add, allocated, validate, empty, saveRecord, deleteRecord, summary, claimStatus, csvCell};
+});
+</script>
+<script>'use strict';
+(() => {
+  const F = window.FinanceCore;
+  const KEY = 'ronix-finance-v1';
+  const $ = selector => document.querySelector(selector);
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+  const uid = () => (globalThis.crypto?.randomUUID?.() || `r-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const currencyNames = {EGP:'جنيه مصري',SAR:'ريال سعودي',AED:'درهم إماراتي',USD:'دولار أمريكي',EUR:'يورو'};
+  const kindNames = {projects:'مشروع',claims:'مطالبة',transactions:'حركة نقدية'};
+  const statusNames = {paid:'مسددة',partial:'مسددة جزئيًا',overdue:'متأخرة',open:'مفتوحة'};
+  const money = (cents, currency = $('#currency-filter').value) => new Intl.NumberFormat('ar-EG',{style:'currency',currency,minimumFractionDigits:2,maximumFractionDigits:2}).format(F.decimalString(cents));
+  const amountInput = cents => F.decimalString(cents);
+  const norm = value => value.trim().toLowerCase();
+  let state = F.empty();
+  let writable = true;
+  let rawRecovery = '';
+  let storageVersion = null;
+  function message(text, error = false) {
+    const node = $('#message'); node.textContent = text; node.className = error ? 'error' : ''; node.hidden = false;
+  }
+  try {
+    const raw = localStorage.getItem(KEY);
+    storageVersion = raw;
+    if (raw) { rawRecovery = raw; state = F.validate(JSON.parse(raw)); }
+  } catch (error) {
+    writable = false;
+    message('تعذر قراءة البيانات المحفوظة. لم يتم استبدالها. استخدم تنزيل نسخة احتياطية لحفظ البيانات الخام، ثم استورد نسخة صحيحة. ' + error.message, true);
+  }
+  function commit(next, restoring = false) {
+    if (!writable && !restoring) throw new Error('الحفظ متوقف لحماية البيانات غير المقروءة. استورد نسخة صحيحة أولًا.');
+    F.validate(next);
+    next.lastSaved = new Date().toISOString();
+    if (!restoring && localStorage.getItem(KEY) !== storageVersion) throw new Error('تغيرت البيانات في نافذة أخرى. حدّث الصفحة قبل الحفظ لتجنب استبدال التعديلات الأحدث.');
+    const encoded = JSON.stringify(next);
+    try { localStorage.setItem(KEY, encoded); }
+    catch { throw new Error('تعذر الحفظ في المتصفح. قد تكون المساحة ممتلئة أو التخزين محظورًا. لم تتغير السجلات؛ نزّل نسخة احتياطية.'); }
+    storageVersion = encoded; state = next; writable = true; rawRecovery = ''; render();
+  }
+  const projectById = id => state.projects.find(p => p.id === id);
+  const claimById = id => state.claims.find(c => c.id === id);
+  function scopeIds() {
+    return new Set(state.projects.filter(p => p.currency === $('#currency-filter').value && (!$('#project-filter').value || p.id === $('#project-filter').value)).map(p=>p.id));
+  }
+  function scoped(kind) { const ids=scopeIds(); return state[kind].filter(r=>ids.has(r.projectId)); }
+  function actionButtons(kind,id) { return `<div class="row-actions"><button data-action="edit" data-kind="${kind}" data-id="${escape(id)}">تعديل</button><button data-action="delete" data-kind="${kind}" data-id="${escape(id)}" class="danger">حذف</button></div>`; }
+  function emptyRow(columns,text) { return `<tr><td colspan="${columns}" class="empty">${escape(text)}</td></tr>`; }
+  function rowMoney(cents,currency) { return `<span class="money">${escape(money(cents,currency))}</span>`; }
+  function render() {
+    const currency = $('#currency-filter').value;
+    const previous = $('#project-filter').value;
+    $('#project-filter').innerHTML = '<option value="">كل مشاريع العملة</option>' + state.projects.filter(p=>p.currency===currency).map(p=>`<option value="${escape(p.id)}">${escape(p.name)}</option>`).join('');
+    if ([...$('#project-filter').options].some(o=>o.value===previous)) $('#project-filter').value=previous;
+    const summary = F.summary(state,currency,$('#project-filter').value);
+    $('#scope').textContent = `· ${currencyNames[currency]} · ${projectById($('#project-filter').value)?.name || 'كل المشاريع'}`;
+    const cards = [
+      ['مطالبات لنا',summary.claimedIn,''],['تحصيلات فعلية',summary.collected,'positive'],['مستحق لنا بعد التحصيلات',summary.receivableDue,'warning'],['رصيد مقدم من العملاء',summary.customerCredit,''],
+      ['مطالبات علينا',summary.claimedOut,''],['دفعات فعلية',summary.paid,''],['مستحق علينا بعد الدفعات',summary.payableDue,'warning'],['مقدم مدفوع للجهات',summary.supplierAdvance,''],
+      ['صافي التدفق النقدي',summary.cashFlow,summary.cashFlow>=0?'positive':'warning'],['تحصيلات غير مخصصة',summary.unallocatedIn,''],['دفعات غير مخصصة',summary.unallocatedOut,'']
+    ];
+    $('#summary').innerHTML=cards.map(([label,value,kind])=>`<div class="card ${kind}"><span>${label}</span><strong>${escape(money(value,currency))}</strong></div>`).join('');
+    $('#saved-at').textContent = state.lastSaved ? `آخر حفظ: ${new Date(state.lastSaved).toLocaleString('ar-EG')}` : 'لم تُسجل بيانات بعد';
+    $('#clear-demo').hidden = !state.projects.some(p=>p.id==='demo-project');
+    $('#demo').disabled = !writable || state.projects.length>0 || state.claims.length>0 || state.transactions.length>0;
+    $('#projects-body').innerHTML=state.projects.map(p=>`<tr><td>${escape(p.name)}</td><td>${escape(p.client)}</td><td>${escape(p.currency)}</td><td>${rowMoney(p.contractCents,p.currency)}</td><td>${actionButtons('projects',p.id)}</td></tr>`).join('') || emptyRow(5,'ابدأ بإضافة مشروع، أو جرّب بيانات المثال.');
+    $('#claims-body').innerHTML=scoped('claims').slice().sort((a,b)=>a.dueDate.localeCompare(b.dueDate)).map(c=>{
+      const s=F.claimStatus(state,c,today());
+      return `<tr><td>${escape(c.number)}<small>${escape(c.party)}</small><small>${escape(c.note)}</small></td><td>${escape(projectById(c.projectId).name)}</td><td>${c.direction==='in'?'مستحقة لنا':'مستحقة علينا'}</td><td>${escape(c.date)}<small>استحقاق: ${escape(c.dueDate)}</small></td><td>${rowMoney(c.amountCents)}</td><td>${rowMoney(s.settled)}</td><td>${rowMoney(s.balance)}</td><td><span class="badge ${s.status}">${statusNames[s.status]}</span></td><td>${actionButtons('claims',c.id)}</td></tr>`;
+    }).join('')||emptyRow(9,'لا توجد مطالبات ضمن الاختيار الحالي.');
+    $('#transactions-body').innerHTML=scoped('transactions').slice().sort((a,b)=>b.date.localeCompare(a.date)).map(t=>`<tr><td>${escape(t.date)}<small>${escape(t.reference)}</small></td><td>${escape(projectById(t.projectId).name)}<small>${escape(t.party)}</small></td><td>${t.direction==='in'?'تحصيل من جهة':'دفعة لجهة'}</td><td>${rowMoney(t.amountCents)}</td><td>${t.claimId?escape(claimById(t.claimId).number):'غير مخصصة / مقدمة'}</td><td><small>${escape(t.note)}</small></td><td>${actionButtons('transactions',t.id)}</td></tr>`).join('')||emptyRow(7,'لا توجد حركات نقدية ضمن الاختيار الحالي.');
+    const groups=new Map();
+    for(const row of [...scoped('claims'),...scoped('transactions')]) {
+      const key=JSON.stringify([row.projectId,norm(row.party)]);
+      if(!groups.has(key))groups.set(key,{projectId:row.projectId,party:row.party,ci:0,co:0,ti:0,to:0});
+    }
+    for(const c of scoped('claims'))groups.get(JSON.stringify([c.projectId,norm(c.party)]))[c.direction==='in'?'ci':'co']+=c.amountCents;
+    for(const t of scoped('transactions'))groups.get(JSON.stringify([t.projectId,norm(t.party)]))[t.direction==='in'?'ti':'to']+=t.amountCents;
+    $('#statement-body').innerHTML=[...groups.values()].map(g=>`<tr><td>${escape(projectById(g.projectId).name)}<small>${escape(g.party)}</small></td>${[g.ci,g.ti,Math.max(0,g.ci-g.ti),Math.max(0,g.ti-g.ci),g.co,g.to,Math.max(0,g.co-g.to),Math.max(0,g.to-g.co)].map(n=>`<td>${rowMoney(n)}</td>`).join('')}</tr>`).join('')||emptyRow(9,'يظهر الكشف بعد تسجيل مطالبات أو حركات.');
+    $('#audit-body').innerHTML=state.audit.slice(-50).reverse().map(a=>`<tr><td>${escape(new Date(a.at).toLocaleString('ar-EG'))}</td><td>${escape({add:'إضافة',edit:'تعديل',delete:'حذف'}[a.action]||a.action)}</td><td>${escape(kindNames[a.kind]||a.kind)}</td><td>${escape(a.after?.number||a.after?.reference||a.after?.name||a.before?.number||a.before?.reference||a.before?.name||a.recordId)}</td></tr>`).join('')||emptyRow(4,'لا توجد تعديلات بعد.');
+  }
+  function field(name,label,html,wide=false) { return `<div class="field${wide?' wide':''}"><label for="f-${name}">${label}</label>${html}</div>`; }
+  function input(name,value='',type='text',required=true,max=120) { return `<input id="f-${name}" name="${name}" type="${type}" value="${escape(value)}" ${required?'required':''} ${type==='text'?`maxlength="${max}"`:''} ${type==='date'?'min="1900-01-01" max="2200-12-31"':''}>`; }
+  function select(name,options,value) { return `<select id="f-${name}" name="${name}">${options.map(([id,label])=>`<option value="${escape(id)}"${id===value?' selected':''}>${escape(label)}</option>`).join('')}</select>`; }
+  const editor=$('#editor'), form=$('#editor-form');
+  function openEditor(kind,id='') {
+    if(!writable) { message('الحفظ متوقف؛ استورد نسخة صحيحة أولًا.',true); return; }
+    if(kind!=='projects'&&!state.projects.length){message('أضف مشروعًا أولًا، ثم سجّل المطالبات والحركات.',true);return;}
+    const record=state[kind].find(r=>r.id===id)||{};
+    form.reset();form.elements.kind.value=kind;form.elements.recordId.value=id;
+    $('#editor-title').textContent=`${id?'تعديل':'إضافة'} ${kindNames[kind]}`;
+    $('#form-error').hidden=true;
+    let fields='';
+    if(kind==='projects') {
+      fields+=field('name','اسم المشروع',input('name',record.name));
+      fields+=field('client','اسم العميل / الجهة الأساسية',input('client',record.client));
+      fields+=field('currency','عملة المشروع',select('currency',F.CURRENCIES.map(c=>[c,`${currencyNames[c]} (${c})`]),record.currency||$('#currency-filter').value));
+      fields+=field('contract','قيمة العقد المرجعية (اختيارية)',input('contract',amountInput(record.contractCents||0))+'<small>لا تُحسب إيرادًا أو تحصيلًا، ولا تضاف إلى المطالبات.</small>');
+    } else {
+      const preferred=record.projectId||$('#project-filter').value||state.projects.find(p=>p.currency===$('#currency-filter').value)?.id||state.projects[0].id;
+      fields+=field('projectId','المشروع',select('projectId',state.projects.map(p=>[p.id,`${p.name} (${p.currency})`]),preferred));
+      fields+=field('direction',kind==='claims'?'اتجاه المطالبة':'نوع الحركة',select('direction',kind==='claims'?[['in','مطالبة مستحقة لنا'],['out','مطالبة مستحقة علينا']]:[['in','تحصيل دخل فعليًا'],['out','دفعة خرجت فعليًا']],record.direction||'in'));
+      if(kind==='transactions')fields+=field('claimId','تخصيص الحركة لمطالبة',select('claimId',[['','غير مخصصة / دفعة مقدمة']],''),true);
+      fields+=field('party','اسم العميل / المورد / المقاول',input('party',record.party||''));
+      fields+=field(kind==='claims'?'number':'reference',kind==='claims'?'رقم المطالبة':'رقم إيصال / مرجع الحركة',input(kind==='claims'?'number':'reference',record.number||record.reference||'', 'text',true,100));
+      fields+=field('amount',kind==='claims'?'قيمة المطالبة النهائية':'المبلغ النقدي الفعلي',input('amount',record.amountCents?amountInput(record.amountCents):'')+'<small id="amount-hint">منزلتان عشريتان؛ مثال: 1250.50</small>');
+      fields+=field('date',kind==='claims'?'تاريخ الإصدار':'تاريخ الحركة',input('date',record.date||today(),'date'));
+      if(kind==='claims')fields+=field('dueDate','تاريخ الاستحقاق',input('dueDate',record.dueDate||today(),'date'));
+      fields+=field('note','ملاحظات (اختيارية)',`<textarea id="f-note" name="note" rows="3" maxlength="1000">${escape(record.note||'')}</textarea>`,true);
+    }
+    $('#form-fields').innerHTML=fields;
+    if(kind==='transactions')syncClaimOptions(record.claimId||'');
+    editor.showModal();
+  }
+  function syncClaimOptions(selected='') {
+    const projectId=form.elements.projectId.value,direction=form.elements.direction.value;
+    const options=[['','غير مخصصة / دفعة مقدمة'],...state.claims.filter(c=>c.projectId===projectId&&c.direction===direction).map(c=>[c.id,`${c.number} — ${c.party} — متبقي ${money(c.amountCents-F.allocated(state,c.id,form.elements.recordId.value),projectById(projectId).currency)}`])];
+    $('#f-claimId').outerHTML=select('claimId',options,selected);
+    syncParty();
+  }
+  function syncParty() {
+    if(form.elements.kind.value!=='transactions')return;
+    const claim=claimById(form.elements.claimId.value);
+    form.elements.party.readOnly=!!claim;
+    if(claim)form.elements.party.value=claim.party;
+  }
+  form.addEventListener('change',event=>{
+    if(form.elements.kind.value==='transactions') {
+      if(['projectId','direction'].includes(event.target.name))syncClaimOptions();
+      if(event.target.name==='claimId')syncParty();
+    }
+  });
+  form.addEventListener('submit',event=>{
+    event.preventDefault();
+    try {
+      const values=new FormData(form),kind=values.get('kind');
+      const text=name=>String(values.get(name)||'').trim();
+      let record={id:text('recordId')||uid()};
+      if(kind==='projects')record={...record,name:text('name'),client:text('client'),currency:text('currency'),contractCents:F.parseAmount(text('contract')||'0',true)};
+      else {
+        record={...record,projectId:text('projectId'),direction:text('direction'),party:text('party'),date:text('date'),amountCents:F.parseAmount(text('amount')),note:text('note')};
+        if(kind==='claims')Object.assign(record,{number:text('number'),dueDate:text('dueDate')});
+        else Object.assign(record,{reference:text('reference'),claimId:text('claimId')||null});
+      }
+      const next=F.saveRecord(state,kind,record);
+      const currency=kind==='projects'?record.currency:projectById(record.projectId).currency;
+      // Selection is presentation only; persistent state changes only after successful storage.
+      const previousCurrency=$('#currency-filter').value;
+      $('#currency-filter').value=currency;
+      try { commit(next); } catch(error) { $('#currency-filter').value=previousCurrency; throw error; }
+      editor.close();message('تم حفظ السجل. يُنصح بتنزيل نسخة احتياطية بعد انتهاء العمل.');
+    } catch(error) { $('#form-error').textContent=error.message;$('#form-error').hidden=false; }
+  });
+  document.querySelectorAll('.close-dialog').forEach(button=>button.addEventListener('click',()=>editor.close()));
+  document.querySelectorAll('[data-new]').forEach(button=>button.addEventListener('click',()=>openEditor(button.dataset.new)));
+  function confirmAction(text) {
+    const dialog=$('#confirm');$('#confirm-text').textContent=text;dialog.returnValue='';dialog.showModal();
+    return new Promise(resolve=>dialog.addEventListener('close',()=>resolve(dialog.returnValue==='yes'),{once:true}));
+  }
+  $('#confirm-yes').addEventListener('click',()=>$('#confirm').close('yes'));
+  $('#confirm-no').addEventListener('click',()=>$('#confirm').close('no'));
+  document.addEventListener('click',async event=>{
+    const button=event.target.closest('button[data-action]');if(!button)return;
+    const {action,kind,id}=button.dataset;
+    if(action==='edit')openEditor(kind,id);
+    else if(action==='delete'&&await confirmAction('هل تريد حذف هذا السجل؟ يُحفظ أثر العملية في سجل التعديلات.')) {
+      try{commit(F.deleteRecord(state,kind,id));message('تم حذف السجل.');}catch(error){message(error.message,true);}
+    }
+  });
+  $('#currency-filter').addEventListener('change',()=>{$('#project-filter').value='';render();});
+  $('#project-filter').addEventListener('change',render);
+  function download(content,name,type='application/json') {
+    const url=URL.createObjectURL(new Blob([content],{type}));
+    const link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  window.addEventListener('storage', event => {
+    if (event.key === KEY || event.key === null) message('تغيرت بيانات الحسابات في نافذة أخرى. حدّث الصفحة قبل متابعة العمل؛ الحفظ من هذه النسخة القديمة متوقف.', true);
+  });
+  function backup() {
+    if(!writable&&rawRecovery){download(rawRecovery,`ronix-recovery-raw-${today()}.txt`,'text/plain');return;}
+    try {
+      const latest = localStorage.getItem(KEY);
+      const data = latest ? F.validate(JSON.parse(latest)) : state;
+      download(JSON.stringify(data,null,2),`ronix-finance-backup-${today()}.json`);
+    } catch { message('تعذر قراءة أحدث البيانات للنسخ الاحتياطي. لم تُنشأ نسخة ناقصة.', true); throw new Error('تعذر إنشاء نسخة احتياطية من البيانات الحالية.'); }
+  }
+  $('#backup').addEventListener('click',()=>{try{backup();}catch(error){message(error.message,true);}});
+  $('#restore').addEventListener('click',()=>$('#import-file').click());
+  $('#import-file').addEventListener('change',async event=>{
+    const file=event.target.files[0];if(!file)return;
+    try {
+      if(file.size>10000000)throw new Error('حجم الملف يتجاوز 10 MB.');
+      const candidate=F.validate(JSON.parse(await file.text()));
+      const currencies=[...new Set(candidate.projects.map(p=>p.currency))].join('، ')||'لا توجد';
+      if(!await confirmAction(`سيستبدل الاستيراد البيانات الحالية بـ ${candidate.projects.length} مشروع و${candidate.claims.length} مطالبة و${candidate.transactions.length} حركة. العملات: ${currencies}. ستُنزل نسخة من البيانات الحالية قبل الاستبدال. هل تتابع؟`))return;
+      backup();commit(candidate,true);message('تم استيراد البيانات والتحقق من أرصدتها.');
+    }catch(error){message('لم يتم الاستيراد: '+error.message,true);}
+    finally{event.target.value='';}
+  });
+  $('#csv').addEventListener('click',()=>{
+    const currency=$('#currency-filter').value;
+    const rows=[['نوع السجل','المشروع','الجهة','العملة','المرجع','التاريخ','الاستحقاق','مبلغ المطالبة','تحصيل','دفعة','المطالبة المرتبطة','المتبقي المرتبط','ملاحظات']];
+    for(const c of scoped('claims'))rows.push([c.direction==='in'?'مطالبة لنا':'مطالبة علينا',projectById(c.projectId).name,c.party,currency,c.number,c.date,c.dueDate,amountInput(c.amountCents),'','',c.number,amountInput(F.claimStatus(state,c,today()).balance),c.note]);
+    for(const t of scoped('transactions'))rows.push([t.direction==='in'?'تحصيل':'دفعة',projectById(t.projectId).name,t.party,currency,t.reference,t.date,'','',t.direction==='in'?amountInput(t.amountCents):'',t.direction==='out'?amountInput(t.amountCents):'',t.claimId?claimById(t.claimId).number:'غير مخصصة','',t.note]);
+    download('\ufeff'+rows.map(row=>row.map(F.csvCell).join(',')).join('\r\n'),`ronix-statement-${currency}-${today()}.csv`,'text/csv;charset=utf-8');
+  });
+  $('#print').addEventListener('click',()=>window.print());
+  $('#demo').addEventListener('click',()=>{
+    if(state.projects.length||!writable)return;
+    try {
+      const date=today();let next=F.empty();
+      next=F.saveRecord(next,'projects',{id:'demo-project',name:'مشروع تجريبي — احذفه قبل العمل الحقيقي',client:'عميل تجريبي',currency:'EGP',contractCents:2000000});
+      next=F.saveRecord(next,'claims',{id:'demo-claim-in',projectId:'demo-project',direction:'in',number:'CL-001',party:'عميل تجريبي',date,dueDate:date,amountCents:1000000,note:'مطالبة مثال بقيمة 10,000 جنيه'});
+      next=F.saveRecord(next,'claims',{id:'demo-claim-out',projectId:'demo-project',direction:'out',number:'SUP-001',party:'مورد تجريبي',date,dueDate:date,amountCents:400000,note:'مطالبة مورد بقيمة 4,000 جنيه'});
+      next=F.saveRecord(next,'transactions',{id:'demo-in',projectId:'demo-project',direction:'in',claimId:'demo-claim-in',reference:'RC-001',party:'عميل تجريبي',date,amountCents:250000,note:'تحصيل جزئي بقيمة 2,500 جنيه'});
+      next=F.saveRecord(next,'transactions',{id:'demo-out',projectId:'demo-project',direction:'out',claimId:'demo-claim-out',reference:'PAY-001',party:'مورد تجريبي',date,amountCents:100000,note:'دفعة بقيمة 1,000 جنيه'});
+      $('#currency-filter').value='EGP';commit(next);message('هذه بيانات مثال فقط: مستحق لنا 7,500 جنيه، وعلينا 3,000 جنيه، وصافي نقدي 1,500 جنيه.');
+    }catch(error){message(error.message,true);}
+  });
+  $('#clear-demo').addEventListener('click',async()=>{
+    if(!state.projects.some(p=>p.id==='demo-project'))return;
+    if(!await confirmAction('سيُحذف مشروع المثال وكل مطالباته وحركاته، بما فيها أي بيانات أضفتها داخل هذا المشروع. ستُنزل نسخة احتياطية أولًا، ولن تُحذف المشاريع الأخرى. هل تتابع؟'))return;
+    try {
+      backup();
+      let next=state;
+      for(const transaction of state.transactions.filter(t=>t.projectId==='demo-project'))next=F.deleteRecord(next,'transactions',transaction.id);
+      for(const claim of state.claims.filter(c=>c.projectId==='demo-project'))next=F.deleteRecord(next,'claims',claim.id);
+      next=F.deleteRecord(next,'projects','demo-project');
+      commit(next);message('تمت إزالة مشروع المثال. يمكنك الآن العمل بمشاريعك الخاصة.');
+    }catch(error){message(error.message,true);}
+  });
+  render();
+})();
+</script>
+</body></html>
