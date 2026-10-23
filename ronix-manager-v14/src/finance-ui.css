@@ -1,0 +1,17 @@
+:root{--paid:#087f46;--due:#c62828}
+.r14-paid{color:var(--paid)!important;font-weight:700}
+.r14-due{color:var(--due)!important;font-weight:700}
+.r14-paid,.r14-due{print-color-adjust:exact;-webkit-print-color-adjust:exact;font-variant-numeric:tabular-nums}
+.r14-logo{display:block;width:86px;height:86px;object-fit:contain;margin:0 auto;border-radius:6px}
+#claimRows{overflow-x:auto}
+.r14-claim-row{display:grid;grid-template-columns:128px minmax(160px,2fr) minmax(110px,1fr) minmax(120px,1fr) 42px;gap:10px;align-items:center;min-width:650px;margin-bottom:10px;border-bottom:1px solid #e2e8f0;padding:10px 0}
+.r14-claim-photo{width:128px;height:96px;display:flex;align-items:center;justify-content:center;background:#f5f7fa;border:1px solid #e0e5ed;border-radius:6px;color:#6b7889;font-size:12px}
+.r14-claim-photo img{width:100%;height:100%;object-fit:contain}
+.r14-claim-row label{font-size:12px;line-height:1.8}
+.r14-claim-row input{border-color:#d6a1a1}
+@media(max-width:650px){.r14-logo{width:44px;height:44px}}
+
+.r14-claims-table table{table-layout:fixed;white-space:normal;min-width:740px}
+.r14-claims-table th,.r14-claims-table td{padding:10px 7px;overflow-wrap:anywhere}
+.r14-claims-table td:nth-child(n+5):nth-child(-n+7){white-space:nowrap;font-size:12px}
+#payamount,#crAmount,#adTotal,.receipt-allocation,.apply-advance{color:var(--paid);font-weight:700}

@@ -65,9 +65,9 @@ try:
         check('reference claim fits one A4 portrait page', len(pdf) == 1 and abs(pdf[0].rect.width - 595.28) < 1 and abs(pdf[0].rect.height - 841.89) < 1)
         check('only project and receipt tables are printed', popup.locator('table').count() == 2)
         check('header uses the claim date', '2026-10-22' in popup.locator('.document-meta').inner_text())
-        check('missing project name uses dash', popup.locator('.projects-table tbody tr').nth(2).locator('td').nth(2).inner_text() == '—')
-        check('total and empty receipt message retained', '12,000' in popup.locator('.claim-total').inner_text() and 'لا توجد دفعات سابقة' in popup.locator('.receipts-table').inner_text())
-        check('no empty settlement tables or duplicate items', 'بنود المستند' not in popup.locator('body').inner_text() and popup.locator('.settlement').count() == 0)
+        check('missing project name uses dash', popup.locator('.project-name').nth(2).inner_text() == '—')
+        check('total and empty receipt message retained', '12,000' in popup.locator('.claim-total').inner_text() and 'لا توجد دفعات مسجلة' in popup.locator('.receipts-table').inner_text())
+        check('no empty settlement tables or duplicate items', 'بنود المستند' not in popup.locator('body').inner_text() and popup.locator('.claim-summary .paid').inner_text().endswith('0 ج.م'))
         pdf[0].get_pixmap(matrix=fitz.Matrix(1.5, 1.5)).save(str(ARTIFACTS / 'claim-reference.png'))
         pdf.close(); popup.close()
 
@@ -83,10 +83,60 @@ try:
         popup, pdf = export_pdf(with_receipts, 'claim-with-receipts')
         check('three projects with photos and receipts fit one page', len(pdf) == 1)
         check('project images finish decoding before print', popup.evaluate('Array.from(document.images).every(i=>i.complete&&i.naturalWidth>0)'))
-        check('partial settlement retained with piastres', '1,000.25' in popup.locator('.settlement').inner_text() and '10,999.75' in popup.locator('.settlement').inner_text())
+        check('partial settlement retained with piastres', '1,000.25' in popup.locator('.claim-summary .paid').inner_text() and '10,999.75' in popup.locator('.claim-total').inner_text())
         check('receipt references and allocated amounts retained', popup.locator('.receipts-table tbody tr').count() == 2 and '2,000.25' in popup.locator('.receipts-table').inner_text() and 'RC-00000000-1111-2222-3333-444444444444' in popup.locator('.receipts-table').inner_text())
+        check('larger project photos preserve their full proportions', popup.locator('.photo img').evaluate_all("els=>els.every(e=>e.clientWidth>=140&&e.clientHeight>=96&&getComputedStyle(e).objectFit==='contain')"))
+        check('actual offline RONIX logo is embedded', popup.locator('.brand-logo').evaluate("e=>e.src.startsWith('data:image/webp;base64,')&&e.naturalWidth>1000"))
+        check('required total deducts only this claim settlement', popup.locator('.projects-table tbody tr').first.locator('td.due').inner_text() == '4,999.75' and '10,999.75' in popup.locator('.claim-total').inner_text())
+        check('payment and required text use consistent colors', popup.locator('.paid').evaluate_all("els=>els.every(e=>getComputedStyle(e).color==='rgb(8, 127, 70)')") and popup.locator('.due').evaluate_all("els=>els.every(e=>getComputedStyle(e).color==='rgb(198, 40, 40)')"))
+        colors={span['color'] for sheet in pdf for block in sheet.get_text('dict')['blocks'] if 'lines' in block for line in block['lines'] for span in line['spans']}
+        check('green and red survive PDF printing with backgrounds disabled', 0x087f46 in colors and 0xc62828 in colors)
+        check('claim table and total fit the paper width', popup.locator('table,.claim-total').evaluate_all("els=>els.every(e=>e.scrollWidth<=e.clientWidth+1)"))
         pdf[0].get_pixmap(matrix=fitz.Matrix(1.5, 1.5)).save(str(ARTIFACTS / 'claim-with-receipts.png'))
         pdf.close(); popup.close()
+
+        # Fully settled and inactive claims must not present a positive payable balance.
+        full = copy.deepcopy(fixture)
+        full['clientReceipts'] = [{'id': 'FULL-'+r['code'], 'code': r['code'], 'date': '2026-10-24', 'amount': r['amount']} for r in full['claims'][0]['projectRows']]
+        full['claimSettlements'] = [{'claimId': 'CL-DEMO-001', 'receiptId': r['id'], 'code': r['code'], 'amount': r['amount']} for r in full['clientReceipts']]
+        popup, pdf = export_pdf(full, 'claim-settled')
+        check('fully paid claim shows zero required and complete paid total', popup.locator('.claim-total bdi').inner_text() == '0' and '12,000' in popup.locator('.claim-summary .paid').inner_text())
+        pdf.close(); popup.close()
+        inactive=copy.deepcopy(fixture); inactive['claims'][0]['status']='ملغاة'
+        popup, pdf = export_pdf(inactive, 'claim-cancelled')
+        check('cancelled claim labels its balance instead of requesting payment', 'ملغاة' in popup.locator('.claim-total').inner_text() and 'إجمالي المطلوب سداده' not in popup.locator('.claim-total').inner_text())
+        pdf.close(); popup.close()
+
+        # Exercise actual application views, including the client and designer sides.
+        ui=copy.deepcopy(with_receipts)
+        ui['assignments']=[{'id':'A1','code':'DEMO-01','designer':'مصمم تجريبي','fee':1500,'kind':'تصميم'}]
+        ui['payments']=[{'id':'PAY-01','code':'DEMO-01','designer':'مصمم تجريبي','amount':500.25,'date':'2026-10-24','method':'نقدي'}]
+        page.evaluate('(v)=>{data=R14.normalize(v);go("claims")}',ui)
+        snapshot=page.evaluate('JSON.stringify(data)')
+        def tones(name, both=True):
+            green=page.locator('#content .r14-paid')
+            red=page.locator('#content .r14-due')
+            check(name+' payments are green', green.count()>0 and green.evaluate_all("els=>els.every(e=>getComputedStyle(e).color==='rgb(8, 127, 70)')"))
+            if both:
+                check(name+' required balances are red', red.count()>0 and red.evaluate_all("els=>els.every(e=>getComputedStyle(e).color==='rgb(198, 40, 40)')"))
+        tones('claims')
+        page.set_viewport_size({'width':1440,'height':1000})
+        page.wait_for_timeout(350)
+        page.screenshot(path=str(ARTIFACTS/'app-claims.png'),full_page=True)
+        for view in ['dashboard','clients','designers','payments','costcenters','reports','advanced']:
+            page.evaluate('(view)=>go(view)',view)
+            tones(view, both=view!='payments')
+        page.evaluate("go('projects');openProject('DEMO-01')")
+        tones('project')
+        page.evaluate("go('clients');selectClient(r14Encode(data.projects[0].client))")
+        tones('client statement')
+        page.evaluate("go('designers');showDesigner(r14Encode('مصمم تجريبي'))")
+        tones('designer statement')
+        page.evaluate("go('claims');openClaim(null,'CL-DEMO-001')")
+        check('editor has larger photos and red monetary inputs', page.locator('.r14-claim-photo').first.evaluate("e=>e.clientWidth>=126&&e.clientHeight>=94") and page.locator('#claimRows input').first.evaluate("e=>getComputedStyle(e).color==='rgb(198, 40, 40)'"))
+        check('editor shows green receipt amounts', page.locator('#claimReceipts .r14-paid').count()==2)
+        page.evaluate('closeModal()')
+        check('viewing and editing without saving leave finance data unchanged', page.evaluate('JSON.stringify(data)')==snapshot)
 
         long_claim = copy.deepcopy(fixture)
         long_claim['projects'] = [{**fixture['projects'][0], 'code': f'PROJECT-{i:03}'} for i in range(1, 46)]

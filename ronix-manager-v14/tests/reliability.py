@@ -14,7 +14,7 @@ with sync_playwright() as pw:
         p.on('dialog',lambda d:d.accept())
         p.on('pageerror',lambda e:errors.append(str(e)))
     setup(page)
-    page.on('request',lambda r:external.append(r.url) if not r.url.startswith('http://127.0.0.1:8004/') else None)
+    page.on('request',lambda r:external.append(r.url) if not r.url.startswith(URL.rsplit('/',1)[0]+'/') and not r.url.startswith('data:') else None)
     page.goto(URL)
     page.evaluate("data=R14.normalize({projects:[{code:'A',name:'test',client:'Client',contract:1234.567,photos:[]}],assignments:[{id:'D',code:'A',designer:'Designer',fee:100}],payments:[],projectExpenses:[{id:'E',code:'A',date:'2026-01-01',category:'مواد',amount:10}]});r14Persist(data);go('dashboard')")
     page.evaluate("editProject('A')");page.locator('#pname').fill('renamed');page.locator('#modalBody form').evaluate('(f)=>f.requestSubmit()')

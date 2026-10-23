@@ -81,7 +81,7 @@ savePayment=function(e,id){
     if(r14Change('حفظ دفعة مصمم',d=>r14Upsert(d,'payments',obj),{id:obj.id,previousAmount:old?.amount,amount}))r14Done('تم حفظ دفعة المصمم');
   }catch(e){alert(e.message)}
 };
-balanceHint=function(){const c=val('paycode'),d=val('paydesigner');if(!c||!d)return;const form=$('payamount')?.closest('form'),match=form?.getAttribute('onsubmit')?.match(/savePayment\(event,'([^']*)'/),old=match?.[1]?data.payments.find(p=>p.id===decodeURIComponent(match[1])):null;const paidBefore=paid(c,d)-(old?.amount||0);$('balanceHint').textContent=`الأتعاب: ${money(fee(c,d))} | المدفوع دون السند الجاري: ${money(paidBefore)} | المتبقي بعد الحفظ: ${money(fee(c,d)-paidBefore-Number(val('payamount')||0))}`};
+balanceHint=function(){const c=val('paycode'),d=val('paydesigner');if(!c||!d)return;const form=$('payamount')?.closest('form'),match=form?.getAttribute('onsubmit')?.match(/savePayment\(event,'([^']*)'/),old=match?.[1]?data.payments.find(p=>p.id===decodeURIComponent(match[1])):null;const paidBefore=paid(c,d)-(old?.amount||0);$('balanceHint').innerHTML=`الأتعاب: ${money(fee(c,d))} | المدفوع دون السند الجاري: ${r14Paid(paidBefore,true)} | المتبقي بعد الحفظ: ${r14Due(fee(c,d)-paidBefore-Number(val('payamount')||0),true)}`};
 saveProjectExpense=function(e,id){
   e.preventDefault();try{
     const old=id?data.projectExpenses.find(x=>x.id===decodeURIComponent(id)):null,code=old?.code||val('ccExpProject'),amount=r14InputMoney('ccExpAmount',{positive:true}),date=r14RequireDate('ccExpDate');
@@ -136,11 +136,11 @@ claimClientProjects=function(){return customerProjects(val('claimClient'))};
 function r14Match(enc){
   const c=data.claims.find(x=>x.id===decodeURIComponent(enc));if(!c)return;if(!R14.active(c))return alert('تجري المطابقة للمطالبات الصادرة والمعتمدة فقط');
   const rows=data.clientReceipts.filter(r=>claimCodes(c).includes(r.code)&&R14.receiptClient(data,r)===R14.claimClient(data,c));
-  modal('مطابقة التحصيل مع المطالبة',`<p>مطالبة ${esc(c.id)} · ${money(c.total)}</p><p class="hint">اختر الجزء المسدد من كل سند. المطابقة لا تنشئ قبضًا جديدًا، ويمكن تصحيحها بوضع صفر.</p><form onsubmit="r14SaveMatch(event,'${enc}')"><div class="tablewrap"><table><thead><tr><th>التاريخ والسند</th><th>المشروع</th><th>متاح لهذه المطالبة</th><th>يُطابق الآن</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.date)}<br>${esc(r.ref||r.batchId||r.id)}</td><td>${esc(r.code)}</td><td>${fmt(R14.delta(r.amount,R14.usedReceipt(data,r.id,c.id)))}</td><td><input aria-label="مبلغ المطابقة" class="field r14-match" type="number" min="0" step="0.01" data-id="${esc(r.id)}" value="${R14.sum(data.claimSettlements.filter(s=>s.receiptId===r.id&&s.claimId===c.id))}"></td></tr>`).join('')||'<tr><td colspan="4">لا يوجد تحصيل مخصص لهذه المشاريع. سجّل القبض ووزعه أولًا.</td></tr>'}</tbody></table></div><div class="modalfoot"><button class="btn primary" type="submit">حفظ المطابقة</button><button type="button" class="btn" onclick="closeModal()">إغلاق</button></div></form>`);
+  modal('مطابقة التحصيل مع المطالبة',`<p>مطالبة ${esc(c.id)} · ${money(c.total)}</p><p class="hint">اختر الجزء المسدد من كل سند. المطابقة لا تنشئ قبضًا جديدًا، ويمكن تصحيحها بوضع صفر.</p><form onsubmit="r14SaveMatch(event,'${enc}')"><div class="tablewrap"><table><thead><tr><th>التاريخ والسند</th><th>المشروع</th><th>متاح لهذه المطالبة</th><th>يُطابق الآن</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.date)}<br>${esc(r.ref||r.batchId||r.id)}</td><td>${esc(r.code)}</td><td>${r14Paid(R14.delta(r.amount,R14.usedReceipt(data,r.id,c.id)))}</td><td><input aria-label="مبلغ المطابقة" class="field r14-match r14-paid" type="number" min="0" step="0.01" data-id="${esc(r.id)}" value="${R14.sum(data.claimSettlements.filter(s=>s.receiptId===r.id&&s.claimId===c.id))}"></td></tr>`).join('')||'<tr><td colspan="4">لا يوجد تحصيل مخصص لهذه المشاريع. سجّل القبض ووزعه أولًا.</td></tr>'}</tbody></table></div><div class="modalfoot"><button class="btn primary" type="submit">حفظ المطابقة</button><button type="button" class="btn" onclick="closeModal()">إغلاق</button></div></form>`);
 }
 function r14SaveMatch(e,enc){e.preventDefault();try{const id=decodeURIComponent(enc),rows=[...document.querySelectorAll('.r14-match')].map(x=>({receiptId:x.dataset.id,amount:R14.amount(x.value||'0')}));if(rows.some(r=>r.amount<0))throw Error('المطابقة لا تقبل مبلغًا سالبًا');if(r14Change('مطابقة مطالبة بالتحصيل',d=>{d.claimSettlements=d.claimSettlements.filter(s=>s.claimId!==id);for(const r of rows.filter(r=>r.amount>0))d.claimSettlements.push({claimId:id,receiptId:r.receiptId,code:d.clientReceipts.find(x=>x.id===r.receiptId).code,amount:r.amount,at:new Date().toISOString()})},{claimId:id}))r14Done('حُفظت المطابقة دون تكرار القبض')}catch(e){alert(e.message)}}
-claimTable=function(cs){return `<div class="tablewrap"><table><thead><tr><th>المطالبة / العميل</th><th>المشاريع</th><th>التاريخ / الاستحقاق</th><th>الحالة</th><th>القيمة</th><th>مسدد بمطابقة</th><th>غير مطابق</th><th>إجراءات</th></tr></thead><tbody>${cs.map(c=>{const enc=r14Encode(c.id),paid=R14.settled(data,c.id),rest=R14.remaining(data,c),active=R14.active(c);return `<tr><td>${esc(c.id)}<br>${esc(R14.claimClient(data,c))}</td><td>${esc(claimCodes(c).join('، '))}</td><td>${esc(c.date)}<br>${esc(c.due||'غير محدد')}</td><td>${esc(R14.status(c))}${active?'<br>'+(!rest?'مسددة':paid?'مسددة جزئيًا':'غير مسددة'):''}</td><td>${fmt(c.total)}</td><td>${fmt(paid)}</td><td>${active?fmt(rest):'—'}</td><td><button class="link" onclick="printClaim('${enc}')">طباعة</button><button class="link" onclick="openClaim(null,'${enc}')">تعديل</button>${active?`<button class="link" onclick="r14Match('${enc}')">مطابقة</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="8">لا توجد مطالبات</td></tr>'}</tbody></table></div>`};
-claimList=function(){const active=data.claims.filter(R14.active),matched=R14.sum(data.claimSettlements),outstanding=R14.delta(R14.sum(active,'total'),matched);return `<div class="v5-metrics">${v5Metric('المطالبات الصادرة والمعتمدة',R14.sum(active,'total'),'المسودات والملغاة مستبعدة')}${v5Metric('مسدد بمطابقة السندات',matched,'لا يزيد القبض مرة ثانية','good')}${v5Metric('متبقي دون مطابقة',outstanding,'قد يكون هناك قبض لم يُطابق بعد','warn')}${v5Metric('رصيد تجاوز الاستحقاق',R14.sum(active.filter(c=>c.due&&c.due<r14Today()),c=>R14.remaining(data,c)),'بحسب المطابقة المسجلة','bad')}</div><div class="panel"><div class="panel-title"><h2>مطالبات العملاء</h2><div class="actions"><button class="btn primary" onclick="openClaim()">+ مطالبة جديدة</button><button class="btn" onclick="openReceipt()">+ تسجيل تحصيل</button><button class="btn" onclick="exportAllExcel()">Excel شامل</button></div></div><p class="hint">طابق السندات مع المطالبات قبل اعتماد المتأخرات. المطابقة تخص مبلغ كل مشروع على حدة.</p>${claimTable(data.claims)}</div><div class="panel"><h2>التحصيل وتوزيع السندات</h2>${receiptTable(data.clientReceipts)}</div>`};
+claimTable=function(cs){return `<div class="tablewrap r14-claims-table"><table><colgroup><col style="width:18%"><col style="width:12%"><col style="width:14%"><col style="width:10%"><col style="width:11%"><col style="width:11%"><col style="width:12%"><col style="width:12%"></colgroup><thead><tr><th>المطالبة / العميل</th><th>المشاريع</th><th>التاريخ / الاستحقاق</th><th>الحالة</th><th>القيمة</th><th class="r14-paid">المسدد</th><th class="r14-due">المطلوب سداده</th><th>إجراءات</th></tr></thead><tbody>${cs.map(c=>{const enc=r14Encode(c.id),paid=R14.settled(data,c.id),rest=R14.remaining(data,c),active=R14.active(c);return `<tr><td>${esc(c.id)}<br>${esc(R14.claimClient(data,c))}</td><td>${esc(claimCodes(c).join('، '))}</td><td>${esc(c.date)}<br>${esc(c.due||'غير محدد')}</td><td>${esc(R14.status(c))}${active?'<br>'+(!rest?'مسددة':paid?'مسددة جزئيًا':'غير مسددة'):''}</td><td>${fmt(c.total)}</td><td>${r14Paid(paid)}</td><td>${active?r14Due(rest):'—'}</td><td><button class="link" onclick="printClaim('${enc}')">طباعة</button><button class="link" onclick="openClaim(null,'${enc}')">تعديل</button>${active?`<button class="link" onclick="r14Match('${enc}')">مطابقة</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="8">لا توجد مطالبات</td></tr>'}</tbody></table></div>`};
+claimList=function(){const active=data.claims.filter(R14.active),matched=R14.sum(data.claimSettlements),outstanding=R14.delta(R14.sum(active,'total'),matched);return `<div class="v5-metrics">${v5Metric('المطالبات الصادرة والمعتمدة',R14.sum(active,'total'),'المسودات والملغاة مستبعدة')}${v5Metric('مسدد بمطابقة السندات',matched,'لا يزيد القبض مرة ثانية','good')}${v5Metric('إجمالي المطلوب سداده',outstanding,'قد يكون هناك قبض لم يُطابق بعد','warn')}${v5Metric('رصيد تجاوز الاستحقاق',R14.sum(active.filter(c=>c.due&&c.due<r14Today()),c=>R14.remaining(data,c)),'بحسب المطابقة المسجلة','bad')}</div><div class="panel"><div class="panel-title"><h2>مطالبات العملاء</h2><div class="actions"><button class="btn primary" onclick="openClaim()">+ مطالبة جديدة</button><button class="btn" onclick="openReceipt()">+ تسجيل تحصيل</button><button class="btn" onclick="exportAllExcel()">Excel شامل</button></div></div><p class="hint">طابق السندات مع المطالبات قبل اعتماد المتأخرات. المطابقة تخص مبلغ كل مشروع على حدة.</p>${claimTable(data.claims)}</div><div class="panel"><h2>التحصيل وتوزيع السندات</h2>${receiptTable(data.clientReceipts)}</div>`};
 
 function r14ClientCashPanel(n){const t=customerTotals(n);return `<div class="panel"><h3>مطابقة قبض العميل</h3><div class="v5-metrics">${v5Metric('قبض فعلي',t.cash,'السندات والمقدمات دون تكرار تخصيصها','good')}${v5Metric('مخصص للمشاريع',t.receipts,'يخفض رصيد عقد المشروع')}${v5Metric('رصيد غير موزع',t.unallocated,'يشمل باقي السندات والمقدمات','warn')}${v5Metric('متبقي بعد كامل قبض العميل',R14.delta(t.contracts,t.cash),'للمراجعة على مستوى العميل؛ الافتتاحي منفصل')}</div><p class="hint">القبض الفعلي = المخصص للمشاريع + غير الموزع. لتوزيع باقي سند قبض، افتح «تعديل» السند وغيّر التوزيع مع إبقاء إجماليه. المقدمات تُوزع من المالية المتقدمة.</p></div>`}
 const r14DisplayClient=displayClientLedger;
@@ -148,7 +148,7 @@ displayClientLedger=function(){r14DisplayClient();const n=val('clientSelect');if
 const r14Advanced=advancedFinance;
 advancedFinance=function(){return r14Advanced().replaceAll('مطالبات تجاوزت تاريخ الاستحقاق','متبقي تجاوز الاستحقاق بحسب المطابقة').replaceAll('مقدم غير موزع','رصيد غير موزع')};
 const r14Dashboard=ccDashboard;
-ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated');return `<div class="panel"><div class="v5-header"><h2>RONIX V14.1 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:R14.sum(data.projectExpenses)}])),'قبض فعلي ناقص دفعات المصممين والمصروفات')}</div></div>`+r14Dashboard()};
+ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated');return `<div class="panel"><div class="v5-header"><h2>RONIX V14.2 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:R14.sum(data.projectExpenses)}])),'قبض فعلي ناقص دفعات المصممين والمصروفات')}</div></div>`+r14Dashboard()};
 function r14ReceiptRows(n){return data.clientReceipts.filter(r=>R14.receiptClient(data,r)===n).sort((a,b)=>a.date.localeCompare(b.date))}
 clientStatementTabs=function(n){const ps=customerProjects(n),t=customerTotals(n);return [
   ['ملخص العميل',[['العميل','العقود','القبض الفعلي','المخصص للمشاريع','غير موزع','متبقي العقود بعد التخصيص'],[n,t.contracts,t.cash,t.receipts,t.unallocated,R14.delta(t.contracts,t.receipts)]]],
@@ -166,63 +166,72 @@ function r14Print(title,tabs,extra=''){
 printCustomerStatement=function(enc){const n=decodeURIComponent(enc);r14Print('كشف حساب '+n,clientStatementTabs(n),'<p class="hint">القبض الفعلي يشمل المقدمات مرة واحدة. توزيع المقدمة حركة تخصيص. الأرصدة الافتتاحية مرجعية منفصلة.</p>')};
 function r14ClaimDocument(c){
   const rows=R14.claimRows(c),codes=new Set(rows.map(r=>r.code));
-  const receipts=data.clientReceipts.filter(r=>codes.has(r.code)).slice().sort((a,b)=>a.date.localeCompare(b.date));
-  const settled=R14.settled(data,c.id);
-  // Keep meaningful legacy descriptions without repeating generated project rows.
+  const receipts=data.clientReceipts.filter(r=>codes.has(r.code)).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  const settled=R14.settled(data,c.id),remaining=R14.remaining(data,c);
+  // Preserve custom legacy descriptions without repeating generated project rows.
   const descriptions=(c.items||[]).filter(item=>!rows.some(r=>
     item.desc===(getP(r.code)?.name||r.code)||item.desc===r.code));
   const printAmount=n=>{const value=R14.cents(n||0)/100;return value.toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(value)?0:2,maximumFractionDigits:2})};
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(c.id)}</title>
   <style>
-  @page{size:A4 portrait;margin:15mm}
+  @page{size:A4 portrait;margin:13mm}
   *{box-sizing:border-box}
   html{background:#edf0f4}
-  body{margin:24px auto;padding:15mm;width:210mm;background:#fff;color:#172b45;font:13px/1.6 Tahoma,Arial,sans-serif;box-shadow:0 2px 14px #172b451a}
-  .claim-header{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;border-bottom:3px solid #b58a48;padding-bottom:12px;margin-bottom:12px;break-inside:avoid}
-  .brand{font:700 32px/1.2 Arial,sans-serif;letter-spacing:3px;color:#76521e}
-  .brand-sub{font:10px/1.6 Arial,sans-serif;letter-spacing:.4px;text-align:right;margin-top:3px}
+  body{margin:24px auto;padding:13mm;width:210mm;background:#fff;color:#172b45;font:13px/1.5 Tahoma,Arial,sans-serif;box-shadow:0 2px 14px #172b451a}
+  .claim-header{display:flex;justify-content:space-between;align-items:center;gap:24px;border-bottom:2px solid #b58a48;padding-bottom:10px;margin-bottom:12px;break-inside:avoid}
+  .brand-logo{display:block;width:82px;height:82px;object-fit:contain;border-radius:3px}
   .document-title{text-align:left;min-width:0}
-  h1{font-size:22px;line-height:1.4;margin:0 0 7px}
-  .document-meta{font-size:12px;overflow-wrap:anywhere;direction:ltr}
-  .client{font-weight:700;margin:0 0 7px}
-  .claim-meta{font-size:12px;margin:0 0 18px}
-  h2{font-size:15px;margin:22px 0 9px;break-after:avoid;page-break-after:avoid}
+  h1{font-size:23px;line-height:1.4;margin:0 0 7px}
+  .document-meta{font-size:11px;overflow-wrap:anywhere;direction:ltr}
+  .client{font-weight:700;margin:0 0 5px;font-size:14px}
+  .claim-meta{font-size:11px;color:#526277;margin:0 0 14px}
+  h2{font-size:14px;margin:15px 0 8px;break-after:avoid;page-break-after:avoid}
   table{border-collapse:collapse;table-layout:fixed;width:100%;margin:0;font-size:12px}
   thead{display:table-header-group}
-  th,td{border:1px solid #d5dde7;padding:8px;text-align:right;vertical-align:middle;overflow-wrap:anywhere}
-  th{color:#526277;font-weight:700;background:#f8f9fb}
+  th,td{border:1px solid #d5dde7;padding:7px;text-align:right;vertical-align:middle;overflow-wrap:anywhere}
+  th{color:#526277;font-weight:700;background:#f8f9fb;font-size:11px}
   tr{break-inside:avoid;page-break-inside:avoid}
   .amount{white-space:nowrap;font-variant-numeric:tabular-nums}
-  .photo{text-align:center}
-  .photo img{display:block;max-width:100%;width:58px;height:44px;object-fit:cover;margin:auto;border-radius:2px}
-  .claim-total{margin:20px 0 0;font-size:14px;font-weight:700;break-inside:avoid;page-break-inside:avoid}
-  .settlement{margin:6px 0 0;font-size:12px}
-  .details,.note{font-size:12px;margin:12px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+  .paid{color:#087f46!important;font-weight:700}
+  .due{color:#c62828!important;font-weight:700}
+  .paid,.due,.claim-header,.claim-total{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .photo{text-align:center;padding:6px}
+  .photo img,.photo-placeholder{display:block;width:100%;height:96px;object-fit:contain;margin:auto;border-radius:3px}
+  .photo-placeholder{display:flex;align-items:center;justify-content:center;border:1px dashed #cbd3df;color:#7d8998;font-size:11px}
+  .project-code{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+  .project-contract{display:block;font-size:10px;color:#526277;margin-top:5px}
+  .claim-summary{margin:14px 0 0;break-inside:avoid;page-break-inside:avoid}
+  .summary-line{display:flex;justify-content:space-between;gap:16px;font-size:12px;padding:3px 0}
+  .claim-total{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:8px;padding:11px 13px;border:1.5px solid #c62828;border-radius:5px;background:#fff7f7;font-size:16px;font-weight:700}
+  .claim-total bdi{font-size:23px;line-height:1.2}
+  .details,.note{font-size:11px;margin:10px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
   .details p{margin:3px 0}
-  .receipt-note{margin:6px 0 0;font-size:10px;color:#526277}
-  .signatures{display:flex;justify-content:space-between;gap:30px;margin-top:48px;font-size:12px;break-inside:avoid;page-break-inside:avoid}
-  @media screen and (max-width:820px){body{width:100%;margin:0;padding:24px}}
-  @media print{html{background:#fff}body{width:auto;margin:0;padding:0;box-shadow:none}th{background:none}.claim-header{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+  .receipt-note{margin:5px 0 0;font-size:10px;color:#526277}
+  .signatures{display:flex;justify-content:space-between;gap:30px;margin-top:24px;font-size:11px;break-inside:avoid;page-break-inside:avoid}
+  @media screen and (max-width:820px){body{width:100%;margin:0;padding:20px}}
+  @media print{html{background:#fff}body{width:auto;margin:0;padding:0;box-shadow:none}}
   </style></head><body>
-  <header class="claim-header"><div><div class="brand" dir="ltr">RONIX</div><div class="brand-sub" dir="ltr">ENGINEERING</div></div>
-  <div class="document-title"><h1>مطالبة مالية مجمعة</h1><div class="document-meta"><bdi>${esc(c.id)}</bdi> · <bdi>${esc(c.date)}</bdi></div></div></header>
+  <header class="claim-header"><img class="brand-logo" src="${R14_LOGO}" alt="RONIX">
+  <div class="document-title"><h1>مطالبة مالية</h1><div class="document-meta"><bdi>${esc(c.id)}</bdi> · <bdi>${esc(c.date)}</bdi></div></div></header>
   <p class="client">السادة / ${esc(R14.claimClient(data,c)||'—')}</p>
-  <p class="claim-meta">تاريخ الاستحقاق: ${esc(c.due||'غير محدد')} | الحالة: ${esc(R14.status(c))}</p>
-  <h2>تفاصيل المشاريع</h2>
-  <table class="projects-table"><colgroup><col style="width:12%"><col style="width:18%"><col style="width:26%"><col style="width:20%"><col style="width:24%"></colgroup>
-  <thead><tr><th>الصورة</th><th>كود المشروع</th><th>المشروع</th><th>قيمة العقد</th><th>قيمة المطالبة (ج.م)</th></tr></thead><tbody>
-  ${rows.map(r=>{const p=getP(r.code),img=p&&cover(p);return `<tr><td class="photo">${img?`<img src="${esc(new URL(img.src,location.href).href)}" alt="${esc(r.code)}">`:'—'}</td><td><bdi>${esc(r.code)}</bdi></td><td>${esc(p?.name||'—')}</td><td class="amount"><bdi>${printAmount(p?.contract||0)}</bdi></td><td class="amount"><bdi>${printAmount(r.amount)}</bdi></td></tr>`}).join('')}
+  <p class="claim-meta">تاريخ الاستحقاق: ${esc(c.due||'غير محدد')} | الحالة: ${esc(R14.status(c))} | جميع المبالغ بالجنيه المصري</p>
+  <table class="projects-table"><colgroup><col style="width:25%"><col style="width:27%"><col style="width:16%"><col style="width:16%"><col style="width:16%"></colgroup>
+  <thead><tr><th>صورة المشروع</th><th>المشروع</th><th>قيمة المطالبة</th><th class="paid">المسدد منها</th><th class="due">المطلوب سداده</th></tr></thead><tbody>
+  ${rows.map(r=>{const p=getP(r.code),img=p&&cover(p),paid=R14.settled(data,c.id,r.code);return `<tr><td class="photo">${img?`<img src="${esc(new URL(img.src,location.href).href)}" alt="${esc(r.code)}">`:'<div class="photo-placeholder">صورة المشروع</div>'}</td><td><bdi class="project-code">${esc(r.code)}</bdi><span class="project-name">${esc(p?.name||'—')}</span><span class="project-contract">العقد: <bdi>${printAmount(p?.contract||0)}</bdi> ج.م</span></td><td class="amount"><bdi>${printAmount(r.amount)}</bdi></td><td class="amount paid"><bdi>${printAmount(paid)}</bdi></td><td class="amount due"><bdi>${printAmount(R14.delta(r.amount,paid))}</bdi></td></tr>`}).join('')}
   </tbody></table>
   ${descriptions.length?`<div class="details">${descriptions.map(item=>`<p>${esc(item.desc)} — <bdi>${printAmount(item.amount)}</bdi> ج.م</p>`).join('')}</div>`:''}
-  <div class="claim-total">إجمالي المطالبة الحالية: <bdi>${printAmount(c.total)}</bdi> ج.م
-  ${settled>0?`<p class="settlement">المسدد من هذه المطالبة: <bdi>${printAmount(settled)}</bdi> ج.م &nbsp; | &nbsp; المتبقي منها: <bdi>${printAmount(R14.remaining(data,c))}</bdi> ج.م</p>`:''}</div>
-  <h2>الدفعات السابقة المسجلة</h2>
-  <table class="receipts-table"><colgroup><col style="width:17%"><col style="width:19%"><col style="width:40%"><col style="width:24%"></colgroup>
-  <thead><tr><th>التاريخ</th><th>المشروع</th><th>رقم السند</th><th>الدفعة المخصصة</th></tr></thead><tbody>
-  ${receipts.map(r=>`<tr><td><bdi>${esc(r.date)}</bdi></td><td><bdi>${esc(r.code)}</bdi></td><td><bdi>${esc(r.ref||r.batchId||r.id)}</bdi></td><td class="amount"><bdi>${printAmount(r.amount)}</bdi></td></tr>`).join('')||'<tr><td colspan="4">لا توجد دفعات سابقة</td></tr>'}
+  <section class="claim-summary">
+  <div class="summary-line"><span>إجمالي قيمة المطالبة</span><span><bdi>${printAmount(c.total)}</bdi> ج.م</span></div>
+  <div class="summary-line paid"><span>إجمالي المسدد من هذه المطالبة</span><span><bdi>${printAmount(settled)}</bdi> ج.م</span></div>
+  <div class="claim-total due"><span>${R14.active(c)?'إجمالي المطلوب سداده':'الرصيد الحسابي — '+esc(R14.status(c))}</span><span><bdi>${printAmount(remaining)}</bdi> ج.م</span></div>
+  </section>
+  <h2>الدفعات المسجلة على المشاريع</h2>
+  <table class="receipts-table"><colgroup><col style="width:18%"><col style="width:19%"><col style="width:39%"><col style="width:24%"></colgroup>
+  <thead><tr><th>التاريخ</th><th>المشروع</th><th>رقم السند</th><th class="paid">الدفعة (ج.م)</th></tr></thead><tbody>
+  ${receipts.map(r=>`<tr><td><bdi>${esc(r.date)}</bdi></td><td><bdi>${esc(r.code)}</bdi></td><td><bdi>${esc(r.ref||r.batchId||r.id)}</bdi></td><td class="amount paid"><bdi>${printAmount(r.amount)}</bdi></td></tr>`).join('')||'<tr><td colspan="4">لا توجد دفعات مسجلة</td></tr>'}
   </tbody></table>
-  ${receipts.length?'<p class="receipt-note">الدفعات مبينة على مستوى المشاريع؛ المسدد من هذه المطالبة يُحدد بحسب السندات المرتبطة بها.</p>':''}
+  ${receipts.length?'<p class="receipt-note">يُخصم من المطلوب فقط السداد المرتبط بهذه المطالبة؛ دفعات المشاريع أعلاه قد تخص مطالبات أخرى.</p>':''}
   ${c.note?`<p class="note">${esc(c.note)}</p>`:''}
   <footer class="signatures"><span>إعداد الحسابات: ______________</span><span>اعتماد RONIX: ______________</span></footer>
   </body></html>`;

@@ -1,4 +1,4 @@
-import argparse,json, re, sys
+import argparse,json, re, sys, os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -22,7 +22,7 @@ with sync_playwright() as pw:
     page=context.new_page(); errors=[];dialogs=[]
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.on('dialog',lambda d:(dialogs.append(d.message),d.accept()))
-    page.goto('http://127.0.0.1:8004/RONIX_Manager.html')
+    page.goto(os.environ.get('RONIX_TEST_URL','http://127.0.0.1:8004/RONIX_Manager.html'))
     check('empty startup',page.locator('.r14-welcome').count()==1)
     check('startup script errors',not errors)
     page.locator('#restore').set_input_files(str(ZIP))

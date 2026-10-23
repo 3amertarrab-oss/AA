@@ -1,5 +1,5 @@
 from pathlib import Path
-import re, shutil, zipfile
+import re, shutil, zipfile, base64
 
 ROOT=Path(__file__).resolve().parent
 ORIGINAL=ROOT.parent/'original/ronix_app/RONIX_Manager.html'
@@ -40,7 +40,10 @@ if not (vendor/'fflate-0.8.2.js').exists():
 fflate=(vendor/'fflate-0.8.2.js').read_text()
 if not SOURCE.exists():
     SOURCE.write_text(base)
-base=base.replace('<script>', '<script>\n'+core+'\n'+storage+'\n</script><script>',1)
+logo='data:image/webp;base64,'+base64.b64encode((ROOT/'src/assets/ronix-logo.webp').read_bytes()).decode('ascii')
+ui=(ROOT/'src/finance-ui.js').read_text()
+base=base.replace('</head>', '<style>\n'+(ROOT/'src/finance-ui.css').read_text()+'\n</style></head>',1)
+base=base.replace('<script>', '<script>\n'+core+'\n'+storage+'\n'+ui+'\nconst R14_LOGO="'+logo+'";\n</script><script>',1)
 scripts='\n'.join((ROOT/'src'/n).read_text() for n in ['upgrade.js','import.js'])
 extra='<style>.r14-welcome{border:2px solid #b58a48}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d4a454;outline-offset:2px}.tablewrap{max-width:100%}.modal{max-width:min(1100px,96vw)}.modal .formgrid label{min-width:0}</style>'
 base+='\n'+extra+'\n<script>\n'+fflate+'\n</script><script>\n'+scripts+'\n</script>\n'
