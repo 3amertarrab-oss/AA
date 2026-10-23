@@ -1,9 +1,11 @@
 {
-  "passed": 53,
+  "passed": 56,
   "checks": [
     "claim-reference: no changes to financial records",
     "reference claim fits one A4 portrait page",
     "only project and receipt tables are printed",
+    "brief client introduction precedes project details",
+    "claim summary follows receipts and precedes signatures",
     "header uses the claim date",
     "missing project name uses dash",
     "total and empty receipt message retained",
@@ -12,8 +14,9 @@
     "three projects with photos and receipts fit one page",
     "project images finish decoding before print",
     "partial settlement retained with piastres",
-    "receipt references and allocated amounts retained",
+    "allocated amounts retained and receipt references excluded",
     "larger project photos preserve their full proportions",
+    "logo has transparent pixels outside and inside the ring",
     "actual offline RONIX logo is embedded",
     "required total deducts only this claim settlement",
     "payment and required text use consistent colors",

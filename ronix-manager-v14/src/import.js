@@ -1,6 +1,6 @@
 let r14PendingImport=null;
 function r14BytesBase64(bytes){let s='';for(let i=0;i<bytes.length;i+=16384)s+=String.fromCharCode(...bytes.subarray(i,i+16384));return btoa(s)}
-function r14ImportSummary(v){return `${v.projects.length} مشروع · ${v.assignments.length} تكليف مصمم · ${v.payments.length} دفعة مصمم · ${v.claims.length} مطالبة · ${v.clientReceipts.length} سطر تحصيل · ${v.advances.length} مقدمة · ${v.projectExpenses.length} مصروف · ${Object.keys(v.receiptAttachments).length} مرفق`}
+function r14ImportSummary(v){return `${v.projects.length} مشروع · ${v.assignments.length} تكليف مصمم · ${v.payments.length} دفعة مصمم · ${v.claims.length} مطالبة · ${v.clientReceipts.length} سطر تحصيل · ${v.advances.length} مقدمة · ${v.projectExpenses.length} مصروف · ${Object.keys(v.receiptAttachments).length+Object.keys(v.paymentAttachments).length} مرفق`}
 function r14PreviewImport(value,name){
   const next=R14.validate(value);r14PendingImport=next;
   const photos=next.projects.reduce((n,p)=>n+(p.photos||[]).length,0);
@@ -43,17 +43,17 @@ render=function(){
   r14Render();
   const content=$('content');
   if(r14BootIssue)content.insertAdjacentHTML('afterbegin',`<div class="panel"><h2>البيانات المحفوظة تحتاج استعادة</h2><p>${esc(r14BootIssue)}</p><button class="btn" onclick="r14ExportUnreadable()">تنزيل البيانات قبل الإصلاح</button><button class="btn primary" onclick="$('restore').click()">استيراد نسخة سليمة</button></div>`);
-  else if(!data.projects.length)content.insertAdjacentHTML('afterbegin',`<div class="panel r14-welcome"><h2>برنامجك الأصلي، مع تحسين الحسابات · V14.2</h2><p>ابدأ باستيراد ملف ZIP القديم لنقل المشاريع والمصممين والدفعات والمطالبات والصور.</p><div class="actions"><button class="btn primary" onclick="$('restore').click()">استيراد برنامجك القديم ZIP / JSON</button><button class="btn" onclick="editProject()">إنشاء أول مشروع</button><button class="btn" onclick="r14Help()">طريقة العمل</button></div><p class="hint">تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.</p></div>`);
+  else if(!data.projects.length)content.insertAdjacentHTML('afterbegin',`<div class="panel r14-welcome"><h2>برنامجك الأصلي، مع تحسين الحسابات · V14.3</h2><p>ابدأ باستيراد ملف ZIP القديم لنقل المشاريع والمصممين والدفعات والمطالبات والصور.</p><div class="actions"><button class="btn primary" onclick="$('restore').click()">استيراد برنامجك القديم ZIP / JSON</button><button class="btn" onclick="editProject()">إنشاء أول مشروع</button><button class="btn" onclick="r14Help()">طريقة العمل</button></div><p class="hint">تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.</p></div>`);
 };
 const r14Modal=modal;
 modal=function(title,body){r14Modal(title.replaceAll('*** ',''),body);for(const input of $('modalBody').querySelectorAll('input[type=number]')){input.step='0.01';if(input.min==='1')input.min='0.01'}$('overlay').setAttribute('role','dialog');$('overlay').setAttribute('aria-modal','true');$('overlay').setAttribute('aria-labelledby','modalTitle')};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 $('restore').accept='.json,.zip';
 document.querySelector('.logo').innerHTML=`<img class="r14-logo" src="${R14_LOGO}" alt="RONIX">`;
-document.querySelector('.sublogo').textContent='PROJECT FINANCE · V14.2';
-document.querySelector('.sidebar-footer').innerHTML='RONIX V14.2 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';
+document.querySelector('.sublogo').textContent='PROJECT FINANCE · V14.3';
+document.querySelector('.sidebar-footer').innerHTML='RONIX V14.3 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';
 const help=document.createElement('button');help.className='nav';help.textContent='؟ بدء العمل والمساعدة';help.onclick=r14Help;document.querySelector('.sidebar-footer').before(help);
-document.querySelector('.footer').textContent='RONIX V14.2 · احتفظ بنسخة احتياطية بعد جلسة العمل';
+document.querySelector('.footer').textContent='RONIX V14.3 · احتفظ بنسخة احتياطية بعد جلسة العمل';
 for(const b of document.querySelectorAll('.nav'))b.innerHTML=b.innerHTML.replaceAll('*** ','');
-document.title='RONIX V14.2 | المشاريع والمصممون والتحصيل والمطالبات';
+document.title='RONIX V14.3 | المشاريع والمصممون والتحصيل والمطالبات';
 render();

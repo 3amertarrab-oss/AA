@@ -49,8 +49,10 @@ const R14 = (() => {
       if (d[k] == null && !['projects','assignments','payments'].includes(k)) d[k]=[];
       if (!Array.isArray(d[k])) throw Error('جدول غير صالح: '+k);
     }
-    if (d.receiptAttachments == null || (Array.isArray(d.receiptAttachments)&&d.receiptAttachments.length===0)) d.receiptAttachments={};
-    if (!d.receiptAttachments || typeof d.receiptAttachments!=='object' || Array.isArray(d.receiptAttachments)) throw Error('مرفقات الإيصالات غير صالحة');
+    for(const key of ['receiptAttachments','paymentAttachments']){
+      if(d[key]==null||(Array.isArray(d[key])&&d[key].length===0))d[key]={};
+      if(!d[key]||typeof d[key]!=='object'||Array.isArray(d[key]))throw Error('مرفقات الإيصالات غير صالحة: '+key);
+    }
     if (d.currency && d.currency!=='EGP') throw Error('هذه النسخة تعمل بالجنيه المصري');
     for(const c of d.claims)if(c.items==null)c.items=claimRows(c).map(r=>({desc:String(r.code||''),amount:r.amount}));
     return d;
@@ -107,7 +109,7 @@ const R14 = (() => {
     // Do not execute active content from a restored photo or attachment.
     const safeImage=s=>typeof s==='string'&&(/^(?:data:image\/(?:png|jpeg|webp|gif);base64,[a-zA-Z0-9+/=\s]+)$/.test(s)||/^project_media\/[\w .()\-]+\.(?:png|jpe?g|webp|gif)$/i.test(s));
     for(const p of d.projects)for(const photo of p.photos||[])if(!photo||!safeImage(photo.src))add('مصدر صورة غير مدعوم: '+p.code);
-    for(const f of Object.values(d.receiptAttachments))if(!f||typeof f.data!=='string'||!/^data:(?:image\/(?:png|jpeg|webp|gif)|application\/pdf);base64,[a-zA-Z0-9+/=\s]+$/.test(f.data))add('صيغة مرفق غير مدعومة');
+    for(const f of [...Object.values(d.receiptAttachments),...Object.values(d.paymentAttachments)])if(!f||typeof f.data!=='string'||!/^data:(?:image\/(?:png|jpeg|webp|gif)|application\/pdf);base64,[a-zA-Z0-9+/=\s]+$/.test(f.data))add('صيغة مرفق غير مدعومة');
     return [...new Set(issues)];
   }
   function validate(v){const d=normalize(v),errors=audit(d);if(errors.length)throw Error(errors.slice(0,8).join('\n'));return d}

@@ -1,0 +1,31 @@
+{
+  "passed": 25,
+  "checks": [
+    "designer form previews transfer image before saving",
+    "new designer payment and image saved together",
+    "saved payment document opens after reload",
+    "download preserves original image bytes",
+    "full-size preview opens as a local blob",
+    "editing payment amount retains original transfer image",
+    "one client document covers allocated and unallocated receipt rows",
+    "reallocation preserves receipt image and cash",
+    "client statement exposes its transfer document",
+    "cancelling a selected replacement leaves data unchanged",
+    "failed payment save rolls back both amount and evidence",
+    "failed client receipt save rolls back money and evidence",
+    "bad.html is rejected without changing stored evidence",
+    "fake.png is rejected without changing stored evidence",
+    "too-big.png is rejected without changing stored evidence",
+    "save while reading is blocked without losing existing data",
+    "latest selected file wins when reads finish out of order",
+    "PDF transfer evidence is accepted",
+    "removing evidence retains the payment record and amount",
+    "advance allocation points to original transfer proof without new cash",
+    "advance table exposes transfer evidence",
+    "backup includes both payment and client documents",
+    "backup restore preserves all evidence and balances",
+    "all restored evidence passes data audit",
+    "attachment workflows have no JavaScript exceptions"
+  ],
+  "errors": []
+}

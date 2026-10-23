@@ -74,11 +74,12 @@ saveAssignment=function(e,c,d){
 };
 savePayment=function(e,id){
   e.preventDefault();try{
+    r14ProofReady(e.target);
     const old=id?data.payments.find(p=>p.id===decodeURIComponent(id)):null,code=old?.code||val('paycode'),designer=old?.designer||val('paydesigner'),amount=r14InputMoney('payamount',{positive:true}),date=r14RequireDate('paydate');
     if(!getA(code,designer))throw Error('كلّف المصمم بالمشروع أولًا');
     if(amount>fee(code,designer)-paid(code,designer)+(old?.amount||0)&&!confirm('الدفعة أكبر من المتبقي للمصمم وسيظهر رصيد دائن. متابعة؟'))return;
     const obj={...old,id:old?.id||r14Id('PAY'),code,designer,date,amount,method:val('paymethod'),ref:val('payref'),note:val('paynote'),history:old?[...(old.history||[]),{changed:new Date().toISOString(),previousAmount:old.amount,previousDate:old.date}]:[]};
-    if(r14Change('حفظ دفعة مصمم',d=>r14Upsert(d,'payments',obj),{id:obj.id,previousAmount:old?.amount,amount}))r14Done('تم حفظ دفعة المصمم');
+    if(r14Change('حفظ دفعة مصمم',d=>{r14Upsert(d,'payments',obj);r14AttachTo(d,e.target,'payment',obj.id)},{id:obj.id,previousAmount:old?.amount,amount}))r14Done('تم حفظ دفعة المصمم');
   }catch(e){alert(e.message)}
 };
 balanceHint=function(){const c=val('paycode'),d=val('paydesigner');if(!c||!d)return;const form=$('payamount')?.closest('form'),match=form?.getAttribute('onsubmit')?.match(/savePayment\(event,'([^']*)'/),old=match?.[1]?data.payments.find(p=>p.id===decodeURIComponent(match[1])):null;const paidBefore=paid(c,d)-(old?.amount||0);$('balanceHint').innerHTML=`الأتعاب: ${money(fee(c,d))} | المدفوع دون السند الجاري: ${r14Paid(paidBefore,true)} | المتبقي بعد الحفظ: ${r14Due(fee(c,d)-paidBefore-Number(val('payamount')||0),true)}`};
@@ -94,17 +95,19 @@ const r14ExpenseForm=openProjectExpense;
 openProjectExpense=function(enc='',eid=''){r14ExpenseForm(enc,eid);const old=eid?data.projectExpenses.find(x=>x.id===decodeURIComponent(eid)):null;$('ccExpNotes').closest('.formgrid').insertAdjacentHTML('beforeend',field('ccExpPayee','المستفيد / المورد / المقاول',old?.payee||''))};
 saveCustomerReceipt=function(e){
   e.preventDefault();try{
+    r14ProofReady(e.target);
     const client=val('crClient'),batchId=activeReceiptEdit||r14Id('RC'),total=r14InputMoney('crAmount',{positive:true});
     if(!clientNames().includes(client))throw Error('اختر العميل');
     const allocations=[...document.querySelectorAll('.receipt-allocation')].map(x=>({code:x.dataset.code,amount:R14.amount(x.value||'0')}));
     const old=data.clientReceipts.filter(r=>(r.batchId||r.id)===batchId);
     if(allocations.some(a=>a.amount>Number(getP(a.code).contract)-received(a.code)+R14.sum(old.filter(r=>r.code===a.code)))&&!confirm('التوزيع يتجاوز عقد مشروع وسيظهر رصيد دائن. متابعة؟'))return;
     const next=R14.receiptEdit(data,{batchId,client,date:r14RequireDate('crDate'),total,allocations,method:val('crMethod'),ref:val('crRef'),note:val('crNote'),id:()=>r14Id('R')});
+    r14AttachTo(next,e.target,'receipt',batchId);
     if(r14Persist(next,old.length?'تعديل سند قبض':'إضافة سند قبض',{batchId,total})){activeReceiptEdit=null;r14Done('حُفظ السند والتوزيع؛ الباقي رصيد غير موزع للعميل')}
   }catch(e){alert(e.message)}
 };
 checkAllocationTotal=function(){let el=$('crCheck');if(!el)return;try{const total=R14.amount(val('crAmount')||'0'),sum=R14.sum([...document.querySelectorAll('.receipt-allocation')],x=>x.value||'0'),rest=R14.delta(total,sum);el.style.color=rest<0?'#b33d4a':'#187a56';el.textContent=`السند: ${money(total)} | التوزيع: ${money(sum)} | غير موزع: ${money(rest)}${rest<0?' — التوزيع أكبر من السند':''}`}catch(e){el.textContent=e.message;el.style.color='#b33d4a'}};
-saveAdvance=function(e){e.preventDefault();try{const client=val('adClient'),total=r14InputMoney('adTotal',{positive:true}),date=r14RequireDate('adDate');if(!clientNames().includes(client))throw Error('اختر العميل');const a={id:r14Id('ADV'),client,total,allocated:0,date,ref:val('adRef'),note:val('adNote'),allocations:[]};if(r14Change('قبض دفعة مقدمة',d=>d.advances.push(a),{advanceId:a.id,total}))r14Done('تم حفظ المقدمة كقبض فعلي غير موزع')}catch(e){alert(e.message)}};
+saveAdvance=function(e){e.preventDefault();try{r14ProofReady(e.target);const client=val('adClient'),total=r14InputMoney('adTotal',{positive:true}),date=r14RequireDate('adDate');if(!clientNames().includes(client))throw Error('اختر العميل');const a={id:r14Id('ADV'),client,total,allocated:0,date,ref:val('adRef'),note:val('adNote'),allocations:[]};if(r14Change('قبض دفعة مقدمة',d=>{d.advances.push(a);r14AttachTo(d,e.target,'receipt',a.id)},{advanceId:a.id,total}))r14Done('تم حفظ المقدمة كقبض فعلي غير موزع')}catch(e){alert(e.message)}};
 saveOpening=function(e){e.preventDefault();try{const client=val('obClient'),amount=r14InputMoney('obAmount',{signed:true}),date=r14RequireDate('obDate');if(!clientNames().includes(client))throw Error('اختر العميل');const old=data.openingBalances.find(o=>o.client===client);if(r14Change('حفظ رصيد افتتاحي مرجعي',d=>{d.openingBalances=d.openingBalances.filter(o=>o.client!==client);d.openingBalances.push({client,date,amount,note:val('obNote')})},{client,amount,previousAmount:old?.amount}))r14Done('حُفظ الرصيد الافتتاحي منفصلًا عن العقود')}catch(e){alert(e.message)}};
 applyAdvance=function(e,enc){e.preventDefault();try{
   const a=data.advances.find(a=>a.id===decodeURIComponent(enc));if(!a)throw Error('المقدمة غير موجودة');
@@ -148,7 +151,7 @@ displayClientLedger=function(){r14DisplayClient();const n=val('clientSelect');if
 const r14Advanced=advancedFinance;
 advancedFinance=function(){return r14Advanced().replaceAll('مطالبات تجاوزت تاريخ الاستحقاق','متبقي تجاوز الاستحقاق بحسب المطابقة').replaceAll('مقدم غير موزع','رصيد غير موزع')};
 const r14Dashboard=ccDashboard;
-ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated');return `<div class="panel"><div class="v5-header"><h2>RONIX V14.2 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:R14.sum(data.projectExpenses)}])),'قبض فعلي ناقص دفعات المصممين والمصروفات')}</div></div>`+r14Dashboard()};
+ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated');return `<div class="panel"><div class="v5-header"><h2>RONIX V14.3 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:R14.sum(data.projectExpenses)}])),'قبض فعلي ناقص دفعات المصممين والمصروفات')}</div></div>`+r14Dashboard()};
 function r14ReceiptRows(n){return data.clientReceipts.filter(r=>R14.receiptClient(data,r)===n).sort((a,b)=>a.date.localeCompare(b.date))}
 clientStatementTabs=function(n){const ps=customerProjects(n),t=customerTotals(n);return [
   ['ملخص العميل',[['العميل','العقود','القبض الفعلي','المخصص للمشاريع','غير موزع','متبقي العقود بعد التخصيص'],[n,t.contracts,t.cash,t.receipts,t.unallocated,R14.delta(t.contracts,t.receipts)]]],
@@ -185,7 +188,7 @@ function r14ClaimDocument(c){
   h1{font-size:23px;line-height:1.4;margin:0 0 7px}
   .document-meta{font-size:11px;overflow-wrap:anywhere;direction:ltr}
   .client{font-weight:700;margin:0 0 5px;font-size:14px}
-  .claim-meta{font-size:11px;color:#526277;margin:0 0 14px}
+  .claim-intro{font-size:12px;line-height:1.8;margin:8px 0 12px}.claim-meta{font-size:11px;color:#526277;margin:0 0 14px}
   h2{font-size:14px;margin:15px 0 8px;break-after:avoid;page-break-after:avoid}
   table{border-collapse:collapse;table-layout:fixed;width:100%;margin:0;font-size:12px}
   thead{display:table-header-group}
@@ -216,23 +219,24 @@ function r14ClaimDocument(c){
   <div class="document-title"><h1>مطالبة مالية</h1><div class="document-meta"><bdi>${esc(c.id)}</bdi> · <bdi>${esc(c.date)}</bdi></div></div></header>
   <p class="client">السادة / ${esc(R14.claimClient(data,c)||'—')}</p>
   <p class="claim-meta">تاريخ الاستحقاق: ${esc(c.due||'غير محدد')} | الحالة: ${esc(R14.status(c))} | جميع المبالغ بالجنيه المصري</p>
+  <p class="claim-intro">نشكر لكم ثقتكم وتعاونكم، ويسعدنا مواصلة العمل معكم. نرفق أدناه بيان المشاريع والدفعات المسجلة، مع توضيح المبلغ المطلوب في نهاية البيان.</p>
   <table class="projects-table"><colgroup><col style="width:25%"><col style="width:27%"><col style="width:16%"><col style="width:16%"><col style="width:16%"></colgroup>
   <thead><tr><th>صورة المشروع</th><th>المشروع</th><th>قيمة المطالبة</th><th class="paid">المسدد منها</th><th class="due">المطلوب سداده</th></tr></thead><tbody>
   ${rows.map(r=>{const p=getP(r.code),img=p&&cover(p),paid=R14.settled(data,c.id,r.code);return `<tr><td class="photo">${img?`<img src="${esc(new URL(img.src,location.href).href)}" alt="${esc(r.code)}">`:'<div class="photo-placeholder">صورة المشروع</div>'}</td><td><bdi class="project-code">${esc(r.code)}</bdi><span class="project-name">${esc(p?.name||'—')}</span><span class="project-contract">العقد: <bdi>${printAmount(p?.contract||0)}</bdi> ج.م</span></td><td class="amount"><bdi>${printAmount(r.amount)}</bdi></td><td class="amount paid"><bdi>${printAmount(paid)}</bdi></td><td class="amount due"><bdi>${printAmount(R14.delta(r.amount,paid))}</bdi></td></tr>`}).join('')}
   </tbody></table>
   ${descriptions.length?`<div class="details">${descriptions.map(item=>`<p>${esc(item.desc)} — <bdi>${printAmount(item.amount)}</bdi> ج.م</p>`).join('')}</div>`:''}
+  <h2>الدفعات المسجلة على المشاريع</h2>
+  <table class="receipts-table"><colgroup><col style="width:30%"><col style="width:40%"><col style="width:30%"></colgroup>
+  <thead><tr><th>التاريخ</th><th>المشروع</th><th class="paid">الدفعة (ج.م)</th></tr></thead><tbody>
+  ${receipts.map(r=>`<tr><td><bdi>${esc(r.date)}</bdi></td><td><bdi>${esc(r.code)}</bdi></td><td class="amount paid"><bdi>${printAmount(r.amount)}</bdi></td></tr>`).join('')||'<tr><td colspan="3">لا توجد دفعات مسجلة</td></tr>'}
+  </tbody></table>
+  ${receipts.length?'<p class="receipt-note">يُخصم من المطلوب فقط السداد المرتبط بهذه المطالبة؛ دفعات المشاريع أعلاه قد تخص مطالبات أخرى.</p>':''}
+  ${c.note?`<p class="note">${esc(c.note)}</p>`:''}
   <section class="claim-summary">
   <div class="summary-line"><span>إجمالي قيمة المطالبة</span><span><bdi>${printAmount(c.total)}</bdi> ج.م</span></div>
   <div class="summary-line paid"><span>إجمالي المسدد من هذه المطالبة</span><span><bdi>${printAmount(settled)}</bdi> ج.م</span></div>
   <div class="claim-total due"><span>${R14.active(c)?'إجمالي المطلوب سداده':'الرصيد الحسابي — '+esc(R14.status(c))}</span><span><bdi>${printAmount(remaining)}</bdi> ج.م</span></div>
   </section>
-  <h2>الدفعات المسجلة على المشاريع</h2>
-  <table class="receipts-table"><colgroup><col style="width:18%"><col style="width:19%"><col style="width:39%"><col style="width:24%"></colgroup>
-  <thead><tr><th>التاريخ</th><th>المشروع</th><th>رقم السند</th><th class="paid">الدفعة (ج.م)</th></tr></thead><tbody>
-  ${receipts.map(r=>`<tr><td><bdi>${esc(r.date)}</bdi></td><td><bdi>${esc(r.code)}</bdi></td><td><bdi>${esc(r.ref||r.batchId||r.id)}</bdi></td><td class="amount paid"><bdi>${printAmount(r.amount)}</bdi></td></tr>`).join('')||'<tr><td colspan="4">لا توجد دفعات مسجلة</td></tr>'}
-  </tbody></table>
-  ${receipts.length?'<p class="receipt-note">يُخصم من المطلوب فقط السداد المرتبط بهذه المطالبة؛ دفعات المشاريع أعلاه قد تخص مطالبات أخرى.</p>':''}
-  ${c.note?`<p class="note">${esc(c.note)}</p>`:''}
   <footer class="signatures"><span>إعداد الحسابات: ______________</span><span>اعتماد RONIX: ______________</span></footer>
   </body></html>`;
 }

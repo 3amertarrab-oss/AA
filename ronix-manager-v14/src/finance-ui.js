@@ -6,3 +6,7 @@ function r14MetricTone(label){
   const due=['المتبقي من العقود','رصيد الأتعاب','متبقي التعاقدات','متبقي العقد','متبقي العقود','رصيد تجاوز الاستحقاق','متبقي بعد كامل قبض العميل','متبقي دون مطابقة','إجمالي المطلوب سداده'];
   return paid.includes(label)?'r14-paid':due.includes(label)?'r14-due':'';
 }
+
+function r14ProofStore(kind){if(!['payment','receipt'].includes(kind))throw Error('نوع مستند غير صالح');return kind==='payment'?'paymentAttachments':'receiptAttachments'}
+function r14ProofFile(kind,id){const store=data[r14ProofStore(kind)];return Object.hasOwn(store,id)?store[id]:null}
+function r14ReceiptProofKey(row){const batch=row.batchId||row.id;return row.sourceAdvanceId&&(r14ProofFile('receipt',row.sourceAdvanceId)||!r14ProofFile('receipt',batch))?row.sourceAdvanceId:batch}
