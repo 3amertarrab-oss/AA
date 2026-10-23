@@ -1,0 +1,25 @@
+{
+  "passed": 19,
+  "checks": [
+    "claim-reference: no changes to financial records",
+    "reference claim fits one A4 portrait page",
+    "only project and receipt tables are printed",
+    "header uses the claim date",
+    "missing project name uses dash",
+    "total and empty receipt message retained",
+    "no empty settlement tables or duplicate items",
+    "claim-with-receipts: no changes to financial records",
+    "three projects with photos and receipts fit one page",
+    "project images finish decoding before print",
+    "partial settlement retained with piastres",
+    "receipt references and allocated amounts retained",
+    "claim-long: no changes to financial records",
+    "long claims paginate without dropping project rows",
+    "long claims keep portrait orientation",
+    "claim-legacy-details: no changes to financial records",
+    "custom legacy descriptions remain printable",
+    "notes remain escaped text",
+    "print workflows have no JavaScript exceptions"
+  ],
+  "errors": []
+}

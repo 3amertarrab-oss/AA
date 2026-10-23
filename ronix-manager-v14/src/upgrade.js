@@ -148,7 +148,7 @@ displayClientLedger=function(){r14DisplayClient();const n=val('clientSelect');if
 const r14Advanced=advancedFinance;
 advancedFinance=function(){return r14Advanced().replaceAll('مطالبات تجاوزت تاريخ الاستحقاق','متبقي تجاوز الاستحقاق بحسب المطابقة').replaceAll('مقدم غير موزع','رصيد غير موزع')};
 const r14Dashboard=ccDashboard;
-ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated');return `<div class="panel"><div class="v5-header"><h2>RONIX V14 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:R14.sum(data.projectExpenses)}])),'قبض فعلي ناقص دفعات المصممين والمصروفات')}</div></div>`+r14Dashboard()};
+ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated');return `<div class="panel"><div class="v5-header"><h2>RONIX V14.1 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:R14.sum(data.projectExpenses)}])),'قبض فعلي ناقص دفعات المصممين والمصروفات')}</div></div>`+r14Dashboard()};
 function r14ReceiptRows(n){return data.clientReceipts.filter(r=>R14.receiptClient(data,r)===n).sort((a,b)=>a.date.localeCompare(b.date))}
 clientStatementTabs=function(n){const ps=customerProjects(n),t=customerTotals(n);return [
   ['ملخص العميل',[['العميل','العقود','القبض الفعلي','المخصص للمشاريع','غير موزع','متبقي العقود بعد التخصيص'],[n,t.contracts,t.cash,t.receipts,t.unallocated,R14.delta(t.contracts,t.receipts)]]],
@@ -164,14 +164,77 @@ function r14Print(title,tabs,extra=''){
   w.document.close();w.focus();let printed=false;const printOnce=()=>{if(!printed){printed=true;w.print()}};w.onload=printOnce;setTimeout(()=>{if(w.document.readyState==='complete')printOnce()},500);
 }
 printCustomerStatement=function(enc){const n=decodeURIComponent(enc);r14Print('كشف حساب '+n,clientStatementTabs(n),'<p class="hint">القبض الفعلي يشمل المقدمات مرة واحدة. توزيع المقدمة حركة تخصيص. الأرصدة الافتتاحية مرجعية منفصلة.</p>')};
-printClaim=function(enc){const c=data.claims.find(x=>x.id===decodeURIComponent(enc));if(!c)return;const matched=data.claimSettlements.filter(s=>s.claimId===c.id);r14Print('مطالبة '+c.id,[
-  ['بيانات المطالبة',[['العميل','تاريخ المطالبة','الاستحقاق','الحالة'],[R14.claimClient(data,c),c.date,c.due||'غير محدد',R14.status(c)]]],
-  ['مشاريع المطالبة',[['الكود','المشروع','العقد','قيمة هذه المطالبة للمشروع','مسدد بمطابقة','متبقٍ'],...R14.claimRows(c).map(r=>[r.code,getP(r.code)?.name,Number(getP(r.code)?.contract||0),r.amount,R14.settled(data,c.id,r.code),R14.delta(r.amount,R14.settled(data,c.id,r.code))])]],
-  ['بنود المستند',[['الوصف','المبلغ'],...(c.items||[]).map(i=>[i.desc,i.amount])]],
-  ['إجماليات',[['المطالبة','مسدد بمطابقة','متبقٍ غير مطابق'],[c.total,R14.settled(data,c.id),R14.remaining(data,c)]]],
-  ['سندات مطابقة لهذه المطالبة',[['التاريخ','السند','المشروع','المبلغ المطابق'],...matched.map(s=>{const r=data.clientReceipts.find(x=>x.id===s.receiptId);return [r.date,r.ref||r.batchId||r.id,s.code,s.amount]})]],
-  ['قبض المشاريع للمعلومة',[['التاريخ','المشروع','السند','المبلغ المخصص'],...data.clientReceipts.filter(r=>claimCodes(c).includes(r.code)).map(r=>[r.date,r.code,r.ref||r.batchId||r.id,r.amount])]],
-],`<p>${esc(c.note||'')}</p><p class="hint">السداد المبين مبني على المطابقة المسجلة. قبض المشاريع العام لا يُطرح تلقائيًا من هذه المطالبة.</p><div>${R14.claimRows(c).map(r=>{const img=cover(getP(r.code));return img?`<span><img src="${esc(new URL(img.src,location.href).href)}" alt="${esc(r.code)}"> ${esc(r.code)} </span>`:''}).join('')}</div>`)};
+function r14ClaimDocument(c){
+  const rows=R14.claimRows(c),codes=new Set(rows.map(r=>r.code));
+  const receipts=data.clientReceipts.filter(r=>codes.has(r.code)).slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const settled=R14.settled(data,c.id);
+  // Keep meaningful legacy descriptions without repeating generated project rows.
+  const descriptions=(c.items||[]).filter(item=>!rows.some(r=>
+    item.desc===(getP(r.code)?.name||r.code)||item.desc===r.code));
+  const printAmount=n=>{const value=R14.cents(n||0)/100;return value.toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(value)?0:2,maximumFractionDigits:2})};
+  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(c.id)}</title>
+  <style>
+  @page{size:A4 portrait;margin:15mm}
+  *{box-sizing:border-box}
+  html{background:#edf0f4}
+  body{margin:24px auto;padding:15mm;width:210mm;background:#fff;color:#172b45;font:13px/1.6 Tahoma,Arial,sans-serif;box-shadow:0 2px 14px #172b451a}
+  .claim-header{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;border-bottom:3px solid #b58a48;padding-bottom:12px;margin-bottom:12px;break-inside:avoid}
+  .brand{font:700 32px/1.2 Arial,sans-serif;letter-spacing:3px;color:#76521e}
+  .brand-sub{font:10px/1.6 Arial,sans-serif;letter-spacing:.4px;text-align:right;margin-top:3px}
+  .document-title{text-align:left;min-width:0}
+  h1{font-size:22px;line-height:1.4;margin:0 0 7px}
+  .document-meta{font-size:12px;overflow-wrap:anywhere;direction:ltr}
+  .client{font-weight:700;margin:0 0 7px}
+  .claim-meta{font-size:12px;margin:0 0 18px}
+  h2{font-size:15px;margin:22px 0 9px;break-after:avoid;page-break-after:avoid}
+  table{border-collapse:collapse;table-layout:fixed;width:100%;margin:0;font-size:12px}
+  thead{display:table-header-group}
+  th,td{border:1px solid #d5dde7;padding:8px;text-align:right;vertical-align:middle;overflow-wrap:anywhere}
+  th{color:#526277;font-weight:700;background:#f8f9fb}
+  tr{break-inside:avoid;page-break-inside:avoid}
+  .amount{white-space:nowrap;font-variant-numeric:tabular-nums}
+  .photo{text-align:center}
+  .photo img{display:block;max-width:100%;width:58px;height:44px;object-fit:cover;margin:auto;border-radius:2px}
+  .claim-total{margin:20px 0 0;font-size:14px;font-weight:700;break-inside:avoid;page-break-inside:avoid}
+  .settlement{margin:6px 0 0;font-size:12px}
+  .details,.note{font-size:12px;margin:12px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+  .details p{margin:3px 0}
+  .receipt-note{margin:6px 0 0;font-size:10px;color:#526277}
+  .signatures{display:flex;justify-content:space-between;gap:30px;margin-top:48px;font-size:12px;break-inside:avoid;page-break-inside:avoid}
+  @media screen and (max-width:820px){body{width:100%;margin:0;padding:24px}}
+  @media print{html{background:#fff}body{width:auto;margin:0;padding:0;box-shadow:none}th{background:none}.claim-header{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+  </style></head><body>
+  <header class="claim-header"><div><div class="brand" dir="ltr">RONIX</div><div class="brand-sub" dir="ltr">ENGINEERING</div></div>
+  <div class="document-title"><h1>مطالبة مالية مجمعة</h1><div class="document-meta"><bdi>${esc(c.id)}</bdi> · <bdi>${esc(c.date)}</bdi></div></div></header>
+  <p class="client">السادة / ${esc(R14.claimClient(data,c)||'—')}</p>
+  <p class="claim-meta">تاريخ الاستحقاق: ${esc(c.due||'غير محدد')} | الحالة: ${esc(R14.status(c))}</p>
+  <h2>تفاصيل المشاريع</h2>
+  <table class="projects-table"><colgroup><col style="width:12%"><col style="width:18%"><col style="width:26%"><col style="width:20%"><col style="width:24%"></colgroup>
+  <thead><tr><th>الصورة</th><th>كود المشروع</th><th>المشروع</th><th>قيمة العقد</th><th>قيمة المطالبة (ج.م)</th></tr></thead><tbody>
+  ${rows.map(r=>{const p=getP(r.code),img=p&&cover(p);return `<tr><td class="photo">${img?`<img src="${esc(new URL(img.src,location.href).href)}" alt="${esc(r.code)}">`:'—'}</td><td><bdi>${esc(r.code)}</bdi></td><td>${esc(p?.name||'—')}</td><td class="amount"><bdi>${printAmount(p?.contract||0)}</bdi></td><td class="amount"><bdi>${printAmount(r.amount)}</bdi></td></tr>`}).join('')}
+  </tbody></table>
+  ${descriptions.length?`<div class="details">${descriptions.map(item=>`<p>${esc(item.desc)} — <bdi>${printAmount(item.amount)}</bdi> ج.م</p>`).join('')}</div>`:''}
+  <div class="claim-total">إجمالي المطالبة الحالية: <bdi>${printAmount(c.total)}</bdi> ج.م
+  ${settled>0?`<p class="settlement">المسدد من هذه المطالبة: <bdi>${printAmount(settled)}</bdi> ج.م &nbsp; | &nbsp; المتبقي منها: <bdi>${printAmount(R14.remaining(data,c))}</bdi> ج.م</p>`:''}</div>
+  <h2>الدفعات السابقة المسجلة</h2>
+  <table class="receipts-table"><colgroup><col style="width:17%"><col style="width:19%"><col style="width:40%"><col style="width:24%"></colgroup>
+  <thead><tr><th>التاريخ</th><th>المشروع</th><th>رقم السند</th><th>الدفعة المخصصة</th></tr></thead><tbody>
+  ${receipts.map(r=>`<tr><td><bdi>${esc(r.date)}</bdi></td><td><bdi>${esc(r.code)}</bdi></td><td><bdi>${esc(r.ref||r.batchId||r.id)}</bdi></td><td class="amount"><bdi>${printAmount(r.amount)}</bdi></td></tr>`).join('')||'<tr><td colspan="4">لا توجد دفعات سابقة</td></tr>'}
+  </tbody></table>
+  ${receipts.length?'<p class="receipt-note">الدفعات مبينة على مستوى المشاريع؛ المسدد من هذه المطالبة يُحدد بحسب السندات المرتبطة بها.</p>':''}
+  ${c.note?`<p class="note">${esc(c.note)}</p>`:''}
+  <footer class="signatures"><span>إعداد الحسابات: ______________</span><span>اعتماد RONIX: ______________</span></footer>
+  </body></html>`;
+}
+printClaim=function(enc){
+  const c=data.claims.find(x=>x.id===decodeURIComponent(enc));if(!c)return;
+  const w=window.open('','_blank');if(!w)return alert('اسمح بالنوافذ المنبثقة للطباعة');
+  w.document.open();w.document.write(r14ClaimDocument(c));w.document.close();
+  // Wait for project thumbnails and fonts before opening print preview.
+  const ready=Promise.all([...w.document.images].map(img=>img.decode().catch(()=>{})).concat(w.document.fonts?.ready||[]));
+  ready.then(()=>{if(!w.closed){w.focus();w.print()}});
+};
 const r14OriginalProjectExcel=projectExcel;
 projectExcel=function(enc){const code=decodeURIComponent(enc),original=exportTabs;try{exportTabs=(tabs,name)=>{tabs[1]=['المطالبات',[['المطالبة','التاريخ','الحالة','حصة المشروع','مسدد بمطابقة','المتبقي'],...claimsFor(code).map(c=>[c.id,c.date,R14.status(c),R14.claimAmount(c,code),R14.settled(data,c.id,code),R14.delta(R14.claimAmount(c,code),R14.settled(data,c.id,code))])]];tabs.push(['مصروفات المشروع',[['التاريخ','النوع','المستفيد','المبلغ','المرجع'],...data.projectExpenses.filter(x=>x.code===code).map(x=>[x.date,x.category,x.payee||'',x.amount,x.ref])]]);original(tabs,name)};r14OriginalProjectExcel(enc)}finally{exportTabs=original}};
 const r14OriginalAllExcel=exportAllExcel;
