@@ -1,0 +1,21 @@
+{
+  "passed": 15,
+  "checks": [
+    "editing other fields preserves legacy precision",
+    "cost center rounds legacy contract to piastres",
+    "expense edit rollback after save failure",
+    "signed opening remains separate from contracts",
+    "invalid statement period rejected",
+    "project photo upload and persistence",
+    "project photo cover preserved",
+    "fully unallocated receipt accepted",
+    "receipt attachment is saved",
+    "malformed restore preserves all existing data",
+    "stale tab write blocked",
+    "corrupt stored data is retained",
+    "saving blocked until explicit restore",
+    "no external resources requested",
+    "reliability workflows have no script exceptions"
+  ],
+  "errors": []
+}
