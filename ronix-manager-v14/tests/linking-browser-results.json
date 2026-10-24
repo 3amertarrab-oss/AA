@@ -1,0 +1,30 @@
+{
+  "passed": 24,
+  "checks": [
+    "latest JSON import previews linked repayments and missing photos",
+    "import preserves every financial source record",
+    "import upgrades schema and records automatic linkage",
+    "client and project and claim totals agree exactly",
+    "all original project photo links were recovered",
+    "media recovery preserves financial records and existing matches",
+    "each photo matches the original bytes for its recorded project path",
+    "all embedded images decode successfully",
+    "cost center displays recovered image",
+    "cost center shows matched and outstanding claim balances",
+    "designer screen separates due and overpayment",
+    "designer balances reconcile without cross-project netting",
+    "Excel linked balances match on-screen account source",
+    "new backup embeds every photo and linked settlement",
+    "fresh browser restore retains all images financial records and links",
+    "fresh restore passes core accounting validation",
+    "review exposes missing metadata and excess payments without changing records",
+    "new receipt automatically updates the matching claim",
+    "editing receipt lowers linked repayment without duplicating cash",
+    "receipt correction audit retains previous and new match amounts",
+    "manual partial allocation is not overridden by later save",
+    "explicit re-enable restores automatic matching",
+    "cancelling automatically matched claim releases links but keeps cash",
+    "all linking and recovery workflows have no script exceptions"
+  ],
+  "errors": []
+}

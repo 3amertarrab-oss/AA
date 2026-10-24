@@ -74,11 +74,21 @@ const R14 = (() => {
     if(rest)entries.push({...base,id:old.find(r=>!r.code)?.id||id(),code:'',unallocated:true,receiptOriginal:rest,amount:fx(rest,exchangeRate),cashAmount:fx(rest,exchangeRate)});
     if(!entries.length)throw Error('السند فارغ');
     const last=entries.at(-1),rounding=delta(fx(total,exchangeRate),sum(entries,'cashAmount'));last.cashAmount=sum([{amount:last.cashAmount},{amount:rounding}]);if(!last.code)last.amount=last.cashAmount;
-    const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);return validate(next);
+    const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);
+    // Keep established automatic links where possible after an edit. Manual links
+    // are never clipped silently; validation rejects a change that would break them.
+    const automatic=next.claimSettlements.filter(s=>s.mode==='auto'&&old.some(r=>r.id===s.receiptId));
+    next.claimSettlements=next.claimSettlements.filter(s=>!automatic.includes(s));
+    for(const s of automatic){const r=next.clientReceipts.find(r=>r.id===s.receiptId),c=next.claims.find(c=>c.id===s.claimId);
+      if(!r||!c||r.code!==s.code||receiptClient(next,r)!==claimClient(next,c))continue;
+      const n=Math.min(cents(s.amount),cents(delta(r.amount,usedReceipt(next,r.id))));
+      if(n>0)next.claimSettlements.push({...s,amount:n/100});
+    }
+    return validate(next);
   }
   function normalize(v) {
     if (!v || typeof v!=='object' || Array.isArray(v)) throw Error('الملف لا يحتوي على قاعدة بيانات RONIX');
-    if (v.schemaVersion > 15) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
+    if (v.schemaVersion > 16) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
     const d = copy(v);
     for (const k of arrays) {
       if (d[k] == null && !['projects','assignments','payments'].includes(k)) d[k]=[];
@@ -108,6 +118,7 @@ const R14 = (() => {
     for(const a of d.assignments){linked(a.code,'تكليف');if(!normName(a.designer))add('اسم مصمم فارغ');monetary(a.fee,'أتعاب')}
     for(const p of d.payments){linked(p.code,'دفعة مصمم');monetary(p.amount,'دفعة مصمم',1);dated(p.date,'دفعة مصمم');if(!d.assignments.some(a=>a.code===p.code&&a.designer===p.designer))add('دفعة بلا تكليف مصمم: '+p.id)}
     for(const c of d.claims){
+      if(c.matchMode!=null&&!['auto','manual'].includes(c.matchMode))add('طريقة ربط المطالبة غير صالحة');
       dated(c.date,'مطالبة');dated(c.due,'استحقاق',true);if(c.due&&c.due<c.date)add('استحقاق قبل تاريخ المطالبة: '+c.id);
       if(!['مسودة','صادرة','معتمدة','ملغاة'].includes(status(c)))add('حالة مطالبة غير معروفة: '+c.id);
       monetary(c.total,'إجمالي مطالبة',1);
@@ -133,6 +144,7 @@ const R14 = (() => {
     for(const o of d.openingBalances){monetary(o.amount,'رصيد افتتاحي',-1e13);dated(o.date,'رصيد افتتاحي')}
     for(const x of d.projectExpenses){linked(x.code,'مصروف');monetary(x.amount,'مصروف',1);dated(x.date,'مصروف')}
     for(const s of d.claimSettlements){
+      if(s.mode!=null&&!['auto','manual'].includes(s.mode))add('طريقة التسوية غير صالحة');
       const c=d.claims.find(c=>c.id===s.claimId),r=d.clientReceipts.find(r=>r.id===s.receiptId);
       monetary(s.amount,'تسوية مطالبة',1);
       if(!c||!r||!active(c)||s.code!==r.code||!claimRows(c).some(x=>x.code===s.code)||claimClient(d,c)!==receiptClient(d,r))add('ربط غير صحيح بين مطالبة وتحصيل');

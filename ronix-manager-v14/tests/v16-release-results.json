@@ -1,0 +1,15 @@
+{
+  "version": "V16",
+  "date": "2026-10-25",
+  "scope": "Accounting links and project media recovery; standalone application deferred",
+  "checks": {
+    "unit": 63,
+    "linking_and_recovery": 24,
+    "v15_review": 29,
+    "legacy_browser": 42,
+    "reliability": 15,
+    "attachments": 25,
+    "claim_print": 56
+  },
+  "total_passed": 254
+}

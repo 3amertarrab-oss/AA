@@ -133,11 +133,21 @@ const R14 = (() => {
     if(rest)entries.push({...base,id:old.find(r=>!r.code)?.id||id(),code:'',unallocated:true,receiptOriginal:rest,amount:fx(rest,exchangeRate),cashAmount:fx(rest,exchangeRate)});
     if(!entries.length)throw Error('السند فارغ');
     const last=entries.at(-1),rounding=delta(fx(total,exchangeRate),sum(entries,'cashAmount'));last.cashAmount=sum([{amount:last.cashAmount},{amount:rounding}]);if(!last.code)last.amount=last.cashAmount;
-    const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);return validate(next);
+    const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);
+    // Keep established automatic links where possible after an edit. Manual links
+    // are never clipped silently; validation rejects a change that would break them.
+    const automatic=next.claimSettlements.filter(s=>s.mode==='auto'&&old.some(r=>r.id===s.receiptId));
+    next.claimSettlements=next.claimSettlements.filter(s=>!automatic.includes(s));
+    for(const s of automatic){const r=next.clientReceipts.find(r=>r.id===s.receiptId),c=next.claims.find(c=>c.id===s.claimId);
+      if(!r||!c||r.code!==s.code||receiptClient(next,r)!==claimClient(next,c))continue;
+      const n=Math.min(cents(s.amount),cents(delta(r.amount,usedReceipt(next,r.id))));
+      if(n>0)next.claimSettlements.push({...s,amount:n/100});
+    }
+    return validate(next);
   }
   function normalize(v) {
     if (!v || typeof v!=='object' || Array.isArray(v)) throw Error('الملف لا يحتوي على قاعدة بيانات RONIX');
-    if (v.schemaVersion > 15) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
+    if (v.schemaVersion > 16) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
     const d = copy(v);
     for (const k of arrays) {
       if (d[k] == null && !['projects','assignments','payments'].includes(k)) d[k]=[];
@@ -167,6 +177,7 @@ const R14 = (() => {
     for(const a of d.assignments){linked(a.code,'تكليف');if(!normName(a.designer))add('اسم مصمم فارغ');monetary(a.fee,'أتعاب')}
     for(const p of d.payments){linked(p.code,'دفعة مصمم');monetary(p.amount,'دفعة مصمم',1);dated(p.date,'دفعة مصمم');if(!d.assignments.some(a=>a.code===p.code&&a.designer===p.designer))add('دفعة بلا تكليف مصمم: '+p.id)}
     for(const c of d.claims){
+      if(c.matchMode!=null&&!['auto','manual'].includes(c.matchMode))add('طريقة ربط المطالبة غير صالحة');
       dated(c.date,'مطالبة');dated(c.due,'استحقاق',true);if(c.due&&c.due<c.date)add('استحقاق قبل تاريخ المطالبة: '+c.id);
       if(!['مسودة','صادرة','معتمدة','ملغاة'].includes(status(c)))add('حالة مطالبة غير معروفة: '+c.id);
       monetary(c.total,'إجمالي مطالبة',1);
@@ -192,6 +203,7 @@ const R14 = (() => {
     for(const o of d.openingBalances){monetary(o.amount,'رصيد افتتاحي',-1e13);dated(o.date,'رصيد افتتاحي')}
     for(const x of d.projectExpenses){linked(x.code,'مصروف');monetary(x.amount,'مصروف',1);dated(x.date,'مصروف')}
     for(const s of d.claimSettlements){
+      if(s.mode!=null&&!['auto','manual'].includes(s.mode))add('طريقة التسوية غير صالحة');
       const c=d.claims.find(c=>c.id===s.claimId),r=d.clientReceipts.find(r=>r.id===s.receiptId);
       monetary(s.amount,'تسوية مطالبة',1);
       if(!c||!r||!active(c)||s.code!==r.code||!claimRows(c).some(x=>x.code===s.code)||claimClient(d,c)!==receiptClient(d,r))add('ربط غير صحيح بين مطالبة وتحصيل');
@@ -250,6 +262,113 @@ const R14 = (() => {
 })();
 if(typeof module!=='undefined')module.exports=R14;
 
+/* One source for linked balances. No storage, DOM, network, or floating-point sums. */
+const R16 = ((R) => {
+  const balance = (a, b) => R.delta(a, b);
+  const positive = v => Math.max(0, v);
+  function designer(d, code='', name='') {
+    const assignments=d.assignments.filter(a=>(!code||a.code===code)&&(!name||a.designer===name));
+    const rows=assignments.map(a=>{
+      const paid=R.sum(d.payments.filter(p=>p.code===a.code&&p.designer===a.designer));
+      const net=balance(a.fee,paid);
+      return {code:a.code,designer:a.designer,fee:R.cents(a.fee)/100,paid,net,due:positive(net),credit:positive(-net)};
+    });
+    return {rows,fees:R.sum(rows,'fee'),paid:R.sum(rows,'paid'),due:R.sum(rows,'due'),credit:R.sum(rows,'credit'),net:R.sum(rows,'net')};
+  }
+  function project(d, code) {
+    const p=d.projects.find(p=>p.code===code);if(!p)throw Error('المشروع غير موجود');
+    const receipts=d.clientReceipts.filter(r=>r.code===code),ds=designer(d,code);
+    const contract=R.cents(p.contract||0)/100,received=R.sum(receipts),cash=R.sum(receipts,R.cashReceipt);
+    const claims=R.sum(d.claims.filter(R.active),c=>R.claimAmount(c,code));
+    const matched=R.sum(d.claimSettlements.filter(s=>s.code===code));
+    const expenses=R.sum(d.projectExpenses.filter(x=>x.code===code));
+    return {code,contract,received,cash,fx:balance(cash,received),contractBalance:balance(contract,received),
+      claims,matched,claimDue:balance(claims,matched),unmatched:balance(received,matched),
+      designers:ds,expenses,cost:R.sum([{amount:ds.fees},{amount:expenses}]),
+      profit:balance(contract,R.sum([{amount:ds.fees},{amount:expenses}])),
+      operatingCash:balance(balance(cash,ds.paid),expenses)};
+  }
+  function client(d,name) {
+    const t=R.totals(d,name),cs=d.claims.filter(c=>R.active(c)&&R.claimClient(d,c)===name);
+    const matched=R.sum(cs,c=>R.settled(d,c.id)),fx=R.fxDifference(d,'',name);
+    return {...t,matched,claimDue:balance(t.claims,matched),unmatched:balance(t.receipts,matched),fx,
+      contractBalance:balance(t.contracts,t.receipts),netBalance:balance(balance(t.contracts,t.receipts),t.unallocated),
+      cashDifference:balance(t.cash,R.sum([{amount:t.receipts},{amount:t.unallocated},{amount:fx}]))};
+  }
+  function reconcile(value,at=new Date().toISOString()) {
+    const d=R.normalize(value),previous=d.claimSettlements;
+    // Manual choices are authoritative; invalid manual links must be corrected explicitly.
+    for(const c of d.claims)if(c.matchMode==null&&previous.some(s=>s.claimId===c.id&&s.mode!=='auto'))c.matchMode='manual';
+    d.claimSettlements=previous.filter(s=>s.mode!=='auto');R.validate(d);
+    const changes=[];
+    const valid=(c,r,code)=>c&&r&&R.active(c)&&c.matchMode!=='manual'&&r.code===code&&
+      R.claimRows(c).some(x=>x.code===code)&&R.claimClient(d,c)===R.receiptClient(d,r);
+    const available=(c,r)=>Math.max(0,Math.min(R.cents(R.delta(r.amount,R.usedReceipt(d,r.id))),R.cents(R.delta(R.claimAmount(c,r.code),R.settled(d,c.id,r.code)))));
+    function add(c,r,n,old){
+      if(!n)return;
+      d.claimSettlements.push({...old,claimId:c.id,receiptId:r.id,code:r.code,amount:n/100,mode:'auto',at:old?.at||at});
+    }
+    // Keep established links first, clipping only automatic links after a corrected amount.
+    for(const s of previous.filter(s=>s.mode==='auto')){
+      const c=d.claims.find(c=>c.id===s.claimId),r=d.clientReceipts.find(r=>r.id===s.receiptId);
+      if(valid(c,r,s.code))add(c,r,Math.min(R.cents(s.amount),available(c,r)),s);
+    }
+    for(const r of [...d.clientReceipts].sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.id).localeCompare(String(b.id)))){
+      if(!r.code||R.cents(r.amount)<=R.cents(R.usedReceipt(d,r.id)))continue;
+      const candidates=d.claims.filter(c=>valid(c,r,r.code)&&R.cents(R.claimAmount(c,r.code))>R.cents(R.settled(d,c.id,r.code)));
+      if(candidates.length!==1)continue;
+      const c=candidates[0],n=available(c,r),existing=d.claimSettlements.find(s=>s.mode==='auto'&&s.claimId===c.id&&s.receiptId===r.id);
+      if(existing)existing.amount=R.sum([{amount:existing.amount},{amount:n/100}]);else add(c,r,n);
+    }
+    const key=s=>JSON.stringify([s.claimId,s.receiptId,s.code,s.amount,s.mode||'manual']);
+    const before=previous.map(key).sort(),after=d.claimSettlements.map(key).sort();
+    if(JSON.stringify(before)!==JSON.stringify(after))changes.push({action:'تحديث ربط التحصيل بالمطالبات',at,before:previous,after:R.copy(d.claimSettlements)});
+    return {data:R.validate(d),changes};
+  }
+  function review(d) {
+    const notes=[];
+    for(const p of d.projects){
+      if(!R.normName(p.name))notes.push({type:'project-name',code:p.code,text:'اسم المشروع غير مسجل'});
+      if(!R.normName(p.client))notes.push({type:'project-client',code:p.code,text:'عميل المشروع غير مسجل'});
+      for(const photo of p.photos||[])if(!photo.src.startsWith('data:image/'))notes.push({type:'photo',code:p.code,text:'صورة مرتبطة بملف خارجي وتحتاج تضمينًا في النسخة الاحتياطية'});
+      const a=project(d,p.code);
+      if(a.unmatched>0)notes.push({type:'unmatched',code:p.code,amount:a.unmatched,text:'قبض مخصص للمشروع لم يُربط بمطالبة؛ قد يكون مقدمة أو يحتاج اختيار المطالبة'});
+    }
+    for(const a of designer(d).rows)if(a.credit>0)notes.push({type:'designer-credit',code:a.code,designer:a.designer,amount:a.credit,text:'مدفوع للمصمم يزيد على الأتعاب المسجلة؛ رصيد منفصل للمراجعة'});
+    return notes;
+  }
+  return {project,client,designer,reconcile,review};
+})(typeof module!=='undefined'?require('./finance-core.js'):R14);
+if(typeof module!=='undefined')module.exports=R16;
+
+const R16Media=(()=>{
+  function mime(bytes){
+    if(bytes[0]===137&&bytes[1]===80&&bytes[2]===78&&bytes[3]===71)return 'image/png';
+    if(bytes[0]===255&&bytes[1]===216&&bytes[2]===255)return 'image/jpeg';
+    const first=String.fromCharCode(...bytes.slice(0,12));
+    if(first.startsWith('GIF87a')||first.startsWith('GIF89a'))return 'image/gif';
+    if(first.startsWith('RIFF')&&first.slice(8)==='WEBP')return 'image/webp';
+    throw Error('ملف الصورة لا يحتوي صورة مدعومة');
+  }
+  function recover(value,entries,encode){
+    const data=JSON.parse(JSON.stringify(value)),missing=[],restored=[];
+    for(const p of data.projects)for(const photo of p.photos||[]){
+      if(String(photo.src).startsWith('data:image/'))continue;
+      if(!/^project_media\/[\w .()\-]+\.(png|jpe?g|webp|gif)$/i.test(photo.src))throw Error('مسار صورة غير صالح');
+      const candidates=Object.entries(entries).filter(([path])=>path===photo.src||path.endsWith('/'+photo.src));
+      if(!candidates.length){missing.push({code:p.code,src:photo.src});continue}
+      const bytes=candidates[0][1];
+      if(candidates.some(([,b])=>b.length!==bytes.length||b.some((v,i)=>v!==bytes[i])))throw Error('الأرشيف يحتوي صورًا مختلفة بالاسم نفسه: '+photo.src);
+      const source=photo.src;photo.src='data:'+mime(bytes)+';base64,'+encode(bytes);
+      photo.recoveredFrom=source;restored.push({code:p.code,photoId:photo.id,source});
+    }
+    for(const p of data.projects)if(p.photos?.length&&!p.photos.some(ph=>ph.id===p.coverId))p.coverId=p.photos[0].id;
+    return {data,restored,missing};
+  }
+  return {recover,mime};
+})();
+if(typeof module!=='undefined')module.exports=R16Media;
+
 // Bootstrap runs before the preserved V13 screens. No sample client data shipped.
 const r14Encode = value => encodeURIComponent(value).replace(/'/g,'%27');
 const r14Key = 'ronix_projects_designers_v1';
@@ -274,8 +393,8 @@ function openReceipt(){}
 function r14Paid(value, currency=false){return `<span class="r14-paid">${currency?money(value):fmt(value)}</span>`}
 function r14Due(value, currency=false){return `<span class="r14-due">${currency?money(value):fmt(value)}</span>`}
 function r14MetricTone(label){
-  const paid=['التحصيل','التحصيل المخصص','المحصّل','المحصّل المخصص','المدفوع للمصممين','مدفوع للمصممين','دفعات المصممين','إجمالي القبض الفعلي','قبض فعلي','قبض مخصص للمشاريع','مخصص للمشاريع','مسدد بمطابقة السندات'];
-  const due=['المتبقي من العقود','رصيد الأتعاب','متبقي التعاقدات','متبقي العقد','متبقي العقود','رصيد تجاوز الاستحقاق','متبقي بعد كامل قبض العميل','متبقي دون مطابقة','إجمالي المطلوب سداده'];
+  const paid=['دفعات تزيد على الأتعاب','التحصيل','التحصيل المخصص','المحصّل','المحصّل المخصص','المدفوع للمصممين','مدفوع للمصممين','دفعات المصممين','إجمالي القبض الفعلي','قبض فعلي','قبض مخصص للمشاريع','مخصص للمشاريع','مسدد بمطابقة السندات'];
+  const due=['مستحق للمصممين','المتبقي من العقود','رصيد الأتعاب','متبقي التعاقدات','متبقي العقد','متبقي العقود','رصيد تجاوز الاستحقاق','متبقي بعد كامل قبض العميل','متبقي دون مطابقة','إجمالي المطلوب سداده'];
   return paid.includes(label)?'r14-paid':due.includes(label)?'r14-due':'';
 }
 
@@ -601,8 +720,10 @@ function r14Persist(next,action='حفظ',details={}) {
   try {
     if(r14BootIssue)throw Error('استعد نسخة سليمة أولًا. يمكنك تنزيل البيانات غير المقروءة من التنبيه أعلى الصفحة.');
     if(localStorage.getItem(KEY)!==r14Disk)throw Error('تغيّرت البيانات في نافذة أخرى. نزّل نسخة من هذه النافذة ثم أعد تحميل الصفحة قبل التسجيل.');
-    const checked=R14.validate(next);
-    checked.schemaVersion=15;checked.currency='EGP';
+    const linked=R16.reconcile(next),checked=linked.data;
+    checked.schemaVersion=16;checked.currency='EGP';
+    const previousLinks=JSON.parse(r14Saved).claimSettlements||[];
+    if(JSON.stringify(previousLinks)!==JSON.stringify(checked.claimSettlements))checked.auditTrail.push({id:r14Id('AUD'),at:new Date().toISOString(),action:'تحديث ربط التحصيل بالمطالبات',before:previousLinks,after:R14.copy(checked.claimSettlements)});
     checked.auditTrail.push({id:r14Id('AUD'),at:new Date().toISOString(),action,...details});
     const serialized=JSON.stringify(checked);
     localStorage.setItem(KEY,serialized);
@@ -739,7 +860,7 @@ function r14Match(enc){
   const rows=data.clientReceipts.filter(r=>claimCodes(c).includes(r.code)&&R14.receiptClient(data,r)===R14.claimClient(data,c));
   modal('مطابقة التحصيل مع المطالبة',`<p>مطالبة ${esc(c.id)} · ${money(c.total)}</p><p class="hint">اختر الجزء المسدد من كل سند. المطابقة لا تنشئ قبضًا جديدًا، ويمكن تصحيحها بوضع صفر.</p><form onsubmit="r14SaveMatch(event,'${enc}')"><div class="tablewrap"><table><thead><tr><th>التاريخ والسند</th><th>المشروع</th><th>متاح لهذه المطالبة</th><th>يُطابق الآن</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.date)}<br>${esc(r.ref||r.batchId||r.id)}</td><td>${esc(r.code)}</td><td>${r14Paid(R14.delta(r.amount,R14.usedReceipt(data,r.id,c.id)))}</td><td><input aria-label="مبلغ المطابقة" class="field r14-match r14-paid" type="number" min="0" step="0.01" data-id="${esc(r.id)}" value="${R14.sum(data.claimSettlements.filter(s=>s.receiptId===r.id&&s.claimId===c.id))}"></td></tr>`).join('')||'<tr><td colspan="4">لا يوجد تحصيل مخصص لهذه المشاريع. سجّل القبض ووزعه أولًا.</td></tr>'}</tbody></table></div><div class="modalfoot"><button class="btn primary" type="submit">حفظ المطابقة</button><button type="button" class="btn" onclick="closeModal()">إغلاق</button></div></form>`);
 }
-function r14SaveMatch(e,enc){e.preventDefault();try{const id=decodeURIComponent(enc),rows=[...document.querySelectorAll('.r14-match')].map(x=>({receiptId:x.dataset.id,amount:R14.amount(x.value||'0')}));if(rows.some(r=>r.amount<0))throw Error('المطابقة لا تقبل مبلغًا سالبًا');if(r14Change('مطابقة مطالبة بالتحصيل',d=>{d.claimSettlements=d.claimSettlements.filter(s=>s.claimId!==id);for(const r of rows.filter(r=>r.amount>0))d.claimSettlements.push({claimId:id,receiptId:r.receiptId,code:d.clientReceipts.find(x=>x.id===r.receiptId).code,amount:r.amount,at:new Date().toISOString()})},{claimId:id}))r14Done('حُفظت المطابقة دون تكرار القبض')}catch(e){alert(e.message)}}
+function r14SaveMatch(e,enc){e.preventDefault();try{const id=decodeURIComponent(enc),rows=[...document.querySelectorAll('.r14-match')].map(x=>({receiptId:x.dataset.id,amount:R14.amount(x.value||'0')}));if(rows.some(r=>r.amount<0))throw Error('المطابقة لا تقبل مبلغًا سالبًا');if(r14Change('مطابقة مطالبة بالتحصيل',d=>{d.claims.find(c=>c.id===id).matchMode='manual';d.claimSettlements=d.claimSettlements.filter(s=>s.claimId!==id);for(const r of rows.filter(r=>r.amount>0))d.claimSettlements.push({claimId:id,receiptId:r.receiptId,code:d.clientReceipts.find(x=>x.id===r.receiptId).code,amount:r.amount,at:new Date().toISOString()})},{claimId:id}))r14Done('حُفظت المطابقة دون تكرار القبض')}catch(e){alert(e.message)}}
 claimTable=function(cs){return `<div class="tablewrap r14-claims-table"><table><colgroup><col style="width:18%"><col style="width:12%"><col style="width:14%"><col style="width:10%"><col style="width:11%"><col style="width:11%"><col style="width:12%"><col style="width:12%"></colgroup><thead><tr><th>المطالبة / العميل</th><th>المشاريع</th><th>التاريخ / الاستحقاق</th><th>الحالة</th><th>القيمة</th><th class="r14-paid">المسدد</th><th class="r14-due">المطلوب سداده</th><th>إجراءات</th></tr></thead><tbody>${cs.map(c=>{const enc=r14Encode(c.id),paid=R14.settled(data,c.id),rest=R14.remaining(data,c),active=R14.active(c);return `<tr><td>${esc(c.id)}<br>${esc(R14.claimClient(data,c))}</td><td>${esc(claimCodes(c).join('، '))}</td><td>${esc(c.date)}<br>${esc(c.due||'غير محدد')}</td><td>${esc(R14.status(c))}${active?'<br>'+(!rest?'مسددة':paid?'مسددة جزئيًا':'غير مسددة'):''}</td><td>${fmt(c.total)}</td><td>${r14Paid(paid)}</td><td>${active?r14Due(rest):'—'}</td><td><button class="link" onclick="printClaim('${enc}')">طباعة</button><button class="link" onclick="openClaim(null,'${enc}')">تعديل</button>${active?`<button class="link" onclick="r14Match('${enc}')">مطابقة</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="8">لا توجد مطالبات</td></tr>'}</tbody></table></div>`};
 claimList=function(){const active=data.claims.filter(R14.active),matched=R14.sum(data.claimSettlements),outstanding=R14.delta(R14.sum(active,'total'),matched);return `<div class="v5-metrics">${v5Metric('المطالبات الصادرة والمعتمدة',R14.sum(active,'total'),'المسودات والملغاة مستبعدة')}${v5Metric('مسدد بمطابقة السندات',matched,'لا يزيد القبض مرة ثانية','good')}${v5Metric('إجمالي المطلوب سداده',outstanding,'قد يكون هناك قبض لم يُطابق بعد','warn')}${v5Metric('رصيد تجاوز الاستحقاق',R14.sum(active.filter(c=>c.due&&c.due<r14Today()),c=>R14.remaining(data,c)),'بحسب المطابقة المسجلة','bad')}</div><div class="panel"><div class="panel-title"><h2>مطالبات العملاء</h2><div class="actions"><button class="btn primary" onclick="openClaim()">+ مطالبة جديدة</button><button class="btn" onclick="openReceipt()">+ تسجيل تحصيل</button><button class="btn" onclick="exportAllExcel()">Excel شامل</button></div></div><p class="hint">طابق السندات مع المطالبات قبل اعتماد المتأخرات. المطابقة تخص مبلغ كل مشروع على حدة.</p>${claimTable(data.claims)}</div><div class="panel"><h2>التحصيل وتوزيع السندات</h2>${receiptTable(data.clientReceipts)}</div>`};
 
@@ -1084,7 +1205,7 @@ function r14AcceptImport(){
   if(data.projects.length||data.clientReceipts.length||data.payments.length)backup();
   if(r14BootIssue&&r14Disk)r14ExportUnreadable();
   const issue=r14BootIssue;r14BootIssue='';
-  if(r14Persist(r14PendingImport,'استيراد نسخة احتياطية')){r14PendingImport=null;closeModal();go('dashboard');notify('تم استيراد البيانات. راجع الأرصدة ثم حمّل نسخة احتياطية V15.')}else r14BootIssue=issue;
+  if(r14Persist(r14PendingImport,'استيراد نسخة احتياطية')){r14PendingImport=null;closeModal();go('dashboard');notify('تم استيراد البيانات. راجع الأرصدة ثم حمّل نسخة احتياطية V16.')}else r14BootIssue=issue;
 }
 function r14ExportUnreadable(){if(r14Disk)download('RONIX_Stored_Data_Before_Recovery.json',r14Disk,'application/json')}
 async function r14ReadArchive(file){
@@ -1108,26 +1229,95 @@ async function r14ReadArchive(file){
   modal('اختر نسخة الحسابات من الأرشيف',`<p>الملف يحتوي على أكثر من نسخة؛ اختر النسخة التي تريد استعادتها.</p><select class="field" id="r14ArchiveChoice">${backups.map((b,i)=>`<option value="${i}">${esc(b.name)} · ${b.data.projects.length} مشروع</option>`).join('')}</select><div class="modalfoot"><button class="btn primary" onclick="r14ChooseArchive(val('r14ArchiveChoice'))">مراجعة النسخة</button></div>`);
 }
 restoreData=async function(input){const file=input.files?.[0];if(!file)return;input.value='';try{if(file.size>40*1024*1024)throw Error('الملف أكبر من 40 ميجابايت');if(/\.zip$/i.test(file.name))await r14ReadArchive(file);else r14PreviewImport(JSON.parse(await file.text()),file.name)}catch(e){r14PendingImport=null;alert('تعذر الاستيراد دون تغيير البيانات الحالية:\n'+e.message)}};
-backup=function(){download('RONIX_V15_Backup_'+r14Today()+'.json',JSON.stringify({...data,schemaVersion:15,currency:'EGP',exportedAt:new Date().toISOString()},null,2),'application/json;charset=utf-8');r14OldNotify('نُزّلت النسخة الاحتياطية بما فيها الصور والمرفقات المحفوظة')};
+backup=function(){download('RONIX_V16_Backup_'+r14Today()+'.json',JSON.stringify({...data,schemaVersion:16,currency:'EGP',exportedAt:new Date().toISOString()},null,2),'application/json;charset=utf-8');r14OldNotify('نُزّلت النسخة الاحتياطية بما فيها الصور والمرفقات المحفوظة')};
 function r14Help(){modal('بدء العمل على النسخة المحسنة',`<p><b>هذا تحديث للبرنامج الأصلي RONIX V13.</b> جميع الأقسام الأصلية موجودة في القائمة.</p><ol><li>لجلب النسخة التي أرسلتها، اضغط «استيراد» واختر ملف ZIP الأصلي. سينقل الحسابات وصور المشاريع من النسخة الاحتياطية الموجودة فيه.</li><li>إذا عملت على البرنامج القديم بعد تاريخ نسخته الاحتياطية، صدّر منه أحدث ملف JSON واستورده بدلًا منها.</li><li>راجع عدد السجلات ثم اعتمد الاستيراد. افتح «فحص البيانات» وراجع كشف عميل ومصمم.</li><li>سجّل القبض من العملاء ووزعه جزئيًا أو كليًا. الباقي يبقى باسم العميل. سجّل دفعات المصممين في قسم الدفعات.</li><li>من المطالبات، اضغط «مطابقة» واربط المبالغ المقبوضة بالمطالبة المناسبة.</li><li>نزّل نسخة احتياطية بعد جلسة العمل؛ البيانات تحفظ في هذا المتصفح على هذا الجهاز.</li></ol><p>Excel للتقارير، وJSON لاستعادة جميع البيانات. لا تجمع القبض مع المطالبات، ولا تجمع دفعات المصمم مع أتعابه كتكلفة ثانية.</p><div class="modalfoot"><button class="btn primary" onclick="closeModal();$('restore').click()">استيراد ZIP أو JSON</button><button class="btn" onclick="closeModal()">إغلاق</button></div>`)}
 const r14Render=render;
 render=function(){
   r14Render();
   const content=$('content');
   if(r14BootIssue)content.insertAdjacentHTML('afterbegin',`<div class="panel"><h2>البيانات المحفوظة تحتاج استعادة</h2><p>${esc(r14BootIssue)}</p><button class="btn" onclick="r14ExportUnreadable()">تنزيل البيانات قبل الإصلاح</button><button class="btn primary" onclick="$('restore').click()">استيراد نسخة سليمة</button></div>`);
-  else if(!data.projects.length)content.insertAdjacentHTML('afterbegin',`<div class="panel r14-welcome"><h2>برنامجك الأصلي، مع تحسين الحسابات · V15</h2><p>ابدأ باستيراد ملف ZIP القديم لنقل المشاريع والمصممين والدفعات والمطالبات والصور.</p><div class="actions"><button class="btn primary" onclick="$('restore').click()">استيراد برنامجك القديم ZIP / JSON</button><button class="btn" onclick="editProject()">إنشاء أول مشروع</button><button class="btn" onclick="r14Help()">طريقة العمل</button></div><p class="hint">تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.</p></div>`);
+  else if(!data.projects.length)content.insertAdjacentHTML('afterbegin',`<div class="panel r14-welcome"><h2>برنامجك الأصلي، مع تحسين الحسابات · V16</h2><p>ابدأ باستيراد ملف ZIP القديم لنقل المشاريع والمصممين والدفعات والمطالبات والصور.</p><div class="actions"><button class="btn primary" onclick="$('restore').click()">استيراد برنامجك القديم ZIP / JSON</button><button class="btn" onclick="editProject()">إنشاء أول مشروع</button><button class="btn" onclick="r14Help()">طريقة العمل</button></div><p class="hint">تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.</p></div>`);
 };
 const r14Modal=modal;
 modal=function(title,body){r14Modal(title.replaceAll('*** ',''),body);for(const input of $('modalBody').querySelectorAll('input[type=number]')){input.step='0.01';if(input.min==='1')input.min='0.01'}$('overlay').setAttribute('role','dialog');$('overlay').setAttribute('aria-modal','true');$('overlay').setAttribute('aria-labelledby','modalTitle')};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 $('restore').accept='.json,.zip';
 document.querySelector('.logo').innerHTML=`<img class="r14-logo" src="${R14_LOGO}" alt="RONIX">`;
-document.querySelector('.sublogo').textContent='PROJECT FINANCE · V15';
-document.querySelector('.sidebar-footer').innerHTML='RONIX V15 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';
+document.querySelector('.sublogo').textContent='PROJECT FINANCE · V16';
+document.querySelector('.sidebar-footer').innerHTML='RONIX V16 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';
 const help=document.createElement('button');help.className='nav';help.textContent='؟ بدء العمل والمساعدة';help.onclick=r14Help;document.querySelector('.sidebar-footer').before(help);
-document.querySelector('.footer').textContent='RONIX V15 · احتفظ بنسخة احتياطية بعد جلسة العمل';
+document.querySelector('.footer').textContent='RONIX V16 · احتفظ بنسخة احتياطية بعد جلسة العمل';
 for(const b of document.querySelectorAll('.nav'))b.innerHTML=b.innerHTML.replaceAll('*** ','');
-document.title='RONIX V15 | المشاريع والمصممون والتحصيل والمطالبات';
+document.title='RONIX V16 | المشاريع والمصممون والتحصيل والمطالبات';
 render();
+
+/* Retain the existing screens, with every linked balance sourced from R16. */
+customerTotals=function(name){return R16.client(data,name)};
+ccAmounts=function(code){if(!getP(code))return null;const a=R16.project(data,code);return {
+ contract:a.contract,receipts:a.received,receiptCash:a.cash,fxDifference:a.fx,committed:a.designers.fees,
+ designerCash:a.designers.paid,designerDue:a.designers.due,designerCredit:a.designers.credit,
+ extra:a.expenses,verified:a.claims,matched:a.matched,claimDue:a.claimDue,unmatched:a.unmatched,
+ contractRemaining:a.contractBalance,projectedProfit:a.profit,operatingCash:a.operatingCash,projectCosts:a.cost
+}};
+function r16LinkPanel(a){return `<div class="panel r16-links"><h3>ربط التحصيل بالمطالبات</h3><div class="v5-metrics">${v5Metric('قيمة المطالبات',a.claims,'صادرة ومعتمدة فقط')}${v5Metric('مسدد بمطابقة السندات',a.matched,'من التحصيل المسجل؛ دون قبض جديد','good')}${v5Metric('إجمالي المطلوب سداده',a.claimDue,'متبقي المطالبات، مستقل عن باقي العقد','bad')}${v5Metric('قبض لم يربط بمطالبة',a.unmatched,'قد يكون مقدمة أو يحتاج اختيار المطالبة')}</div><p class="hint">يُربط التحصيل تلقائيًا عند وجود مطالبة واحدة متاحة للمشروع والعميل. إذا تعددت المطالبات، اختر «مطابقة». الربط لا يغيّر قيمة العقد أو السند.</p></div>`}
+function r16DesignerPanel(code='',name=''){const a=R16.designer(data,code,name);return `<div class="panel r16-designer-balance"><h3>مستحقات المصممين والدفعات الزائدة</h3><div class="v5-metrics">${v5Metric('مستحق للمصممين',a.due,'مجموع الأرصدة الموجبة لكل تكليف','bad')}${v5Metric('دفعات تزيد على الأتعاب',a.credit,'رصيد منفصل للمراجعة؛ لم يخصم من مشاريع أخرى','good')}${v5Metric('صافي رصيد الأتعاب',a.net,'المستحق ناقص الدفعات الزائدة')}</div>${a.rows.filter(x=>x.credit>0).map(x=>`<p>${esc(x.code)} · ${esc(x.designer)}: الأتعاب ${money(x.fee)}، المدفوع ${r14Paid(x.paid,true)}، الزيادة ${r14Paid(x.credit,true)}.</p>`).join('')}</div>`}
+const r16ProjectPanel=clientProjectPanel;
+clientProjectPanel=function(p){return r16ProjectPanel(p)+r16LinkPanel(R16.project(data,p.code))};
+const r16ClientCash=r14ClientCashPanel;
+r14ClientCashPanel=function(name){return r16ClientCash(name)+r16LinkPanel(R16.client(data,name))};
+const r16RenderDesigner=renderDesigner;
+renderDesigner=function(){r16RenderDesigner();$('content').insertAdjacentHTML('beforeend',r16DesignerPanel('',designerFocus))};
+const r16CostCenter=showCostCenter;
+showCostCenter=function(enc){r16CostCenter(enc);const code=decodeURIComponent(enc);if(getP(code))$('ccDetail').insertAdjacentHTML('beforeend',r16LinkPanel(R16.project(data,code))+r16DesignerPanel(code))};
+const r16Dashboard=ccDashboard;
+ccDashboard=function(){const cs=data.claims.filter(R14.active),claims=R14.sum(cs,'total'),matched=R14.sum(data.claimSettlements),received=R14.sum(data.clientReceipts.filter(r=>r.code));return r16Dashboard()+r16LinkPanel({claims,matched,claimDue:R14.delta(claims,matched),unmatched:R14.delta(received,matched)})+r16DesignerPanel()};
+const r16Match=r14Match;
+r14Match=function(enc){r16Match(enc);const c=data.claims.find(c=>c.id===decodeURIComponent(enc));if(!c||!R14.active(c))return;$('modalBody').insertAdjacentHTML('afterbegin',`<p class="notice">طريقة الربط: ${c.matchMode==='manual'?'يدوية — تحفظ اختياراتك دون إعادة توزيع تلقائي':'تلقائية عند وضوح المطالبة'}. حفظ الجدول أدناه يعتمد اختيارك اليدوي.</p>`);$('modalBody').querySelector('.modalfoot')?.insertAdjacentHTML('beforeend',`<button type="button" class="btn" onclick="r16AutomaticMatch('${enc}')">تفعيل الربط التلقائي</button>`)};
+function r16AutomaticMatch(enc){const id=decodeURIComponent(enc);if(r14Change('تفعيل ربط مطالبة تلقائي',d=>{const c=d.claims.find(c=>c.id===id);if(!c)throw Error('المطالبة غير موجودة');c.matchMode='auto';d.claimSettlements=d.claimSettlements.filter(s=>s.claimId!==id)},{claimId:id}))r14Done('تم تحديث الربط؛ راجع المتبقي')}
+const r16ClaimList=claimList;
+claimList=function(){return r16ClaimList().replace('طابق السندات مع المطالبات قبل اعتماد المتأخرات. المطابقة تخص مبلغ كل مشروع على حدة.','الربط التلقائي يحدّث المطالبات الواضحة مع كل حفظ. عند تعدد المطالبات أو الرغبة في تغيير التوزيع، استخدم «مطابقة».')};
+const r16ProjectTabs=r15ProjectFinancialTabs;
+r15ProjectFinancialTabs=function(ps){return [...r16ProjectTabs(ps),['الربط المحاسبي',[['المشروع','العقد','سداد العقد','متبقي العقد','المطالبات','مسدد المطالبات','متبقي المطالبات','قبض غير مطابق','مستحق المصممين','دفعات زائدة للمصممين','تكلفة والتزامات','هامش تقديري','قبض فعلي','صافي حركة نقدية'],...ps.map(p=>{const a=R16.project(data,p.code);return[p.code,a.contract,a.received,a.contractBalance,a.claims,a.matched,a.claimDue,a.unmatched,a.designers.due,a.designers.credit,a.cost,a.profit,a.cash,a.operatingCash]})]]]};
+const r16ExportDesigner=r15ExportDesigner;
+r15ExportDesigner=function(enc){const original=exportTabs,a=R16.designer(data,'',decodeURIComponent(enc));try{exportTabs=(tabs,name)=>original([...tabs,['أرصدة مستقلة',[['المشروع','المصمم','الأتعاب','المدفوع','المستحق','الدفعات الزائدة','صافي الرصيد'],...a.rows.map(x=>[x.code,x.designer,x.fee,x.paid,x.due,x.credit,x.net])]]],name);r16ExportDesigner(enc)}finally{exportTabs=original}};
+v8Review=function(){const issues=v8Audit(),notes=R16.review(data);modal('فحص الربط الحسابي والصور',`<div class="notice">${issues.length?'أخطاء اتساق: '+issues.length:'فحص اتساق الحسابات ناجح'} · ملاحظات متابعة: ${notes.length}</div>${issues.map(t=>`<p>${esc(t)}</p>`).join('')}<div class="tablewrap"><table><tr><th>المشروع</th><th>الملاحظة</th><th>المبلغ</th></tr>${notes.map(n=>`<tr><td>${esc(n.code)}</td><td>${esc(n.text)}${n.designer?' · '+esc(n.designer):''}</td><td>${n.amount==null?'—':fmt(n.amount)}</td></tr>`).join('')||'<tr><td colspan="3">لا توجد ملاحظات متابعة.</td></tr>'}</table></div><p>تظهر الأرصدة الزائدة والبيانات الناقصة للمراجعة؛ لا تُعدّل قيم السندات أو الأسماء تلقائيًا.</p><div class="modalfoot"><button class="btn" onclick="r16PhotoHelp()">استعادة صور المشاريع</button><button class="btn primary" onclick="backup()">نسخة احتياطية</button></div>`)};v8Btn.onclick=v8Review;
+const r16PreviewImport=r14PreviewImport;
+r14PreviewImport=function(value,name){const linked=R16.reconcile(value);r16PreviewImport(linked.data,name);r14PendingImport.auditTrail.push(...linked.changes.map(x=>({id:r14Id('AUD'),...x})));const amount=R14.sum(linked.data.claimSettlements),missing=R16.review(linked.data).filter(x=>x.type==='photo').length;$('modalBody').insertAdjacentHTML('afterbegin',`<p class="notice">المسدد المرتبط بالمطالبات: ${money(amount)}. روجعت روابط المطالبات دون تغيير مبالغ التحصيل. ${missing?`${missing} صورة تحتاج استعادتها من ZIP الأصلي عبر زر «استعادة صور المشاريع» بعد الاستيراد.`:'صور المشاريع المخزنة مضمنة في البيانات.'}</p>`)};
+function r16RefreshLinks(){if(r14Change('تحديث الروابط الحسابية',()=>{}))r14Done('تم تحديث الروابط الحسابية')}
+r15Changes=function(){modal('تحديث الربط الحسابي · V16',`<ol><li>ربط التحصيل والمطالبات تلقائيًا عند وضوح المطالبة، مع اختيار يدوي للحالات المتعددة.</li><li>حساب موحد للعميل والمشروع ومركز التكلفة والتقارير؛ تعديل السند يحدث الربط التلقائي دون تكرار القبض.</li><li>فصل مستحقات المصممين عن الدفعات التي تتجاوز الأتعاب، مع بقاء المستندات وسجل الحذف.</li><li>استعادة صور المشاريع من ZIP الأصلي دون استبدال الحسابات، وتضمين الصور في JSON.</li><li>فحص واضح للأرصدة والروابط والصور والبيانات الناقصة.</li></ol><p>الواجهات الأساسية محفوظة، والتحويل إلى تطبيق مستقل يبقى لمرحلة لاحقة.</p><button class="btn primary" onclick="r16RefreshLinks()">تحديث الروابط الحالية</button>`)};
+r15Help.textContent='✓ ما الجديد · V16';r15Help.onclick=r15Changes;
+document.title='RONIX V16 | الحسابات المترابطة';
+document.querySelector('.sublogo').textContent='PROJECT FINANCE · V16';
+document.querySelector('.sidebar-footer').innerHTML='RONIX V16 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';
+document.querySelector('.footer').textContent='RONIX V16 · احتفظ بنسخة احتياطية بعد جلسة العمل';
+// Loading V15 is read-only. Upgrade its links on the first save or explicit refresh.
+render();
+
+function r16PhotoHelp(){const missing=R16.review(data).filter(n=>n.type==='photo').length;modal('استعادة صور المشاريع',`<p>صور تحتاج تضمينًا: <b>${missing}</b>.</p><p>اختر ZIP الأصلي الذي يحتوي مجلد project_media. ستُطابق الصور بمساراتها المسجلة وتُضاف إلى بيانات المشاريع الحالية، دون استبدال الحسابات أو استيراد حركات قديمة.</p><label class="btn primary">اختيار ZIP الصور<input class="hide" type="file" accept=".zip" onchange="r16RestorePhotos(this)"></label><p>الصور المضافة حديثًا تبقى كما هي. بعد الاستعادة نزّل JSON جديدًا؛ سيحتوي الصور نفسها.</p>`)}
+async function r16RestorePhotos(input){
+ const file=input.files?.[0];if(!file)return;input.value='';
+ try{
+  if(file.size>40*1024*1024)throw Error('حجم ZIP يتجاوز 40 ميجابايت');
+  const snapshot=JSON.stringify(data);let count=0,total=0;
+  const entries=fflate.unzipSync(new Uint8Array(await file.arrayBuffer()),{filter(e){
+   if(++count>1000||e.name.split('/').includes('..')||e.name.startsWith('/'))throw Error('أرشيف غير صالح');
+   const wanted=/(?:^|\/)project_media\/[^/]+\.(?:png|jpe?g|webp|gif)$/i.test(e.name);
+   if(wanted&&(e.originalSize>15*1024*1024||(total+=e.originalSize)>30*1024*1024))throw Error('صور الأرشيف تتجاوز الحجم المدعوم');
+   return wanted;
+  }});
+  const result=R16Media.recover(data,entries,r14BytesBase64);
+  if(!result.restored.length)throw Error(result.missing.length?'لم توجد الصور المطلوبة بمساراتها في الأرشيف.':'الصور الحالية مضمنة بالفعل، أو لا توجد صور مسجلة.');
+  for(const item of result.restored){const photo=result.data.projects.find(p=>p.code===item.code).photos.find(ph=>ph.id===item.photoId),image=new Image();image.src=photo.src;await image.decode()}
+  if(JSON.stringify(data)!==snapshot)throw Error('تغيرت البيانات أثناء قراءة الصور؛ أعد اختيار الملف');
+  if(r14Persist(result.data,'استعادة صور المشاريع دون استبدال الحسابات',{restoredPhotos:result.restored,missingPhotos:result.missing})){
+   r14Done('استعيدت '+result.restored.length+' صورة. المتبقي دون مصدر: '+result.missing.length);r16PhotoHelp();
+  }
+ }catch(e){alert('تعذرت استعادة الصور: '+e.message)}
+}
+const r16Backup=backup;
+backup=function(){r16Backup();const missing=R16.review(data).filter(n=>n.type==='photo').length;if(missing)r14OldNotify('نُزلت الحسابات، لكن '+missing+' صورة مرتبطة بملفات خارجية. استخدم «استعادة صور المشاريع» ثم صدّر نسخة جديدة.')};
+const r16PhotoButton=document.createElement('button');r16PhotoButton.className='nav';r16PhotoButton.textContent='▧ استعادة صور المشاريع';r16PhotoButton.onclick=r16PhotoHelp;document.querySelector('.sidebar-footer').before(r16PhotoButton);
+// An existing V15 store is upgraded once, with an audit entry and atomic storage.
+if(!r14BootIssue&&data.projects.length&&(data.schemaVersion||0)<16){r14Persist(data,'ترقية الروابط الحسابية إلى V16');render()}
 
 </script>
