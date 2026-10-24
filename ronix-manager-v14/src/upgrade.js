@@ -4,7 +4,7 @@ function r14Persist(next,action='حفظ',details={}) {
     if(r14BootIssue)throw Error('استعد نسخة سليمة أولًا. يمكنك تنزيل البيانات غير المقروءة من التنبيه أعلى الصفحة.');
     if(localStorage.getItem(KEY)!==r14Disk)throw Error('تغيّرت البيانات في نافذة أخرى. نزّل نسخة من هذه النافذة ثم أعد تحميل الصفحة قبل التسجيل.');
     const checked=R14.validate(next);
-    checked.schemaVersion=14;checked.currency='EGP';
+    checked.schemaVersion=15;checked.currency='EGP';
     checked.auditTrail.push({id:r14Id('AUD'),at:new Date().toISOString(),action,...details});
     const serialized=JSON.stringify(checked);
     localStorage.setItem(KEY,serialized);
@@ -151,7 +151,7 @@ displayClientLedger=function(){r14DisplayClient();const n=val('clientSelect');if
 const r14Advanced=advancedFinance;
 advancedFinance=function(){return r14Advanced().replaceAll('مطالبات تجاوزت تاريخ الاستحقاق','متبقي تجاوز الاستحقاق بحسب المطابقة').replaceAll('مقدم غير موزع','رصيد غير موزع')};
 const r14Dashboard=ccDashboard;
-ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated');return `<div class="panel"><div class="v5-header"><h2>RONIX V14.3 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:R14.sum(data.projectExpenses)}])),'قبض فعلي ناقص دفعات المصممين والمصروفات')}</div></div>`+r14Dashboard()};
+ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated');return `<div class="panel"><div class="v5-header"><h2>RONIX V15 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:R14.sum(data.projectExpenses)}])),'قبض فعلي ناقص دفعات المصممين والمصروفات')}</div></div>`+r14Dashboard()};
 function r14ReceiptRows(n){return data.clientReceipts.filter(r=>R14.receiptClient(data,r)===n).sort((a,b)=>a.date.localeCompare(b.date))}
 clientStatementTabs=function(n){const ps=customerProjects(n),t=customerTotals(n);return [
   ['ملخص العميل',[['العميل','العقود','القبض الفعلي','المخصص للمشاريع','غير موزع','متبقي العقود بعد التخصيص'],[n,t.contracts,t.cash,t.receipts,t.unallocated,R14.delta(t.contracts,t.receipts)]]],
@@ -222,13 +222,13 @@ function r14ClaimDocument(c){
   <p class="claim-intro">نشكر لكم ثقتكم وتعاونكم، ويسعدنا مواصلة العمل معكم. نرفق أدناه بيان المشاريع والدفعات المسجلة، مع توضيح المبلغ المطلوب في نهاية البيان.</p>
   <table class="projects-table"><colgroup><col style="width:25%"><col style="width:27%"><col style="width:16%"><col style="width:16%"><col style="width:16%"></colgroup>
   <thead><tr><th>صورة المشروع</th><th>المشروع</th><th>قيمة المطالبة</th><th class="paid">المسدد منها</th><th class="due">المطلوب سداده</th></tr></thead><tbody>
-  ${rows.map(r=>{const p=getP(r.code),img=p&&cover(p),paid=R14.settled(data,c.id,r.code);return `<tr><td class="photo">${img?`<img src="${esc(new URL(img.src,location.href).href)}" alt="${esc(r.code)}">`:'<div class="photo-placeholder">صورة المشروع</div>'}</td><td><bdi class="project-code">${esc(r.code)}</bdi><span class="project-name">${esc(p?.name||'—')}</span><span class="project-contract">العقد: <bdi>${printAmount(p?.contract||0)}</bdi> ج.م</span></td><td class="amount"><bdi>${printAmount(r.amount)}</bdi></td><td class="amount paid"><bdi>${printAmount(paid)}</bdi></td><td class="amount due"><bdi>${printAmount(R14.delta(r.amount,paid))}</bdi></td></tr>`}).join('')}
+  ${rows.map(r=>{const p=getP(r.code),img=p&&cover(p),paid=R14.settled(data,c.id,r.code);return `<tr><td class="photo">${img?`<img src="${esc(new URL(img.src,location.href).href)}" alt="${esc(r.code)}">`:'<div class="photo-placeholder">صورة المشروع</div>'}</td><td><bdi class="project-code">${esc(r.code)}</bdi><span class="project-name">${esc(p?.name||'—')}</span><span class="project-contract">العقد: <bdi>${printAmount(p?.contract||0)}</bdi> ج.م${p&&R14.projectCurrency(p)!=='EGP'?`<br>${printAmount(R14.projectOriginalTotal(p))} ${esc(R14.projectCurrency(p))}`:''}</span></td><td class="amount"><bdi>${printAmount(r.amount)}</bdi></td><td class="amount paid"><bdi>${printAmount(paid)}</bdi></td><td class="amount due"><bdi>${printAmount(R14.delta(r.amount,paid))}</bdi></td></tr>`}).join('')}
   </tbody></table>
   ${descriptions.length?`<div class="details">${descriptions.map(item=>`<p>${esc(item.desc)} — <bdi>${printAmount(item.amount)}</bdi> ج.م</p>`).join('')}</div>`:''}
   <h2>الدفعات المسجلة على المشاريع</h2>
   <table class="receipts-table"><colgroup><col style="width:30%"><col style="width:40%"><col style="width:30%"></colgroup>
-  <thead><tr><th>التاريخ</th><th>المشروع</th><th class="paid">الدفعة (ج.م)</th></tr></thead><tbody>
-  ${receipts.map(r=>`<tr><td><bdi>${esc(r.date)}</bdi></td><td><bdi>${esc(r.code)}</bdi></td><td class="amount paid"><bdi>${printAmount(r.amount)}</bdi></td></tr>`).join('')||'<tr><td colspan="3">لا توجد دفعات مسجلة</td></tr>'}
+  <thead><tr><th>التاريخ</th><th>المشروع</th><th class="paid">السداد المخصص (ج.م)</th></tr></thead><tbody>
+  ${receipts.map(r=>`<tr><td><bdi>${esc(r.date)}</bdi></td><td><bdi>${esc(r.code)}</bdi></td><td class="amount paid"><bdi>${printAmount(r.amount)}</bdi>${r.incomingCurrency&&r.incomingCurrency!=='EGP'?`<br><small>قبض: ${printAmount(r.receiptOriginal)} ${esc(r.incomingCurrency)}</small>`:''}</td></tr>`).join('')||'<tr><td colspan="3">لا توجد دفعات مسجلة</td></tr>'}
   </tbody></table>
   ${receipts.length?'<p class="receipt-note">يُخصم من المطلوب فقط السداد المرتبط بهذه المطالبة؛ دفعات المشاريع أعلاه قد تخص مطالبات أخرى.</p>':''}
   ${c.note?`<p class="note">${esc(c.note)}</p>`:''}

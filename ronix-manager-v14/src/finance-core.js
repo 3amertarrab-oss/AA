@@ -1,6 +1,6 @@
 /* RONIX V14. Monetary arithmetic in integer piastres; no network or storage. */
 const R14 = (() => {
-  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail'];
+  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments'];
   const copy = v => JSON.parse(JSON.stringify(v));
   const normName = v => String(v || '').trim();
   function cents(v) {
@@ -35,15 +35,50 @@ const R14 = (() => {
     const adv = d.advances.filter(a=>normName(a.client)===name);
     const receipts = sum(rs.filter(r=>r.code));
     const unallocated = sum([...looseReceipts(d,name),...adv.map(a=>({amount:delta(a.total,a.allocated||0)}))]);
-    const cash = sum([...rs.filter(r=>!r.sourceAdvanceId),...adv.map(a=>({amount:a.total}))]);
+    const cash = sum([...rs.filter(r=>!r.sourceAdvanceId).map(r=>({amount:cashReceipt(r)})),...adv.map(a=>({amount:a.total}))]);
     return {contracts:sum(projects,'contract'),receipts,unallocated,cash,claims:sum(d.claims.filter(c=>claimClient(d,c)===name&&active(c)),'total')};
   }
   const settled = (d,id,code) => sum(d.claimSettlements.filter(s=>s.claimId===id&&(!code||s.code===code)));
   const usedReceipt = (d,id,exceptClaim) => sum(d.claimSettlements.filter(s=>s.receiptId===id&&s.claimId!==exceptClaim));
   const remaining = (d,c) => delta(c.total,settled(d,c.id));
+  // Rates are six-decimal fixed point; ledger values remain EGP piastres.
+  function rate(v){const s=String(v).trim();if(!/^\d+(?:\.\d{1,6})?$/.test(s)||Number(s)<=0||Number(s)>1000000)throw Error('سعر الصرف موجب وحتى 6 منازل عشرية');return Number(s)}
+  function rateUnits(v){const [a,b='']=String(rate(v)).split('.');return BigInt(a)*1000000n+BigInt(b.padEnd(6,'0'))}
+  function fx(v,r=1){const n=BigInt(cents(v))*rateUnits(r),q=n<0n?-((-n+500000n)/1000000n):(n+500000n)/1000000n;const out=Number(q)/100;cents(out);return out}
+  function unfx(v,r=1){const n=BigInt(cents(v))*1000000n,d=rateUnits(r),q=n<0n?-((-n+d/2n)/d):(n+d/2n)/d;return Number(q)/100}
+  const projectCurrency=p=>p?.contractCurrency??'EGP';
+  const projectRate=p=>p?.contractRate??1;
+  const originalContract=p=>p?.originalContract??p?.contract??0;
+  const projectOriginalTotal=p=>sum([{amount:originalContract(p)},...(p.contractExtras||[])]);
+  const projectBookTotal=p=>fx(projectOriginalTotal(p),projectRate(p));
+  const assignmentTotal=a=>sum([{amount:a.baseFee??a.fee},...(a.extraWorks||[]),...(a.feeAdjustments||[]).map(r=>({amount:r.type==='discount'?-r.amount:r.amount}))]);
+  const cashReceipt=r=>r.cashAmount??r.amount;
+  const fxDifference=(d,code,client)=>sum(d.clientReceipts.filter(r=>!r.sourceAdvanceId&&(!code||r.code===code)&&(!client||receiptClient(d,r)===client)),r=>delta(cashReceipt(r),r.amount));
+  const receivedOriginal=(d,p)=>sum(d.clientReceipts.filter(r=>r.code===p.code),r=>r.projectAmount??unfx(r.amount,projectRate(p)));
+  function foreignReceiptEdit(d,{batchId,client,date,total,currency='EGP',exchangeRate=1,allocations,method,ref,note,id}){
+    amount(total);rate(exchangeRate);if(!/^[A-Z]{3}$/.test(currency)||(currency==='EGP'&&Number(exchangeRate)!==1))throw Error('راجع عملة القبض وسعر الصرف');
+    if(!dateOK(date)||total<=0)throw Error('راجع مبلغ السند وتاريخه');
+    if(new Set(allocations.map(a=>a.code)).size!==allocations.length)throw Error('المشروع مكرر');
+    const old=d.clientReceipts.filter(r=>(r.batchId||r.id)===batchId);if(old.some(r=>r.sourceAdvanceId))throw Error('تخصيص المقدمة يعدل من مصدره');
+    const history=old.length?[...(old[0].history||[]),{at:new Date().toISOString(),previous:old.map(({history,...r})=>r)}]:[];
+    const base={batchId,client,date,method,ref:ref||batchId,note,history,incomingCurrency:currency,receiptRate:Number(exchangeRate),receiptTotal:total};
+    const entries=[];
+    for(const a of allocations){
+      const p=d.projects.find(p=>p.code===a.code);if(!p||normName(p.client)!==client)throw Error('مشروع غير مرتبط بالعميل');
+      const native=amount(a.projectAmount),cash=amount(a.receiptOriginal);if(native<0||cash<0||(native===0)!==(cash===0))throw Error('راجع تخصيص العقد والمبلغ المخصص من السند');
+      if(!native)continue;
+      if(projectCurrency(p)===currency&&cents(native)!==cents(cash))throw Error('عند تطابق العملتين يجب أن يتساوى مبلغ العقد والجزء المخصص من السند');
+      entries.push({...base,id:old.find(r=>r.code===a.code)?.id||id(),code:a.code,projectAmount:native,projectCurrency:projectCurrency(p),bookRate:projectRate(p),receiptOriginal:cash,amount:fx(native,projectRate(p)),cashAmount:fx(cash,exchangeRate)});
+    }
+    const rest=delta(total,sum(entries,'receiptOriginal'));if(rest<0)throw Error('التوزيع أكبر من إجمالي السند');
+    if(rest)entries.push({...base,id:old.find(r=>!r.code)?.id||id(),code:'',unallocated:true,receiptOriginal:rest,amount:fx(rest,exchangeRate),cashAmount:fx(rest,exchangeRate)});
+    if(!entries.length)throw Error('السند فارغ');
+    const last=entries.at(-1),rounding=delta(fx(total,exchangeRate),sum(entries,'cashAmount'));last.cashAmount=sum([{amount:last.cashAmount},{amount:rounding}]);if(!last.code)last.amount=last.cashAmount;
+    const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);return validate(next);
+  }
   function normalize(v) {
     if (!v || typeof v!=='object' || Array.isArray(v)) throw Error('الملف لا يحتوي على قاعدة بيانات RONIX');
-    if (v.schemaVersion > 14) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
+    if (v.schemaVersion > 15) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
     const d = copy(v);
     for (const k of arrays) {
       if (d[k] == null && !['projects','assignments','payments'].includes(k)) d[k]=[];
@@ -106,6 +141,28 @@ const R14 = (() => {
       for(const c of d.claims)for(const r of claimRows(c))if(cents(settled(d,c.id,r.code))>cents(r.amount))add('تسوية تتجاوز مبلغ المشروع في المطالبة: '+c.id);
       for(const r of d.clientReceipts)if(cents(usedReceipt(d,r.id))>cents(r.amount))add('تحصيل مستخدم أكثر من مرة: '+r.id);
     }catch{}
+    const detailRows=(rows,label,adjustments=false)=>{if(!Array.isArray(rows))throw Error(label+': جدول غير صالح');unique(rows,r=>r.id,label);for(const r of rows){if(!String(r.name||'').trim())add(label+': الاسم مطلوب');dated(r.date,label);monetary(r.amount,label,1);if(adjustments&&!['increase','discount'].includes(r.type))add(label+': نوع غير صالح')}};
+    try{
+      for(const p of d.projects){
+        if(p.projectDate)dated(p.projectDate,'تاريخ المشروع');
+        if(p.originalContract!=null){
+          if(!/^[A-Z]{3}$/.test(projectCurrency(p)))add('عملة مشروع غير صالحة');rate(projectRate(p));if(projectCurrency(p)==='EGP'&&projectRate(p)!==1)add('سعر صرف الجنيه يجب أن يساوي 1');
+          monetary(p.originalContract,'العقد الأصلي');detailRows(p.contractExtras||[],'تعاقد إضافي');
+          if(cents(p.contract)!==cents(projectBookTotal(p)))add('إجمالي العقد لا يطابق الأصل والإضافات وسعر الصرف');
+        }
+      }
+      for(const a of d.assignments)if(a.baseFee!=null){monetary(a.baseFee,'أتعاب أصلية');detailRows(a.extraWorks||[],'عمل إضافي');detailRows(a.feeAdjustments||[],'تعديل أتعاب',true);if(cents(a.fee)!==cents(assignmentTotal(a)))add('الأتعاب لا تطابق الأصل والإضافات والخصومات')}
+      unique(d.deletedPayments,r=>r.payment?.id,'دفعات محذوفة');
+      for(const x of d.deletedPayments){const p=x.payment;if(!p||d.payments.some(a=>a.id===p.id))add('دفعة محذوفة مكررة أو غير صالحة');else {linked(p.code,'دفعة محذوفة');monetary(p.amount,'دفعة محذوفة',1);dated(p.date,'دفعة محذوفة');if(!x.deletedAt||!x.reason)add('سجل حذف غير مكتمل')}}
+      const batches=new Map();
+      for(const r of d.clientReceipts)if(r.incomingCurrency){
+        if(!/^[A-Z]{3}$/.test(r.incomingCurrency)||(r.incomingCurrency==='EGP'&&r.receiptRate!==1))add('عملة سند غير صالحة');rate(r.receiptRate);monetary(r.receiptOriginal,'قبض بعملة السند',1);monetary(r.cashAmount,'نقد فعلي',1);monetary(r.receiptTotal,'إجمالي السند',1);
+        if(r.code){const p=projects.get(r.code);if(!p||r.projectCurrency!==projectCurrency(p)||r.bookRate!==projectRate(p))add('عملة أو سعر العقد لا يطابق تخصيصه');monetary(r.projectAmount,'سداد بعملة العقد',1);if(cents(r.amount)!==cents(fx(r.projectAmount,r.bookRate)))add('قيمة تسوية العقد غير مطابقة');if(r.projectCurrency===r.incomingCurrency&&cents(r.projectAmount)!==cents(r.receiptOriginal))add('تخصيص بنفس العملة غير متساو')}
+        else if(cents(r.amount)!==cents(r.cashAmount))add('الرصيد غير الموزع لا يساوي نقده');
+        const key=r.batchId||r.id;if(!batches.has(key))batches.set(key,[]);batches.get(key).push(r);
+      }
+      for(const [id,rows] of batches){const first=rows[0];if(d.clientReceipts.filter(r=>(r.batchId||r.id)===id).length!==rows.length||rows.some(r=>r.incomingCurrency!==first.incomingCurrency||r.receiptRate!==first.receiptRate||r.receiptTotal!==first.receiptTotal))add('بيانات عملة السند غير متجانسة');if(cents(sum(rows,'receiptOriginal'))!==cents(first.receiptTotal)||cents(sum(rows,'cashAmount'))!==cents(fx(first.receiptTotal,first.receiptRate)))add('توزيع القبض بعملته أو مقابل الجنيه غير متطابق');for(const r of rows)if(Math.abs(cents(r.cashAmount)-cents(fx(r.receiptOriginal,r.receiptRate)))>rows.length)add('مقابل نقدي غير مطابق لسعر الصرف')}
+    }catch(e){add(e.message)}
     // Do not execute active content from a restored photo or attachment.
     const safeImage=s=>typeof s==='string'&&(/^(?:data:image\/(?:png|jpeg|webp|gif);base64,[a-zA-Z0-9+/=\s]+)$/.test(s)||/^project_media\/[\w .()\-]+\.(?:png|jpe?g|webp|gif)$/i.test(s));
     for(const p of d.projects)for(const photo of p.photos||[])if(!photo||!safeImage(photo.src))add('مصدر صورة غير مدعوم: '+p.code);
@@ -130,6 +187,6 @@ const R14 = (() => {
     const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);
     validate(next);return next;
   }
-  return {arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
+  return {rate,fx,unfx,projectCurrency,projectRate,originalContract,projectOriginalTotal,projectBookTotal,assignmentTotal,cashReceipt,fxDifference,receivedOriginal,foreignReceiptEdit,arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
 })();
 if(typeof module!=='undefined')module.exports=R14;

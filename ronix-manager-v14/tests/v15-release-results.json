@@ -1,0 +1,17 @@
+{
+  "version": "V15",
+  "date": "2026-10-24",
+  "scope": "PowerPoint review only; standalone application deferred",
+  "completed_groups": 7,
+  "total_groups": 7,
+  "completion_percent": 100,
+  "checks": {
+    "unit": 37,
+    "review_ui": 29,
+    "legacy_browser": 42,
+    "reliability": 15,
+    "attachments": 25,
+    "claim_print": 56
+  },
+  "total_passed": 204
+}

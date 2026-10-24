@@ -24,3 +24,5 @@
 .r14-proof-pdf{font-size:20px;padding:18px;background:white;border:1px solid #d5dde7}
 button:disabled{opacity:.6;cursor:wait}
 @media print{.r14-proof-action{display:none}}
+
+.r15-terms{border-top:1px solid #d5dde7;padding-top:16px;margin-top:16px}.r15-terms h3{margin:0;font-size:16px}.r15-row{display:grid;grid-template-columns:minmax(150px,2fr) 145px 130px 42px;gap:8px;margin:10px 0}.r15-row.adjust{grid-template-columns:minmax(150px,2fr) 145px 100px 130px 42px}.r15-cost-photo{display:flex;gap:20px;align-items:center;flex-wrap:wrap}.r15-photo-button{background:white;border:0}.r15-photo-button img{width:240px;height:180px;object-fit:contain}.r15-contract-panel p{line-height:1.9;font-size:13px}.r15-selected-project{outline:2px solid #b58a48;background:#fff9ec}.r15-row .field{min-width:0}@media(max-width:700px){.r15-row,.r15-row.adjust{grid-template-columns:1fr 1fr}.r15-row .r15-name{grid-column:1/-1}}

@@ -12,7 +12,7 @@ function r14AcceptImport(){
   if(data.projects.length||data.clientReceipts.length||data.payments.length)backup();
   if(r14BootIssue&&r14Disk)r14ExportUnreadable();
   const issue=r14BootIssue;r14BootIssue='';
-  if(r14Persist(r14PendingImport,'استيراد نسخة احتياطية')){r14PendingImport=null;closeModal();go('dashboard');notify('تم استيراد البيانات. راجع الأرصدة ثم حمّل نسخة احتياطية V14.')}else r14BootIssue=issue;
+  if(r14Persist(r14PendingImport,'استيراد نسخة احتياطية')){r14PendingImport=null;closeModal();go('dashboard');notify('تم استيراد البيانات. راجع الأرصدة ثم حمّل نسخة احتياطية V15.')}else r14BootIssue=issue;
 }
 function r14ExportUnreadable(){if(r14Disk)download('RONIX_Stored_Data_Before_Recovery.json',r14Disk,'application/json')}
 async function r14ReadArchive(file){
@@ -36,24 +36,24 @@ async function r14ReadArchive(file){
   modal('اختر نسخة الحسابات من الأرشيف',`<p>الملف يحتوي على أكثر من نسخة؛ اختر النسخة التي تريد استعادتها.</p><select class="field" id="r14ArchiveChoice">${backups.map((b,i)=>`<option value="${i}">${esc(b.name)} · ${b.data.projects.length} مشروع</option>`).join('')}</select><div class="modalfoot"><button class="btn primary" onclick="r14ChooseArchive(val('r14ArchiveChoice'))">مراجعة النسخة</button></div>`);
 }
 restoreData=async function(input){const file=input.files?.[0];if(!file)return;input.value='';try{if(file.size>40*1024*1024)throw Error('الملف أكبر من 40 ميجابايت');if(/\.zip$/i.test(file.name))await r14ReadArchive(file);else r14PreviewImport(JSON.parse(await file.text()),file.name)}catch(e){r14PendingImport=null;alert('تعذر الاستيراد دون تغيير البيانات الحالية:\n'+e.message)}};
-backup=function(){download('RONIX_V14_Backup_'+r14Today()+'.json',JSON.stringify({...data,schemaVersion:14,currency:'EGP',exportedAt:new Date().toISOString()},null,2),'application/json;charset=utf-8');r14OldNotify('نُزّلت النسخة الاحتياطية بما فيها الصور والمرفقات المحفوظة')};
+backup=function(){download('RONIX_V15_Backup_'+r14Today()+'.json',JSON.stringify({...data,schemaVersion:15,currency:'EGP',exportedAt:new Date().toISOString()},null,2),'application/json;charset=utf-8');r14OldNotify('نُزّلت النسخة الاحتياطية بما فيها الصور والمرفقات المحفوظة')};
 function r14Help(){modal('بدء العمل على النسخة المحسنة',`<p><b>هذا تحديث للبرنامج الأصلي RONIX V13.</b> جميع الأقسام الأصلية موجودة في القائمة.</p><ol><li>لجلب النسخة التي أرسلتها، اضغط «استيراد» واختر ملف ZIP الأصلي. سينقل الحسابات وصور المشاريع من النسخة الاحتياطية الموجودة فيه.</li><li>إذا عملت على البرنامج القديم بعد تاريخ نسخته الاحتياطية، صدّر منه أحدث ملف JSON واستورده بدلًا منها.</li><li>راجع عدد السجلات ثم اعتمد الاستيراد. افتح «فحص البيانات» وراجع كشف عميل ومصمم.</li><li>سجّل القبض من العملاء ووزعه جزئيًا أو كليًا. الباقي يبقى باسم العميل. سجّل دفعات المصممين في قسم الدفعات.</li><li>من المطالبات، اضغط «مطابقة» واربط المبالغ المقبوضة بالمطالبة المناسبة.</li><li>نزّل نسخة احتياطية بعد جلسة العمل؛ البيانات تحفظ في هذا المتصفح على هذا الجهاز.</li></ol><p>Excel للتقارير، وJSON لاستعادة جميع البيانات. لا تجمع القبض مع المطالبات، ولا تجمع دفعات المصمم مع أتعابه كتكلفة ثانية.</p><div class="modalfoot"><button class="btn primary" onclick="closeModal();$('restore').click()">استيراد ZIP أو JSON</button><button class="btn" onclick="closeModal()">إغلاق</button></div>`)}
 const r14Render=render;
 render=function(){
   r14Render();
   const content=$('content');
   if(r14BootIssue)content.insertAdjacentHTML('afterbegin',`<div class="panel"><h2>البيانات المحفوظة تحتاج استعادة</h2><p>${esc(r14BootIssue)}</p><button class="btn" onclick="r14ExportUnreadable()">تنزيل البيانات قبل الإصلاح</button><button class="btn primary" onclick="$('restore').click()">استيراد نسخة سليمة</button></div>`);
-  else if(!data.projects.length)content.insertAdjacentHTML('afterbegin',`<div class="panel r14-welcome"><h2>برنامجك الأصلي، مع تحسين الحسابات · V14.3</h2><p>ابدأ باستيراد ملف ZIP القديم لنقل المشاريع والمصممين والدفعات والمطالبات والصور.</p><div class="actions"><button class="btn primary" onclick="$('restore').click()">استيراد برنامجك القديم ZIP / JSON</button><button class="btn" onclick="editProject()">إنشاء أول مشروع</button><button class="btn" onclick="r14Help()">طريقة العمل</button></div><p class="hint">تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.</p></div>`);
+  else if(!data.projects.length)content.insertAdjacentHTML('afterbegin',`<div class="panel r14-welcome"><h2>برنامجك الأصلي، مع تحسين الحسابات · V15</h2><p>ابدأ باستيراد ملف ZIP القديم لنقل المشاريع والمصممين والدفعات والمطالبات والصور.</p><div class="actions"><button class="btn primary" onclick="$('restore').click()">استيراد برنامجك القديم ZIP / JSON</button><button class="btn" onclick="editProject()">إنشاء أول مشروع</button><button class="btn" onclick="r14Help()">طريقة العمل</button></div><p class="hint">تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.</p></div>`);
 };
 const r14Modal=modal;
 modal=function(title,body){r14Modal(title.replaceAll('*** ',''),body);for(const input of $('modalBody').querySelectorAll('input[type=number]')){input.step='0.01';if(input.min==='1')input.min='0.01'}$('overlay').setAttribute('role','dialog');$('overlay').setAttribute('aria-modal','true');$('overlay').setAttribute('aria-labelledby','modalTitle')};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 $('restore').accept='.json,.zip';
 document.querySelector('.logo').innerHTML=`<img class="r14-logo" src="${R14_LOGO}" alt="RONIX">`;
-document.querySelector('.sublogo').textContent='PROJECT FINANCE · V14.3';
-document.querySelector('.sidebar-footer').innerHTML='RONIX V14.3 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';
+document.querySelector('.sublogo').textContent='PROJECT FINANCE · V15';
+document.querySelector('.sidebar-footer').innerHTML='RONIX V15 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';
 const help=document.createElement('button');help.className='nav';help.textContent='؟ بدء العمل والمساعدة';help.onclick=r14Help;document.querySelector('.sidebar-footer').before(help);
-document.querySelector('.footer').textContent='RONIX V14.3 · احتفظ بنسخة احتياطية بعد جلسة العمل';
+document.querySelector('.footer').textContent='RONIX V15 · احتفظ بنسخة احتياطية بعد جلسة العمل';
 for(const b of document.querySelectorAll('.nav'))b.innerHTML=b.innerHTML.replaceAll('*** ','');
-document.title='RONIX V14.3 | المشاريع والمصممون والتحصيل والمطالبات';
+document.title='RONIX V15 | المشاريع والمصممون والتحصيل والمطالبات';
 render();
