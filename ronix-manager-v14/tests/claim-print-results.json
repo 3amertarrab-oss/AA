@@ -13,7 +13,7 @@
     "claim-with-receipts: no changes to financial records",
     "three projects with photos and receipts fit one page",
     "project images finish decoding before print",
-    "partial settlement retained with piastres",
+    "partial settlement rounded only for print",
     "allocated amounts retained and receipt references excluded",
     "larger project photos preserve their full proportions",
     "logo has transparent pixels outside and inside the ring",

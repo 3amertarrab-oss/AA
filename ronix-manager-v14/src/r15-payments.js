@@ -46,7 +46,7 @@ saveCustomerReceipt=function(e){e.preventDefault();try{
  r14ProofReady(e.target);const client=val('crClient'),batchId=activeReceiptEdit||r14Id('RC'),total=r14InputMoney('crAmount',{positive:true}),currency=val('crCurrency'),exchangeRate=R14.rate(val('crRate')),allocations=r15AllocationRead(),old=data.clientReceipts.filter(r=>(r.batchId||r.id)===batchId);
  if(!clientNames().includes(client))throw Error('اختر العميل');
  if(allocations.some(a=>{const p=getP(a.code);return a.projectAmount>R14.sum([{amount:R14.projectOriginalTotal(p)},{amount:-R14.receivedOriginal(data,p)},...old.filter(r=>r.code===p.code).map(r=>({amount:r.projectAmount??R14.unfx(r.amount,R14.projectRate(p))}))])})&&!confirm('السداد يتجاوز رصيد عقد وسيظهر رصيد دائن. متابعة؟'))return;
- const next=R14.foreignReceiptEdit(data,{batchId,client,date:r14RequireDate('crDate'),total,currency,exchangeRate,allocations,method:val('crMethod'),ref:val('crRef'),note:val('crNote'),id:()=>r14Id('R')});r14AttachTo(next,e.target,'receipt',batchId);
+ const next=R14.foreignReceiptEdit(data,{batchId,client,date:r14RequireDate('crDate'),total,currency,exchangeRate,allocations,method:val('crMethod'),ref:val('crRef'),note:val('crNote'),id:()=>r14Id('R')});for(const row of next.clientReceipts.filter(r=>(r.batchId||r.id)===batchId))row.rateQuote=r19ReadRateMeta('crRate',currency,exchangeRate);r14AttachTo(next,e.target,'receipt',batchId);
  if(r14Persist(next,old.length?'تعديل سند قبض':'إضافة سند قبض',{batchId,total,currency,exchangeRate})){activeReceiptEdit=null;r14Done('حُفظ القبض وسداد العقود وفرق الصرف')}
  }catch(e){alert(e.message)}};
 // Deleting a designer payment preserves its proof and reversal record.

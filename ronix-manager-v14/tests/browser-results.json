@@ -41,7 +41,7 @@
     "backup includes attachments and claim settlements",
     "restore retains attachments and matches",
     "comprehensive Excel includes all financial tables",
-    "claim print includes exact settlement",
+    "claim print rounds display and keeps exact settlement in accounts",
     "all page scripts remain error-free"
   ],
   "errors": [],

@@ -1,0 +1,21 @@
+{
+  "version": "V19",
+  "date": "2026-10-25",
+  "scope": "Optional daily reference FX lookup with manual input, stable short document numbers and whole-money display",
+  "daily_rate_source": "https://github.com/fawazahmed0/exchange-api",
+  "bank_specific_rate": "Manual input; automatic quote is a daily reference, not a bank buy/sell price",
+  "completed_request_items": 3,
+  "checks": {
+    "unit": 103,
+    "presentation_browser": 30,
+    "customers_browser": 32,
+    "review_v17": 26,
+    "review_v15": 29,
+    "linking_and_recovery": 24,
+    "legacy_browser": 42,
+    "reliability": 15,
+    "attachments": 25,
+    "claim_print": 56
+  },
+  "total_passed": 382
+}

@@ -110,7 +110,7 @@ with sync_playwright() as pw:
     context.add_init_script('window.print=()=>{}')
     with page.expect_popup() as popup:
         page.evaluate('(id)=>printClaim(r14Encode(id))',claim)
-    check('claim print includes exact settlement', '230.50' in popup.value.locator('body').inner_text())
+    check('claim print rounds display and keeps exact settlement in accounts', '231' in popup.value.locator('.claim-total').inner_text() and page.evaluate('R14.remaining(data,data.claims[0])')==230.5)
     popup.value.close()
     check('all page scripts remain error-free',not errors)
     result={'passed':len(checks),'checks':checks,'errors':errors,'expected_dialogs':len(dialogs)}

@@ -1,3 +1,5 @@
+function r19Doc(kind,id){return R19.number(data,kind,id)}
+function r19Ref(kind,id,ref=''){return R19.reference(data,kind,id,ref)}
 // Presentation only: keep financial values and export data unchanged.
 function r14Paid(value, currency=false){return `<span class="r14-paid">${currency?money(value):fmt(value)}</span>`}
 function r14Due(value, currency=false){return `<span class="r14-due">${currency?money(value):fmt(value)}</span>`}
