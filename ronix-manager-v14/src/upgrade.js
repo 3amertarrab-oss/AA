@@ -4,7 +4,7 @@ function r14Persist(next,action='حفظ',details={}) {
     if(r14BootIssue)throw Error('استعد نسخة سليمة أولًا. يمكنك تنزيل البيانات غير المقروءة من التنبيه أعلى الصفحة.');
     if(localStorage.getItem(KEY)!==r14Disk)throw Error('تغيّرت البيانات في نافذة أخرى. نزّل نسخة من هذه النافذة ثم أعد تحميل الصفحة قبل التسجيل.');
     const linked=R16.reconcile(next),checked=linked.data;
-    checked.schemaVersion=16;checked.currency='EGP';
+    checked.schemaVersion=17;checked.currency='EGP';
     const previousLinks=JSON.parse(r14Saved).claimSettlements||[];
     if(JSON.stringify(previousLinks)!==JSON.stringify(checked.claimSettlements))checked.auditTrail.push({id:r14Id('AUD'),at:new Date().toISOString(),action:'تحديث ربط التحصيل بالمطالبات',before:previousLinks,after:R14.copy(checked.claimSettlements)});
     checked.auditTrail.push({id:r14Id('AUD'),at:new Date().toISOString(),action,...details});

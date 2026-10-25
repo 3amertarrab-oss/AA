@@ -1,6 +1,6 @@
 /* RONIX V14. Monetary arithmetic in integer piastres; no network or storage. */
 const R14 = (() => {
-  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments'];
+  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners'];
   const copy = v => JSON.parse(JSON.stringify(v));
   const normName = v => String(v || '').trim();
   function cents(v) {
@@ -88,7 +88,7 @@ const R14 = (() => {
   }
   function normalize(v) {
     if (!v || typeof v!=='object' || Array.isArray(v)) throw Error('الملف لا يحتوي على قاعدة بيانات RONIX');
-    if (v.schemaVersion > 16) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
+    if (v.schemaVersion > 17) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
     const d = copy(v);
     for (const k of arrays) {
       if (d[k] == null && !['projects','assignments','payments'].includes(k)) d[k]=[];
@@ -112,6 +112,10 @@ const R14 = (() => {
     unique(d.projects,p=>p.code,'المشاريع');
     for(const key of ['assignments','payments','claims','clientReceipts','advances','projectExpenses'])unique(d[key],x=>x.id,key,key==='assignments');
     const projects=new Map(d.projects.map(p=>[p.code,p]));
+    unique(d.trashRecords,x=>x.id,'سلة المحذوفات');
+    unique(d.archivedDesigners,x=>x.name,'المصممون المؤرشفون');
+    for(const x of d.trashRecords)if(!['project','assignment','designer'].includes(x.kind)||!x.reason||!x.at||!Array.isArray(x.projects)||!Array.isArray(x.assignments))add('سجل محذوفات غير صالح');
+    for(const x of d.archivedDesigners)if(!x.name||!x.reason||!x.at)add('أرشيف مصمم غير صالح');
     const linked=(code,label)=>{if(!projects.has(code))add(label+': مشروع غير موجود '+code)};
     for(const p of d.projects){if(typeof p.code!=='string'||!p.code.trim()||typeof p.name!=='string')add('بيانات مشروع غير صالحة');monetary(p.contract||0,'عقد '+p.code)}
     unique(d.assignments,a=>a.code+'::'+normName(a.designer).replace(/\s+/g,' '),'تكليف المصمم');

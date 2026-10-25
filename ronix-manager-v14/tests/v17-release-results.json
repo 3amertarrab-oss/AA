@@ -1,0 +1,19 @@
+{
+  "version": "V17",
+  "date": "2026-10-25",
+  "scope": "Review round 3; tax pending user clarification; Google sync not implemented",
+  "review_groups_completed": 6,
+  "review_groups_total": 7,
+  "completion_percent_rounded": 86,
+  "checks": {
+    "unit": 73,
+    "review_v17": 26,
+    "review_v15": 29,
+    "linking_and_recovery": 24,
+    "legacy_browser": 42,
+    "reliability": 15,
+    "attachments": 25,
+    "claim_print": 56
+  },
+  "total_passed": 290
+}

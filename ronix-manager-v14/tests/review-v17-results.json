@@ -1,0 +1,32 @@
+{
+  "passed": 26,
+  "checks": [
+    "backup and restore removed from top bar",
+    "reports exposes backup restore and recycle bin",
+    "latest source records preserved without resurrecting older data",
+    "latest import passes accounting audit",
+    "EGP input calculates SAR repayment without changing actual cash",
+    "cross-currency receipt saves exact cash and explicit rounding difference",
+    "receipt edit reloads actual and contractual amounts separately",
+    "native-first suggestion does not overshoot receipt by rounding cents",
+    "allocate remainder fills both currencies",
+    "first Excel sheet contains project totals and full transaction overview",
+    "first sheet names every assigned designer",
+    "detail sheets include numeric payments and links",
+    "backdrop click retains open form and typed data",
+    "Escape does not discard an editing form",
+    "explicit close button dismisses dialog",
+    "unused project and assignment move to recycle bin",
+    "project restore returns assignment and original balances",
+    "assignment deletion leaves project intact",
+    "unpaid designer can be deleted and restored",
+    "linked project deletion explains accounting-preserving archive",
+    "archived project retains financial balances and payment",
+    "archived project hidden from working directory",
+    "archived project remains accessible on demand",
+    "paid designer archive preserves its ledger",
+    "archive state and financial links survive backup restore",
+    "review workflows remain free of script exceptions"
+  ],
+  "errors": []
+}
