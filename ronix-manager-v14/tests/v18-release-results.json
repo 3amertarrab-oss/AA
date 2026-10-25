@@ -1,0 +1,19 @@
+{
+  "version": "V18",
+  "date": "2026-10-25",
+  "scope": "Editable customer dropdown, typed new customer and separate persistent directory; tax and Google sync remain pending",
+  "customer_request_groups_completed": 3,
+  "customer_request_groups_total": 3,
+  "checks": {
+    "unit": 87,
+    "customers_browser": 32,
+    "review_v17": 26,
+    "review_v15": 29,
+    "linking_and_recovery": 24,
+    "legacy_browser": 42,
+    "reliability": 15,
+    "attachments": 25,
+    "claim_print": 56
+  },
+  "total_passed": 336
+}

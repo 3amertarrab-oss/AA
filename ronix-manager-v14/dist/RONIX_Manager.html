@@ -55,11 +55,12 @@ button:disabled{opacity:.6;cursor:wait}
 @media print{.r14-proof-action{display:none}}
 
 .r15-terms{border-top:1px solid #d5dde7;padding-top:16px;margin-top:16px}.r15-terms h3{margin:0;font-size:16px}.r15-row{display:grid;grid-template-columns:minmax(150px,2fr) 145px 130px 42px;gap:8px;margin:10px 0}.r15-row.adjust{grid-template-columns:minmax(150px,2fr) 145px 100px 130px 42px}.r15-cost-photo{display:flex;gap:20px;align-items:center;flex-wrap:wrap}.r15-photo-button{background:white;border:0}.r15-photo-button img{width:240px;height:180px;object-fit:contain}.r15-contract-panel p{line-height:1.9;font-size:13px}.r15-selected-project{outline:2px solid #b58a48;background:#fff9ec}.r15-row .field{min-width:0}@media(max-width:700px){.r15-row,.r15-row.adjust{grid-template-columns:1fr 1fr}.r15-row .r15-name{grid-column:1/-1}}
+.r18-client-picker{position:relative;display:flex;gap:6px}.r18-client-picker>.field{flex:1;min-width:0}.r18-client-toggle{flex:none;padding:8px 13px}.r18-client-options{position:absolute;top:calc(100% + 4px);right:0;left:0;z-index:35;max-height:250px;overflow:auto;background:white;border:1px solid #b58a48;border-radius:9px;box-shadow:0 8px 25px #17233730;padding:5px}.r18-client-options[hidden]{display:none}.r18-client-option{display:block;width:100%;text-align:right;border:0;background:white;color:#172337;padding:11px 12px;border-radius:6px;font-size:14px}.r18-client-option:hover,.r18-client-option[aria-selected=true]{background:#f7edda}.r18-new-customer{color:#087f46;border-top:1px solid #e0e5ed}.r18-client-options .hint{padding:8px;margin:0}
 
 </style></head><body><div class="layout"><aside class="side"><div><div class="logo">RONIX</div><div class="sublogo">DESIGNER FINANCE</div></div><button class="nav active" data-page="dashboard" onclick="go('dashboard')"><span>◈</span>الرئيسية</button><button class="nav" data-page="projects" onclick="go('projects')"><span>▣</span>المشاريع</button><button class="nav" data-page="designers" onclick="go('designers')"><span>♟</span>المصممون</button><button class="nav" data-page="payments" onclick="go('payments')"><span>▤</span>الدفعات</button><button class="nav" data-page="clients" onclick="go('clients')"><span>◉</span>كشف حساب العملاء</button><button class="nav" data-page="claims" onclick="go('claims')"><span>▤</span>مطالبات العملاء</button><button class="nav" data-page="advanced" onclick="go('advanced')"><span>✦</span>*** المالية المتقدمة</button><button class="nav" data-page="reports" onclick="go('reports')"><span>▥</span>التقارير</button><div class="sidebar-footer">RONIX ENGINEERING<br>نسخة تشغيل محلية · البيانات تحفظ على هذا المتصفح</div></aside><main class="main"><header class="top"><div><div class="eyebrow">RONIX / PROJECT ACCOUNTS</div><h1 id="title">لوحة التحكم</h1><div class="subtitle" id="sub">إدارة المشروع والمصمم والمدفوعات من مكان واحد</div></div><div class="actions"><button class="btn" onclick="backup()">↓ نسخة احتياطية</button><button class="btn" onclick="document.getElementById('restore').click()">↑ استعادة</button><input id="restore" type="file" accept=".json" hidden onchange="restoreData(this)"><button class="btn gold" onclick="openPayment()">+ دفعة جديدة</button></div></header><section id="content"></section><footer class="footer">RONIX © 2026 · يُرجى الاحتفاظ بنسخة احتياطية منتظمة</footer></main></div><div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modalhead"><h2 id="modalTitle">إضافة</h2><button class="close" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div><div id="toast" class="toast"></div><script>
 /* RONIX V14. Monetary arithmetic in integer piastres; no network or storage. */
 const R14 = (() => {
-  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners'];
+  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers'];
   const copy = v => JSON.parse(JSON.stringify(v));
   const normName = v => String(v || '').trim();
   function cents(v) {
@@ -147,7 +148,7 @@ const R14 = (() => {
   }
   function normalize(v) {
     if (!v || typeof v!=='object' || Array.isArray(v)) throw Error('الملف لا يحتوي على قاعدة بيانات RONIX');
-    if (v.schemaVersion > 17) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
+    if (v.schemaVersion > 18) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
     const d = copy(v);
     for (const k of arrays) {
       if (d[k] == null && !['projects','assignments','payments'].includes(k)) d[k]=[];
@@ -169,6 +170,9 @@ const R14 = (() => {
     const dated=(s,label,optional=false)=>{if((!optional||s)&&!dateOK(s))add(label+': تاريخ غير صالح')};
     const unique=(rows,key,label,optional=false)=>{const seen=new Set();for(const r of rows){const k=key(r);if((!k&&!optional)||(k&&seen.has(k)))add(label+': معرّف فارغ أو مكرر');if(k)seen.add(k)}};
     unique(d.projects,p=>p.code,'المشاريع');
+    unique(d.customers,c=>c?.id,'معرّفات العملاء');
+    unique(d.customers,c=>normName(c?.name),'أسماء العملاء');
+    for(const c of d.customers)if(!c||typeof c.id!=='string'||typeof c.name!=='string'||!c.name.trim()||c.name!==c.name.trim()||['phone','email','note'].some(k=>c[k]!=null&&typeof c[k]!=='string'))add('بيانات عميل غير صالحة');
     for(const key of ['assignments','payments','claims','clientReceipts','advances','projectExpenses'])unique(d[key],x=>x.id,key,key==='assignments');
     const projects=new Map(d.projects.map(p=>[p.code,p]));
     unique(d.trashRecords,x=>x.id,'سلة المحذوفات');
@@ -407,6 +411,55 @@ const R17Life=((R)=>{
 })(typeof module!=='undefined'?require('./finance-core.js'):R14);
 if(typeof module!=='undefined')module.exports=R17Life;
 
+/* Customer directory, preserving the legacy name-based ledger without merging accounts. */
+const R18Clients=((R)=>{
+  const clean=v=>String(v??'').trim().replace(/\s+/g,' ');
+  const key=v=>clean(v).normalize('NFC').toLocaleLowerCase('en');
+  function sourceNames(d){return [...new Set([
+    ...d.customers.map(c=>c.name),...d.projects.map(p=>p.client),...d.claims.map(c=>c.client),
+    ...d.clientReceipts.map(r=>r.client),...d.advances.map(a=>a.client),...d.openingBalances.map(o=>o.client),
+    ...d.trashRecords.flatMap(x=>x.projects.map(p=>p.client))
+  ].map(R.normName).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ar'))}
+  function newId(name,used){
+    let h=2166136261;for(const ch of name){h^=ch.codePointAt(0);h=Math.imul(h,16777619)>>>0}
+    const base='C-'+h.toString(16);let id=base,i=1;while(used.has(id))id=base+'-'+i++;return id;
+  }
+  function sync(value){
+    const d=R.validate(value),names=new Set(d.customers.map(c=>R.normName(c.name))),ids=new Set(d.customers.map(c=>c.id));
+    for(const name of sourceNames(d))if(!names.has(name)){
+      const id=newId(name,ids);ids.add(id);names.add(name);d.customers.push({id,name,phone:'',email:'',note:''});
+    }
+    return d;
+  }
+  function resolveName(value,raw){
+    const d=sync(value),exact=R.normName(raw),name=clean(raw);if(!name)throw Error('اختر عميلًا من القائمة أو اكتب اسم عميل جديد');
+    const same=d.customers.find(c=>c.name===exact);if(same)return same.name;
+    const similar=d.customers.filter(c=>key(c.name)===key(name));
+    if(similar.length>1)throw Error('توجد أسماء عملاء متشابهة في البيانات القديمة؛ اختر العميل المطلوب من القائمة');
+    return similar[0]?.name||name;
+  }
+  function save(value,record){
+    const d=sync(value),old=record.id?d.customers.find(c=>c.id===record.id):null;
+    if(record.id&&!old)throw Error('العميل غير موجود');
+    const name=old&&R.normName(record.name)===old.name?old.name:clean(record.name);
+    if(!name)throw Error('اسم العميل مطلوب');
+    if((!old||name!==old.name)&&d.customers.some(c=>c!==old&&(c.name===name||key(c.name)===key(name))))throw Error('يوجد عميل بهذا الاسم؛ اختره بدل إنشاء حساب مكرر');
+    const next={...old,id:old?.id||newId(name,new Set(d.customers.map(c=>c.id))),name,phone:String(record.phone||'').trim(),email:String(record.email||'').trim(),note:String(record.note||'').trim()};
+    if(old){
+      const previous=old.name;
+      // Rename all current references in one transaction. Historical snapshots remain unchanged.
+      if(name!==previous){
+        for(const table of ['projects','claims','clientReceipts','advances','openingBalances'])for(const row of d[table])if(R.normName(row.client)===previous)row.client=name;
+        for(const x of d.trashRecords)for(const p of x.projects)if(R.normName(p.client)===previous)p.client=name;
+      }
+      d.customers[d.customers.indexOf(old)]=next;
+    }else d.customers.push(next);
+    return R.validate(d);
+  }
+  return {clean,key,sourceNames,sync,resolveName,save};
+})(typeof module!=='undefined'?require('./finance-core.js'):R14);
+if(typeof module!=='undefined')module.exports=R18Clients;
+
 // Bootstrap runs before the preserved V13 screens. No sample client data shipped.
 const r14Encode = value => encodeURIComponent(value).replace(/'/g,'%27');
 const r14Key = 'ronix_projects_designers_v1';
@@ -415,7 +468,7 @@ const r14Empty = () => R14.normalize({projects:[],assignments:[],payments:[]});
 function r14Load() {
   try {
     r14Disk=localStorage.getItem(r14Key);
-    const result=r14Disk?R14.validate(JSON.parse(r14Disk)):r14Empty();
+    const result=r14Disk?R18Clients.sync(JSON.parse(r14Disk)):r14Empty();
     r14Saved=JSON.stringify(result);return result;
   } catch(e) {
     r14BootIssue='تعذر فتح البيانات المحفوظة: '+e.message;
@@ -758,8 +811,8 @@ function r14Persist(next,action='حفظ',details={}) {
   try {
     if(r14BootIssue)throw Error('استعد نسخة سليمة أولًا. يمكنك تنزيل البيانات غير المقروءة من التنبيه أعلى الصفحة.');
     if(localStorage.getItem(KEY)!==r14Disk)throw Error('تغيّرت البيانات في نافذة أخرى. نزّل نسخة من هذه النافذة ثم أعد تحميل الصفحة قبل التسجيل.');
-    const linked=R16.reconcile(next),checked=linked.data;
-    checked.schemaVersion=17;checked.currency='EGP';
+    const linked=R16.reconcile(next),checked=R18Clients.sync(linked.data);
+    checked.schemaVersion=18;checked.currency='EGP';
     const previousLinks=JSON.parse(r14Saved).claimSettlements||[];
     if(JSON.stringify(previousLinks)!==JSON.stringify(checked.claimSettlements))checked.auditTrail.push({id:r14Id('AUD'),at:new Date().toISOString(),action:'تحديث ربط التحصيل بالمطالبات',before:previousLinks,after:R14.copy(checked.claimSettlements)});
     checked.auditTrail.push({id:r14Id('AUD'),at:new Date().toISOString(),action,...details});
@@ -1261,10 +1314,10 @@ function r14PreviewImport(value,name){
 }
 function r14AcceptImport(){
   if(!r14PendingImport)return;
-  if(data.projects.length||data.clientReceipts.length||data.payments.length)backup();
+  if(data.projects.length||data.clientReceipts.length||data.payments.length||data.customers.length)backup();
   if(r14BootIssue&&r14Disk)r14ExportUnreadable();
   const issue=r14BootIssue;r14BootIssue='';
-  if(r14Persist(r14PendingImport,'استيراد نسخة احتياطية')){r14PendingImport=null;closeModal();go('dashboard');notify('تم استيراد البيانات. راجع الأرصدة ثم حمّل نسخة احتياطية V17.')}else r14BootIssue=issue;
+  if(r14Persist(r14PendingImport,'استيراد نسخة احتياطية')){r14PendingImport=null;closeModal();go('dashboard');notify('تم استيراد البيانات. راجع الأرصدة ثم حمّل نسخة احتياطية V18.')}else r14BootIssue=issue;
 }
 function r14ExportUnreadable(){if(r14Disk)download('RONIX_Stored_Data_Before_Recovery.json',r14Disk,'application/json')}
 async function r14ReadArchive(file){
@@ -1288,26 +1341,26 @@ async function r14ReadArchive(file){
   modal('اختر نسخة الحسابات من الأرشيف',`<p>الملف يحتوي على أكثر من نسخة؛ اختر النسخة التي تريد استعادتها.</p><select class="field" id="r14ArchiveChoice">${backups.map((b,i)=>`<option value="${i}">${esc(b.name)} · ${b.data.projects.length} مشروع</option>`).join('')}</select><div class="modalfoot"><button class="btn primary" onclick="r14ChooseArchive(val('r14ArchiveChoice'))">مراجعة النسخة</button></div>`);
 }
 restoreData=async function(input){const file=input.files?.[0];if(!file)return;input.value='';try{if(file.size>40*1024*1024)throw Error('الملف أكبر من 40 ميجابايت');if(/\.zip$/i.test(file.name))await r14ReadArchive(file);else r14PreviewImport(JSON.parse(await file.text()),file.name)}catch(e){r14PendingImport=null;alert('تعذر الاستيراد دون تغيير البيانات الحالية:\n'+e.message)}};
-backup=function(){download('RONIX_V17_Backup_'+r14Today()+'.json',JSON.stringify({...data,schemaVersion:17,currency:'EGP',exportedAt:new Date().toISOString()},null,2),'application/json;charset=utf-8');r14OldNotify('نُزّلت النسخة الاحتياطية بما فيها الصور والمرفقات المحفوظة')};
+backup=function(){download('RONIX_V18_Backup_'+r14Today()+'.json',JSON.stringify({...data,schemaVersion:18,currency:'EGP',exportedAt:new Date().toISOString()},null,2),'application/json;charset=utf-8');r14OldNotify('نُزّلت النسخة الاحتياطية بما فيها الصور والمرفقات المحفوظة')};
 function r14Help(){modal('بدء العمل على النسخة المحسنة',`<p><b>هذا تحديث للبرنامج الأصلي RONIX V13.</b> جميع الأقسام الأصلية موجودة في القائمة.</p><ol><li>لجلب النسخة التي أرسلتها، اضغط «استيراد» واختر ملف ZIP الأصلي. سينقل الحسابات وصور المشاريع من النسخة الاحتياطية الموجودة فيه.</li><li>إذا عملت على البرنامج القديم بعد تاريخ نسخته الاحتياطية، صدّر منه أحدث ملف JSON واستورده بدلًا منها.</li><li>راجع عدد السجلات ثم اعتمد الاستيراد. افتح «فحص البيانات» وراجع كشف عميل ومصمم.</li><li>سجّل القبض من العملاء ووزعه جزئيًا أو كليًا. الباقي يبقى باسم العميل. سجّل دفعات المصممين في قسم الدفعات.</li><li>من المطالبات، اضغط «مطابقة» واربط المبالغ المقبوضة بالمطالبة المناسبة.</li><li>نزّل نسخة احتياطية بعد جلسة العمل؛ البيانات تحفظ في هذا المتصفح على هذا الجهاز.</li></ol><p>Excel للتقارير، وJSON لاستعادة جميع البيانات. لا تجمع القبض مع المطالبات، ولا تجمع دفعات المصمم مع أتعابه كتكلفة ثانية.</p><div class="modalfoot"><button class="btn primary" onclick="closeModal();$('restore').click()">استيراد ZIP أو JSON</button><button class="btn" onclick="closeModal()">إغلاق</button></div>`)}
 const r14Render=render;
 render=function(){
   r14Render();
   const content=$('content');
   if(r14BootIssue)content.insertAdjacentHTML('afterbegin',`<div class="panel"><h2>البيانات المحفوظة تحتاج استعادة</h2><p>${esc(r14BootIssue)}</p><button class="btn" onclick="r14ExportUnreadable()">تنزيل البيانات قبل الإصلاح</button><button class="btn primary" onclick="$('restore').click()">استيراد نسخة سليمة</button></div>`);
-  else if(!data.projects.length)content.insertAdjacentHTML('afterbegin',`<div class="panel r14-welcome"><h2>برنامجك الأصلي، مع تحسين الحسابات · V17</h2><p>ابدأ باستيراد ملف ZIP القديم لنقل المشاريع والمصممين والدفعات والمطالبات والصور.</p><div class="actions"><button class="btn primary" onclick="$('restore').click()">استيراد برنامجك القديم ZIP / JSON</button><button class="btn" onclick="editProject()">إنشاء أول مشروع</button><button class="btn" onclick="r14Help()">طريقة العمل</button></div><p class="hint">تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.</p></div>`);
+  else if(!data.projects.length)content.insertAdjacentHTML('afterbegin',`<div class="panel r14-welcome"><h2>برنامجك الأصلي، مع تحسين الحسابات · V18</h2><p>ابدأ باستيراد ملف ZIP القديم لنقل المشاريع والمصممين والدفعات والمطالبات والصور.</p><div class="actions"><button class="btn primary" onclick="$('restore').click()">استيراد برنامجك القديم ZIP / JSON</button><button class="btn" onclick="editProject()">إنشاء أول مشروع</button><button class="btn" onclick="r14Help()">طريقة العمل</button></div><p class="hint">تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.</p></div>`);
 };
 const r14Modal=modal;
 modal=function(title,body){r14Modal(title.replaceAll('*** ',''),body);for(const input of $('modalBody').querySelectorAll('input[type=number]')){input.step='0.01';if(input.min==='1')input.min='0.01'}$('overlay').setAttribute('role','dialog');$('overlay').setAttribute('aria-modal','true');$('overlay').setAttribute('aria-labelledby','modalTitle')};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 $('restore').accept='.json,.zip';
 document.querySelector('.logo').innerHTML=`<img class="r14-logo" src="${R14_LOGO}" alt="RONIX">`;
-document.querySelector('.sublogo').textContent='PROJECT FINANCE · V17';
-document.querySelector('.sidebar-footer').innerHTML='RONIX V17 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';
+document.querySelector('.sublogo').textContent='PROJECT FINANCE · V18';
+document.querySelector('.sidebar-footer').innerHTML='RONIX V18 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';
 const help=document.createElement('button');help.className='nav';help.textContent='؟ بدء العمل والمساعدة';help.onclick=r14Help;document.querySelector('.sidebar-footer').before(help);
-document.querySelector('.footer').textContent='RONIX V17 · احتفظ بنسخة احتياطية بعد جلسة العمل';
+document.querySelector('.footer').textContent='RONIX V18 · احتفظ بنسخة احتياطية بعد جلسة العمل';
 for(const b of document.querySelectorAll('.nav'))b.innerHTML=b.innerHTML.replaceAll('*** ','');
-document.title='RONIX V17 | المشاريع والمصممون والتحصيل والمطالبات';
+document.title='RONIX V18 | المشاريع والمصممون والتحصيل والمطالبات';
 render();
 
 /* Retain the existing screens, with every linked balance sourced from R16. */
@@ -1415,6 +1468,85 @@ projectExcel=function(enc){const p=getP(decodeURIComponent(enc));if(!p)return;co
 };
 r15Changes=function(){modal('تحديث ملاحظات الاستخدام · V17',`<ol><li>حذف المشروع والمصمم والتكليف مع استعادة، وأرشفة السجلات ذات الحركات المالية.</li><li>نقل النسخ الاحتياطي والاستعادة إلى التقارير.</li><li>إدخال القبض بالجنيه لعقد أجنبي وحساب المقابل دون زيادة المبلغ المقبوض بسبب التقريب.</li><li>كشف Excel المشروع يبدأ بالملخص والحركات والأرصدة.</li><li>منع إغلاق النوافذ بالضغط خارجها أثناء الإدخال.</li></ol><p>بند الضريبة بانتظار تحديد نوعه ونسبته؛ لم يُطبق على العقود.</p>`)};r15Help.textContent='✓ ما الجديد · V17';r15Help.onclick=r15Changes;
 document.title='RONIX V17 | المشاريع والحسابات';document.querySelector('.sublogo').textContent='PROJECT FINANCE · V17';document.querySelector('.sidebar-footer').innerHTML='RONIX V17 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';document.querySelector('.footer').textContent='RONIX V17 · احتفظ بنسخة احتياطية بعد جلسة العمل';
+render();
+
+/* Editable customer picker and a separate, persistent customer directory. */
+clientNames=function(){return R18Clients.sourceNames(data)};
+function r18CustomerOptions(showAll=false){
+  const input=$('pclient'),list=$('r18ClientOptions');if(!input||!list)return;
+  const query=showAll?'':R18Clients.key(input.value),names=clientNames().filter(n=>R18Clients.key(n).includes(query));
+  list.replaceChildren();input._r18Active=-1;input.removeAttribute('aria-activedescendant');
+  for(const [i,name] of names.entries()){
+    const button=document.createElement('button');button.type='button';button.className='r18-client-option';button.id='r18-client-option-'+i;button.setAttribute('role','option');button.setAttribute('aria-selected','false');button.textContent=name;
+    button.onclick=()=>r18ChooseCustomer(name);list.append(button);
+  }
+  const typed=R18Clients.clean(input.value),similar=clientNames().some(n=>R18Clients.key(n)===R18Clients.key(typed));
+  if(typed&&!similar){
+    const button=document.createElement('button');button.type='button';button.className='r18-client-option r18-new-customer';button.id='r18-client-option-new';button.setAttribute('role','option');button.setAttribute('aria-selected','false');button.textContent='+ استخدام عميل جديد: '+typed;button.onclick=()=>r18ChooseCustomer(typed);list.append(button);
+  }
+  if(!list.childElementCount){const empty=document.createElement('p');empty.className='hint';empty.textContent='اكتب اسم العميل الجديد، وسيُضاف عند حفظ المشروع.';list.append(empty)}
+  list.hidden=false;input.setAttribute('aria-expanded','true');r18CustomerHint();
+}
+function r18CloseCustomerOptions(){const input=$('pclient'),list=$('r18ClientOptions');if(list)list.hidden=true;if(input){input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');input._r18Active=-1}}
+function r18CustomerHint(){const input=$('pclient'),hint=$('r18ClientHint');if(!input||!hint)return;const name=R18Clients.clean(input.value),exists=clientNames().some(n=>R18Clients.key(n)===R18Clients.key(name));hint.textContent=!name?'اختر من القائمة أو اكتب اسم عميل جديد.':exists?'العميل موجود في قائمة العملاء.':'سيُضاف هذا العميل إلى القائمة عند حفظ المشروع.'}
+function r18ChooseCustomer(name){const input=$('pclient');input.value=name;input.focus();r18CloseCustomerOptions();r18CustomerHint()}
+function r18CustomerKey(event){
+  const input=event.currentTarget,list=$('r18ClientOptions');
+  if(event.key==='Escape'&&list&&!list.hidden){event.preventDefault();event.stopPropagation();r18CloseCustomerOptions();return}
+  if(event.key==='ArrowDown'||event.key==='ArrowUp'){
+    event.preventDefault();if(list.hidden)r18CustomerOptions(true);
+    const options=[...list.querySelectorAll('[role=option]')];if(!options.length)return;
+    const delta=event.key==='ArrowDown'?1:-1;input._r18Active=((input._r18Active??-1)+delta+options.length)%options.length;
+    options.forEach((b,i)=>b.setAttribute('aria-selected',String(i===input._r18Active)));const active=options[input._r18Active];input.setAttribute('aria-activedescendant',active.id);active.scrollIntoView({block:'nearest'});
+  }else if(event.key==='Enter'&&!list.hidden&&input._r18Active>=0){event.preventDefault();list.querySelectorAll('[role=option]')[input._r18Active]?.click()}
+  else if(event.key==='Tab')r18CloseCustomerOptions();
+}
+function r18BindCustomerPicker(){
+  const input=$('pclient');if(!input)return;
+  const wrapper=document.createElement('div');wrapper.className='r18-client-picker';input.before(wrapper);wrapper.append(input);
+  input.required=true;input.autocomplete='off';input.setAttribute('role','combobox');input.setAttribute('aria-label','العميل — اختر أو اكتب اسمًا جديدًا');input.setAttribute('aria-controls','r18ClientOptions');input.setAttribute('aria-autocomplete','list');input.setAttribute('aria-expanded','false');
+  const toggle=document.createElement('button');toggle.type='button';toggle.className='btn r18-client-toggle';toggle.textContent='▾';toggle.setAttribute('aria-label','عرض قائمة العملاء');toggle.onclick=()=>{const open=!$('r18ClientOptions').hidden;if(open)r18CloseCustomerOptions();else r18CustomerOptions(true)};
+  const list=document.createElement('div');list.id='r18ClientOptions';list.className='r18-client-options';list.hidden=true;list.setAttribute('role','listbox');list.setAttribute('aria-label','العملاء');wrapper.append(toggle,list);
+  const hint=document.createElement('span');hint.id='r18ClientHint';hint.className='hint';hint.setAttribute('aria-live','polite');wrapper.after(hint);
+  input.oninput=()=>r18CustomerOptions();input.onfocus=()=>r18CustomerOptions();input.onkeydown=r18CustomerKey;r18CustomerHint();
+}
+const r18EditProject=editProject;
+editProject=function(enc){r18EditProject(enc);r18BindCustomerPicker()};
+const r18SaveProject=saveProject;
+saveProject=function(e,original){e.preventDefault();try{$('pclient').value=R18Clients.resolveName(data,val('pclient'));return r18SaveProject(e,original)}catch(error){alert(error.message)}};
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.r18-client-picker'))r18CloseCustomerOptions()});
+// The form-level Escape guard runs in capture phase; close just this picker first.
+window.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('r18ClientOptions')&&!$('r18ClientOptions').hidden){e.preventDefault();e.stopImmediatePropagation();r18CloseCustomerOptions()}},true);
+function r18CustomerRows(search=$('r18CustomerSearch')?.value||''){
+  const query=R18Clients.key(search);
+  const rows=data.customers.filter(c=>R18Clients.key([c.name,c.phone,c.email].join(' ')).includes(query)).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+  return `<div class="tablewrap"><table><thead><tr><th>العميل</th><th>الهاتف</th><th>المشاريع</th><th>قيمة العقود</th><th>القبض الفعلي</th><th>متبقي العقود</th><th>إجراءات</th></tr></thead><tbody>${rows.map(c=>{const t=customerTotals(c.name),id=r14Encode(c.id),name=r14Encode(c.name);return `<tr><td><b>${esc(c.name)}</b>${c.email?'<br><small>'+esc(c.email)+'</small>':''}</td><td>${esc(c.phone||'—')}</td><td>${customerProjects(c.name).length}</td><td>${fmt(t.contracts)}</td><td>${r14Paid(t.cash)}</td><td>${r14Due(t.contractBalance)}</td><td><button class="link" onclick="selectClient('${name}')">كشف الحساب</button><button class="link" onclick="r18EditCustomer('${id}')">تعديل</button><button class="link" onclick="r18ProjectForCustomer('${name}')">+ مشروع</button><button class="link" onclick="openCustomerReceipt('${name}')">+ تحصيل</button></td></tr>`}).join('')||'<tr><td colspan="7" class="empty">لا توجد نتائج. يمكنك إضافة عميل جديد.</td></tr>'}</tbody></table></div>`;
+}
+function r18FilterCustomers(){$('r18CustomerRows').innerHTML=r18CustomerRows()}
+function r18CustomerDirectory(){return `<div class="panel"><div class="panel-title"><h2>قائمة العملاء <span class="pill">${data.customers.length}</span></h2><div class="actions"><button class="btn primary" onclick="r18EditCustomer()">+ عميل جديد</button><button class="btn" onclick="r18ExportCustomers()">Excel العملاء</button></div></div><p class="hint">أضف العميل مرة واحدة، ثم اختره عند إنشاء المشروع أو تسجيل التحصيل. يمكنك فتح حسابه من هذه القائمة.</p><div class="filters"><input id="r18CustomerSearch" class="field" aria-label="بحث العملاء" placeholder="ابحث باسم العميل أو الهاتف أو البريد" oninput="r18FilterCustomers()"></div><div id="r18CustomerRows">${r18CustomerRows('')}</div></div>`}
+function r18EditCustomer(enc=''){
+  const c=enc?data.customers.find(c=>c.id===decodeURIComponent(enc)):null;if(enc&&!c)return alert('العميل غير موجود');
+  modal(c?'تعديل بيانات العميل':'إضافة عميل جديد',`<form onsubmit="r18SaveCustomer(event,'${c?r14Encode(c.id):''}')"><div class="formgrid">${field('r18CustomerName','اسم العميل',c?.name||'','text','required')}${field('r18CustomerPhone','الهاتف',c?.phone||'','tel')}${field('r18CustomerEmail','البريد الإلكتروني',c?.email||'','email')}<label class="full">ملاحظات<textarea class="field" id="r18CustomerNote" rows="3">${esc(c?.note||'')}</textarea></label></div><p class="hint">${c?'تعديل الاسم يُحدّث اسم العميل في مشاريعه وسنداته ومطالباته مع حفظ المبالغ والروابط. لا يمكن دمج حسابين باسم واحد.':'سيظهر العميل في القوائم حتى إذا لم تُضف له مشروعًا بعد.'}</p><div class="modalfoot"><button class="btn primary" type="submit">حفظ العميل</button><button class="btn" type="button" onclick="closeModal()">إلغاء</button></div></form>`)
+}
+function r18SaveCustomer(e,enc){e.preventDefault();try{
+  const id=enc?decodeURIComponent(enc):'',previous=data.customers.find(c=>c.id===id),name=val('r18CustomerName');
+  const next=R18Clients.save(data,{id,name,phone:val('r18CustomerPhone'),email:val('r18CustomerEmail'),note:val('r18CustomerNote')});
+  if(r14Persist(next,previous?'تعديل بيانات عميل':'إضافة عميل',{customerId:previous?.id||next.customers.at(-1).id,previousName:previous?.name,name:R18Clients.clean(name)}))r14Done('تم حفظ العميل وتحديث القوائم')
+}catch(error){alert(error.message)}}
+function r18ProjectForCustomer(enc){editProject();$('pclient').value=decodeURIComponent(enc);r18CloseCustomerOptions();r18CustomerHint()}
+function r18CustomerTab(){return ['دليل العملاء',[['العميل','الهاتف','البريد الإلكتروني','الملاحظات','المشاريع','العقود','القبض الفعلي','غير موزع','متبقي العقود'],...data.customers.map(c=>{const t=customerTotals(c.name);return[c.name,c.phone||'',c.email||'',c.note||'',customerProjects(c.name).length,t.contracts,t.cash,t.unallocated,t.contractBalance]})]]}
+function r18ExportCustomers(){exportTabs([r18CustomerTab()],'RONIX_Customers')}
+const r18ExportAll=exportAllExcel;
+exportAllExcel=function(){const original=exportTabs;try{exportTabs=(tabs,name)=>original([...tabs,r18CustomerTab()],name);r18ExportAll()}finally{exportTabs=original}};
+const r18PreviewImport=r14PreviewImport;
+r14PreviewImport=function(value,name){const next=R18Clients.sync(value);r18PreviewImport(next,name);$('modalBody').insertAdjacentHTML('afterbegin',`<p class="notice">قائمة العملاء: ${next.customers.length} عميل. تُنقل الأسماء الحالية دون دمج أرصدة أو تغيير سجلات الحساب.</p>`)};
+titles.customerDirectory=['العملاء','إدارة العملاء واختيارهم في المشاريع والتحصيلات'];
+const r18CustomerNav=document.createElement('button');r18CustomerNav.className='nav';r18CustomerNav.dataset.page='customerDirectory';r18CustomerNav.textContent='◉ العملاء';r18CustomerNav.onclick=()=>go('customerDirectory');document.querySelector('.nav[data-page="clients"]').before(r18CustomerNav);
+const r18Render=render;
+render=function(){if(page==='customerDirectory'&&!projectFocus&&!designerFocus){$('content').innerHTML=r18CustomerDirectory();return}r18Render()};
+r15Changes=function(){modal('قائمة العملاء · V18',`<ol><li>قسم مستقل للعملاء مع الإضافة والتعديل والبحث وكشف الحساب.</li><li>قائمة منسدلة قابلة للبحث والكتابة في حقل عميل المشروع.</li><li>العميل الجديد يُحفظ مع المشروع ويظهر في قوائم التحصيل والمطالبات.</li><li>منع تكرار الأسماء الجديدة بسبب المسافات أو اختلاف حالة الأحرف.</li><li>نقل أسماء العملاء القديمة تلقائيًا وحفظ القائمة في JSON وExcel.</li></ol><p>بند الضريبة السابق ما زال بانتظار نوعه ونسبته. ربط Google لم يُفعّل في هذه النسخة.</p>`)};
+r15Help.textContent='✓ ما الجديد · V18';r15Help.onclick=r15Changes;
+document.title='RONIX V18 | العملاء والمشاريع';document.querySelector('.sublogo').textContent='PROJECT FINANCE · V18';document.querySelector('.sidebar-footer').innerHTML='RONIX V18 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';document.querySelector('.footer').textContent='RONIX V18 · احتفظ بنسخة احتياطية بعد جلسة العمل';
 render();
 
 </script>

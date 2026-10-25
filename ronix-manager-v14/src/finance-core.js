@@ -1,6 +1,6 @@
 /* RONIX V14. Monetary arithmetic in integer piastres; no network or storage. */
 const R14 = (() => {
-  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners'];
+  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers'];
   const copy = v => JSON.parse(JSON.stringify(v));
   const normName = v => String(v || '').trim();
   function cents(v) {
@@ -88,7 +88,7 @@ const R14 = (() => {
   }
   function normalize(v) {
     if (!v || typeof v!=='object' || Array.isArray(v)) throw Error('الملف لا يحتوي على قاعدة بيانات RONIX');
-    if (v.schemaVersion > 17) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
+    if (v.schemaVersion > 18) throw Error('هذه النسخة أحدث من البرنامج؛ استخدم إصدارًا مناسبًا');
     const d = copy(v);
     for (const k of arrays) {
       if (d[k] == null && !['projects','assignments','payments'].includes(k)) d[k]=[];
@@ -110,6 +110,9 @@ const R14 = (() => {
     const dated=(s,label,optional=false)=>{if((!optional||s)&&!dateOK(s))add(label+': تاريخ غير صالح')};
     const unique=(rows,key,label,optional=false)=>{const seen=new Set();for(const r of rows){const k=key(r);if((!k&&!optional)||(k&&seen.has(k)))add(label+': معرّف فارغ أو مكرر');if(k)seen.add(k)}};
     unique(d.projects,p=>p.code,'المشاريع');
+    unique(d.customers,c=>c?.id,'معرّفات العملاء');
+    unique(d.customers,c=>normName(c?.name),'أسماء العملاء');
+    for(const c of d.customers)if(!c||typeof c.id!=='string'||typeof c.name!=='string'||!c.name.trim()||c.name!==c.name.trim()||['phone','email','note'].some(k=>c[k]!=null&&typeof c[k]!=='string'))add('بيانات عميل غير صالحة');
     for(const key of ['assignments','payments','claims','clientReceipts','advances','projectExpenses'])unique(d[key],x=>x.id,key,key==='assignments');
     const projects=new Map(d.projects.map(p=>[p.code,p]));
     unique(d.trashRecords,x=>x.id,'سلة المحذوفات');

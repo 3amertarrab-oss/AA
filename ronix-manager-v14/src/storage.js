@@ -6,7 +6,7 @@ const r14Empty = () => R14.normalize({projects:[],assignments:[],payments:[]});
 function r14Load() {
   try {
     r14Disk=localStorage.getItem(r14Key);
-    const result=r14Disk?R14.validate(JSON.parse(r14Disk)):r14Empty();
+    const result=r14Disk?R18Clients.sync(JSON.parse(r14Disk)):r14Empty();
     r14Saved=JSON.stringify(result);return result;
   } catch(e) {
     r14BootIssue='تعذر فتح البيانات المحفوظة: '+e.message;
