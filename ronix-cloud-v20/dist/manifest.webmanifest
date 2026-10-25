@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "RONIX — حسابات المشاريع",
+  "short_name": "RONIX",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "lang": "ar",
+  "dir": "rtl",
+  "background_color": "#f1f4f8",
+  "theme_color": "#172b45",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

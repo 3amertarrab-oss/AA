@@ -1,0 +1,11 @@
+{
+  "passed": 4,
+  "checks": [
+    "empty email does not generate an allowlist grant",
+    "local setup generates full schema and safely quotes lowercase email",
+    "setup links point to the intended project editors",
+    "entered email and generated private SQL are not persisted"
+  ],
+  "errors": [],
+  "environment": "Chromium on localhost with clipboard fallback forced, synthetic email; file:// navigation blocked by environment policy"
+}

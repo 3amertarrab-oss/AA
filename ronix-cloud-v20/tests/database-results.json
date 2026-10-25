@@ -1,0 +1,25 @@
+{
+  "passed": 18,
+  "checks": [
+    "schema is safely rerunnable and creates private storage",
+    "anonymous cannot read ledger or call financial functions",
+    "unlisted authenticated account cannot load or save",
+    "authorized first load is an empty ledger",
+    "first atomic save advances revision once",
+    "retrying same mutation is idempotent",
+    "stale revision never overwrites newer data",
+    "another allowed account sees no other owner ledger",
+    "direct update cannot bypass compare and swap",
+    "members cannot grant themselves another email",
+    "malformed data is rejected before writing",
+    "simultaneous writers produce one save and one conflict",
+    "old successful mutation stays idempotent after later changes",
+    "own private evidence can be read",
+    "another user cannot read evidence",
+    "cross-account uploads are rejected",
+    "evidence cannot be overwritten or deleted through the client role",
+    "revoking allowed email blocks existing authenticated access"
+  ],
+  "engine": "PostgreSQL 17; simulated Supabase auth claims and storage metadata",
+  "errors": []
+}
