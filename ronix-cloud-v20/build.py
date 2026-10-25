@@ -13,8 +13,9 @@ html=BASE.read_text()
 html=html.replace('const KEY=r14Key;let data=r14Load();',"const KEY='ronix-v20-boot';let data=r14Empty();r14Saved=JSON.stringify(data);")
 assert "const KEY='ronix-v20-boot'" in html
 html=html.replace('<body>','<body class="r20-locked">',1)
+html=html.replace('width=device-width,initial-scale=1','width=device-width,initial-scale=1,viewport-fit=cover',1)
 html=html.replace('</head>','<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#172b45"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="RONIX"><link rel="apple-touch-icon" href="icon.png"><style>'+ (ROOT/'cloud.css').read_text()+'</style></head>',1)
-html=html.replace('V19','V20').replace('تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.','استورد أحدث نسخة JSON. بعد الحفظ تُزامن الحسابات والصور مع حسابك الخاص.')
+html=html.replace('V19','V20').replace('*** ','').replace('تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.','استورد أحدث نسخة JSON. بعد الحفظ تُزامن الحسابات والصور مع حسابك الخاص.')
 html+='\n<script src="config.js"></script><script src="supabase.js"></script><script>\n'+(ROOT/'media.js').read_text()+'\n'+(ROOT/'cloud.js').read_text()+'\n</script>'
 (DIST/'index.html').write_text(html)
 shutil.copyfile(ROOT/'config.js',DIST/'config.js');shutil.copyfile(VENDOR/'supabase.js',DIST/'supabase.js');shutil.copyfile(VENDOR/'supabase-LICENSE.txt',DIST/'supabase-LICENSE.txt')

@@ -114,7 +114,30 @@ try:
   q.wait_for_function('navigator.serviceWorker.controller!==null',timeout=15000) if q.evaluate('navigator.serviceWorker.controller!==null') else q.reload()
   q.wait_for_function('R20Cloud.state.ready');z.set_offline(True);q.reload();q.wait_for_function('R20Cloud.state.ready');check('installed shell opens cached account offline',q.evaluate('data.projects[0].contract')==1000.97)
   cached=q.evaluate('async()=>{const keys=await caches.keys();const out=[];for(const k of keys){const c=await caches.open(k);out.push(...(await c.keys()).map(r=>r.url))}return out}');check('service worker never caches auth or accounting API responses',not any('/supabase/' in u for u in cached))
-  z.set_offline(False);q.locator('#r20Refresh').click();synced(q);q.evaluate('go("customerDirectory")');q.wait_for_timeout(300);q.screenshot(path=str(OUT/'iphone-account.png'),full_page=True)
+  z.set_offline(False);q.locator('#r20Refresh').click();synced(q)
+  # Audit every main screen at iPhone width. Wide tables may scroll inside their
+  # own container, but the document, panels, cards and controls must never collide.
+  mobile_pages=['dashboard','projects','costcenters','designers','payments','customerDirectory','clients','claims','advanced','reports']
+  mobile_columns=[]
+  for mobile_page in mobile_pages:
+   q.evaluate('(name)=>go(name)',mobile_page);q.wait_for_timeout(80)
+   assert q.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),mobile_page+' expands the page horizontally'
+   mobile_columns.extend(q.evaluate("()=>[...document.querySelectorAll('.grid,.claim-kpis,.v5-metrics,.cc-grid')].filter(x=>x.offsetParent).map(x=>({name:x.className,columns:getComputedStyle(x).gridTemplateColumns.trim().split(/\\s+/).length}))"))
+   q.screenshot(path=str(OUT/f'iphone-{mobile_page}.png'),full_page=True)
+  check('every main screen stays inside the iPhone viewport',True)
+  check('financial cards use one non-overlapping column on iPhone',bool(mobile_columns) and all(x['columns']==1 for x in mobile_columns))
+  q.evaluate('editProject()');q.wait_for_timeout(80)
+  check('project form fits the iPhone viewport',q.evaluate("()=>{const r=document.querySelector('.modal').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&document.documentElement.scrollWidth<=innerWidth+1}"));q.evaluate('closeModal()')
+  q.evaluate('openCustomerReceipt()');q.wait_for_timeout(80)
+  check('receipt and evidence form fits the iPhone viewport',q.evaluate("()=>{const r=document.querySelector('.modal').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&document.documentElement.scrollWidth<=innerWidth+1}"));q.screenshot(path=str(OUT/'iphone-receipt-form.png'),full_page=True);q.evaluate('closeModal()')
+  for width,height in [(320,568),(430,932)]:
+   q.set_viewport_size({'width':width,'height':height})
+   for mobile_page in mobile_pages:
+    q.evaluate('(name)=>go(name)',mobile_page);q.wait_for_timeout(40)
+    assert q.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),f'{mobile_page} expands {width}px viewport'
+  check('all screens fit compact and large iPhone widths',True)
+  q.set_viewport_size({'width':390,'height':844})
+  q.evaluate('go("customerDirectory")');q.wait_for_timeout(80);q.screenshot(path=str(OUT/'iphone-account.png'),full_page=True)
   check('cloud workflows have no script exceptions',not errors)
   result={'passed':len(checks),'checks':checks,'errors':errors,'backend':'Local deterministic Auth/REST/Storage; real bundled Supabase browser SDK'};(ROOT/'tests/browser-results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));b.close()
 finally:server.shutdown()

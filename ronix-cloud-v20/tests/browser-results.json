@@ -1,5 +1,5 @@
 {
-  "passed": 28,
+  "passed": 33,
   "checks": [
     "logged-out page hides all accounting screens",
     "email login opens empty isolated cloud ledger",
@@ -28,6 +28,11 @@
     "different user cannot inherit previous account data",
     "installed shell opens cached account offline",
     "service worker never caches auth or accounting API responses",
+    "every main screen stays inside the iPhone viewport",
+    "financial cards use one non-overlapping column on iPhone",
+    "project form fits the iPhone viewport",
+    "receipt and evidence form fits the iPhone viewport",
+    "all screens fit compact and large iPhone widths",
     "cloud workflows have no script exceptions"
   ],
   "errors": [],
