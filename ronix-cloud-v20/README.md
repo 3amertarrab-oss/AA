@@ -24,6 +24,7 @@ The setup page works as a local file and includes clipboard fallback. The applic
 - Photos and transfer evidence use content-hashed private PNG/JPEG/WebP/PDF objects, with a 5 MiB per-file limit and integrity checks on download. No public document URLs are generated. Existing objects cannot be overwritten or deleted through the app role; unused uploads may therefore need an administrator's later retention review.
 - Local working copies still contain embedded evidence and are subject to browser storage quotas. A quota error rejects the new operation before upload. This is appropriate for a small single-owner ledger, not an unlimited document archive or a multi-user ERP.
 - Backups hydrate all embedded cloud documents and keep data schema **19**, so V20 JSON can be imported by offline V19. App version and data schema version are intentionally different. Download a backup after each work session.
+- Exchange-rate forms link to Banque Misr's official rates page. A manually entered rate is dated and recorded as `Banque Misr (manual)`. The automatic button remains a general public reference for comparison and is explicitly labelled as such; use the bank's actual buy/sell execution rate for accounting.
 - The service worker caches only the app shell, never Auth/REST/Storage responses. An already logged-in account can reopen its cached local copy offline. Login requires connectivity.
 
 ## Build and validation

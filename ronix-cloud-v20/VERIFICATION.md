@@ -14,6 +14,8 @@ An additional private-data check packed and restored the supplied V16 JSON: 33 p
 
 The browser suite tests pending offline edits, reconnection, failed document uploads, quota rollback, same-tab storage changes, conflict preservation and recovery, ambiguous network failures after commit, exact decimal financial values, portable backups, account separation, sign-out, mobile navigation, every screen at compact and large iPhone widths, key input forms, and service worker caching boundaries. It uses synthetic records and two separate Chromium contexts. It does not use the real Supabase backend.
 
+The inherited V19 presentation workflow was also rerun after selecting Banque Misr: 31 browser checks passed, including the official bank link, clear separation between the general automatic reference and the bank rate, dated manual provenance, exact converted cash, backup/restore, and late-response protection.
+
 The setup page was tested over localhost with clipboard access deliberately unavailable to exercise manual-copy fallback. The environment blocks `file://` navigation in Chromium, so opening the setup file directly in a desktop browser has not been browser-tested here.
 
 The existing V19 accounting suite previously passed 382 checks; those are historical offline results and are **not** counted as new cloud checks. The V19 financial core is used unchanged.
