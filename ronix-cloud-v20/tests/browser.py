@@ -78,6 +78,7 @@ try:
   login(q);check('second device receives all records and matching photos and proofs',q.evaluate('data.projects[0].photos[0].src')==PNG and q.evaluate('data.receiptAttachments.R1.data')==PNG and q.evaluate('data.documentNumbers')==p.evaluate('data.documentNumbers'))
   check('mobile layout fits iPhone width',q.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
   q.locator('#r20Menu').click();q.locator('.nav[data-page=customerDirectory]').click();check('iPhone menu opens customer directory and closes after selection',q.locator('#r18CustomerRows').count()==1 and q.locator('#r20Menu').get_attribute('aria-expanded')=='false')
+  q.evaluate('go("projects");openProject("P")');q.locator('#r20Back').click();check('visible mobile back button returns from project detail',q.evaluate('projectFocus')=='' and q.locator('#projectRows').count()==1)
   q.evaluate('r14Change("receipt test",d=>d.clientReceipts.push({id:"R2",code:"P",client:"عميل تجريبي",date:"2026-10-26",amount:10.25}))');synced(q);p.locator('#r20Refresh').click();synced(p)
   check('mobile payment reaches laptop without duplicated cash',p.evaluate('customerTotals("عميل تجريبي").cash===35.5&&data.clientReceipts.length===2'))
   # Keep both editors open, so neither device silently loads the other's work.

@@ -22,6 +22,7 @@ try:
   p.locator('#restore').set_input_files(str(args.backup));p.get_by_role('button',name='استيراد هذه النسخة',exact=True).click()
   check('latest source records preserved without resurrecting older data',p.evaluate('(before)=>["projects","assignments","payments","claims","clientReceipts","receiptAttachments","paymentAttachments"].every(k=>JSON.stringify(data[k])===JSON.stringify(before[k]))',source))
   check('latest import passes accounting audit',p.evaluate('v8Audit().length===0'))
+  claim_html=p.evaluate('()=>{const p=data.projects[0],c={id:"CL-SHOW",code:p.code,client:p.client,date:"2026-10-27",due:"2026-11-03",status:"معتمدة",total:1000,items:[{desc:p.name,amount:1000}],projectRows:[{code:p.code,amount:1000}]};return r14ClaimDocument(c)}');claim_page=ctx.new_page();claim_page.set_content(claim_html);check('claim PDF stays concise with project images paid green and due red',claim_page.locator('h1').inner_text()=='مطالبة مالية' and claim_page.locator('.projects-table').count()==1 and claim_page.locator('.claim-total.due').count()==1);claim_page.screenshot(path=str(OUT/'07-claim-preferred.png'),full_page=True);claim_page.close()
   # The reported 6,500 EGP / SAR 14 case, entered from cash rather than guessed native amount.
   foreign=p.evaluate('data.projects.find(p=>R14.projectCurrency(p)==="SAR"&&R14.projectRate(p)===14).code')
   p.evaluate('(code)=>{go("projects");openProject(r14Encode(code));openReceipt(r14Encode(code))}',foreign);p.locator('#crAmount').fill('6500')

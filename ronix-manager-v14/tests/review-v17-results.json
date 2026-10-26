@@ -1,10 +1,11 @@
 {
-  "passed": 28,
+  "passed": 29,
   "checks": [
     "backup and restore removed from top bar",
     "reports exposes backup restore and recycle bin",
     "latest source records preserved without resurrecting older data",
     "latest import passes accounting audit",
+    "claim PDF stays concise with project images paid green and due red",
     "EGP input calculates SAR repayment without changing actual cash",
     "cross-currency receipt saves exact cash and explicit rounding difference",
     "receipt edit reloads actual and contractual amounts separately",

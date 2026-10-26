@@ -1,5 +1,5 @@
 {
-  "passed": 33,
+  "passed": 34,
   "checks": [
     "logged-out page hides all accounting screens",
     "email login opens empty isolated cloud ledger",
@@ -8,6 +8,7 @@
     "second device receives all records and matching photos and proofs",
     "mobile layout fits iPhone width",
     "iPhone menu opens customer directory and closes after selection",
+    "visible mobile back button returns from project detail",
     "mobile payment reaches laptop without duplicated cash",
     "refresh preserves open form and allows conflict-safe save",
     "stale save preserves mobile edit and never overwrites laptop",
