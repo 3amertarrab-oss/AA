@@ -13,3 +13,10 @@ test('malformed tax rows and mismatched totals are rejected',()=>{
  assert.throws(()=>R.validate(db({...base,taxItems:[{id:'X',name:'VAT',type:'add',mode:'percent',value:101}]})));
  assert.throws(()=>R.validate(db({...base,taxItems:[{id:'X',name:'VAT',type:'add',mode:'percent',value:14}]})))
 });
+
+test('statement item equals quantity times unit price and survives validation',()=>{
+ const d=db({code:'P',name:'Project',client:'Client',contract:1000,photos:[],statementItems:[{id:'ST1',date:'2026-10-27',description:'تركيب قواعد',quantity:4.5,unitPrice:100,amount:450,note:'متر'}]});
+ assert.equal(R.validate(d).projects[0].statementItems[0].amount,450);
+ d.projects[0].statementItems[0].amount=451;
+ assert.throws(()=>R.validate(d),/قيمة بند المستخلص/);
+});

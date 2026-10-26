@@ -176,6 +176,8 @@ const R14 = (() => {
     try{
       for(const p of d.projects){
         if(p.projectDate)dated(p.projectDate,'تاريخ المشروع');
+        if(!Array.isArray(p.statementItems||[]))add('بنود المستخلص: جدول غير صالح');
+        else {unique(p.statementItems||[],x=>x.id,'بنود المستخلص');for(const x of p.statementItems||[]){dated(x.date,'تاريخ بند المستخلص');if(!String(x.description||'').trim())add('بيان المستخلص مطلوب');if(!Number.isFinite(Number(x.quantity))||Number(x.quantity)<0)add('كمية المستخلص غير صالحة');monetary(x.unitPrice,'سعر بند المستخلص');monetary(x.amount,'قيمة بند المستخلص');if(cents(x.amount)!==cents(amount((Number(x.quantity)*Number(x.unitPrice)).toFixed(2))))add('قيمة بند المستخلص لا تطابق الكمية والسعر')}}
         if(p.originalContract!=null){
           if(!/^[A-Z]{3}$/.test(projectCurrency(p)))add('عملة مشروع غير صالحة');rate(projectRate(p));if(projectCurrency(p)==='EGP'&&projectRate(p)!==1)add('سعر صرف الجنيه يجب أن يساوي 1');
           monetary(p.originalContract,'العقد الأصلي');detailRows(p.contractExtras||[],'تعاقد إضافي');
