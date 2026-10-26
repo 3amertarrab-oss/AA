@@ -22,6 +22,7 @@ try:
   p.locator('#restore').set_input_files(str(args.backup));p.get_by_role('button',name='استيراد هذه النسخة',exact=True).click()
   check('latest source records preserved without resurrecting older data',p.evaluate('(before)=>["projects","assignments","payments","claims","clientReceipts","receiptAttachments","paymentAttachments"].every(k=>JSON.stringify(data[k])===JSON.stringify(before[k]))',source))
   check('latest import passes accounting audit',p.evaluate('v8Audit().length===0'))
+  auto_code=p.evaluate('data.projects.find(x=>x.contract>received(x.code))?.code');p.evaluate('(code)=>openClaim(r14Encode(code))',auto_code);expected=p.evaluate('(code)=>r21ClaimSuggested(code)',auto_code);claim_input=p.get_by_label('قيمة المطالبة للمشروع');check('new claim amount is calculated automatically from contract receipts and prior claims',float(claim_input.input_value())==expected and 'محسوب تلقائيًا' in claim_input.locator('xpath=..').inner_text());p.screenshot(path=str(OUT/'08-automatic-claim.png'),full_page=True);claim_input.fill(str(max(1,expected-1)));claim_input.dispatch_event('change');check('automatic claim amount remains manually editable',p.evaluate('claimDraftRows[0].manual===true') and float(claim_input.input_value())==max(1,expected-1));p.evaluate('closeModal()')
   claim_html=p.evaluate('()=>{const p=data.projects[0],c={id:"CL-SHOW",code:p.code,client:p.client,date:"2026-10-27",due:"2026-11-03",status:"معتمدة",total:1000,items:[{desc:p.name,amount:1000}],projectRows:[{code:p.code,amount:1000}]};return r14ClaimDocument(c)}');claim_page=ctx.new_page();claim_page.set_content(claim_html);check('claim PDF stays concise with project images paid green and due red',claim_page.locator('h1').inner_text()=='مطالبة مالية' and claim_page.locator('.projects-table').count()==1 and claim_page.locator('.claim-total.due').count()==1);claim_page.screenshot(path=str(OUT/'07-claim-preferred.png'),full_page=True);claim_page.close()
   # The reported 6,500 EGP / SAR 14 case, entered from cash rather than guessed native amount.
   foreign=p.evaluate('data.projects.find(p=>R14.projectCurrency(p)==="SAR"&&R14.projectRate(p)===14).code')
@@ -55,6 +56,7 @@ try:
   before=p.evaluate('data')
   with p.expect_download() as dl:p.evaluate('backup()')
   backup=Path(dl.value.path()).read_bytes();p.locator('#restore').set_input_files({'name':'roundtrip.json','mimeType':'application/json','buffer':backup});p.get_by_role('button',name='استيراد هذه النسخة',exact=True).click();p.reload();check('archive state and financial links survive backup restore',all(p.evaluate('data')[k]==before[k] for k in ['projects','assignments','payments','archivedDesigners','trashRecords']))
+  if errors:print('SCRIPT ERRORS:',errors,flush=True)
   check('review workflows remain free of script exceptions',not errors)
   result={'passed':len(checks),'checks':checks,'errors':errors};(ROOT/'tests/review-v17-results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False,indent=2));browser.close()
 finally:server.shutdown()
