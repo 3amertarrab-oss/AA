@@ -173,6 +173,7 @@ function r14ClaimDocument(c){
   const rows=R14.claimRows(c),codes=new Set(rows.map(r=>r.code));
   const receipts=data.clientReceipts.filter(r=>codes.has(r.code)).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   const settled=R14.settled(data,c.id),remaining=R14.remaining(data,c);
+  const shareText=`مطالبة مالية ${r19Doc('claim',c.id)}\nالعميل: ${R14.claimClient(data,c)||'—'}\nقيمة المطالبة: ${R19.formatAmount(c.total)} ج.م\nالمسدد: ${R19.formatAmount(settled)} ج.م\nالمطلوب سداده: ${R19.formatAmount(remaining)} ج.م`;
   // Preserve custom legacy descriptions without repeating generated project rows.
   const descriptions=(c.items||[]).filter(item=>!rows.some(r=>
     item.desc===(getP(r.code)?.name||r.code)||item.desc===r.code));
@@ -214,9 +215,13 @@ function r14ClaimDocument(c){
   .details p{margin:3px 0}
   .receipt-note{margin:5px 0 0;font-size:10px;color:#526277}
   .signatures{display:flex;justify-content:space-between;gap:30px;margin-top:24px;font-size:11px;break-inside:avoid;page-break-inside:avoid}
-  @media screen and (max-width:820px){body{width:100%;margin:0;padding:20px}}
-  @media print{html{background:#fff}body{width:auto;margin:0;padding:0;box-shadow:none}}
+  .claim-actions{position:sticky;top:0;z-index:10;display:flex;gap:8px;padding:10px;margin:-13mm -13mm 12px;background:#172b45;direction:rtl}
+  .claim-actions button{appearance:none;border:1px solid #d5dde7;border-radius:8px;background:#fff;color:#172b45;padding:10px 14px;font:700 13px Tahoma,Arial;cursor:pointer}
+  .claim-actions .share{background:#087f46;color:#fff;border-color:#087f46}
+  @media screen and (max-width:820px){body{width:100%;margin:0;padding:16px}.claim-actions{margin:-16px -16px 16px;padding:10px 12px;position:sticky}.claim-actions button{flex:1;padding:11px 5px;font-size:12px}}
+  @media print{html{background:#fff}body{width:auto;margin:0;padding:0;box-shadow:none}.claim-actions{display:none!important}}
   </style></head><body>
+  <nav class="claim-actions" aria-label="إجراءات المطالبة"><button type="button" onclick="if(window.opener&&!window.opener.closed)window.close();else history.back()">رجوع</button><button type="button" class="share" onclick="shareClaim()">مشاركة / واتساب</button><button type="button" onclick="window.print()">طباعة / PDF</button></nav>
   <header class="claim-header"><img class="brand-logo" src="${R14_LOGO}" alt="RONIX">
   <div class="document-title"><h1>مطالبة مالية</h1><div class="document-meta"><bdi>${esc(r19Doc('claim',c.id))}</bdi> · <bdi>${esc(c.date)}</bdi></div></div></header>
   <p class="client">السادة / ${esc(R14.claimClient(data,c)||'—')}</p>
@@ -240,6 +245,7 @@ function r14ClaimDocument(c){
   <div class="claim-total due"><span>${R14.active(c)?'إجمالي المطلوب سداده':'الرصيد الحسابي — '+esc(R14.status(c))}</span><span><bdi>${printAmount(remaining)}</bdi> ج.م</span></div>
   </section>
   <footer class="signatures"><span>إعداد الحسابات: ______________</span><span>اعتماد RONIX: ______________</span></footer>
+  <script>async function shareClaim(){const text=${JSON.stringify(shareText)};try{if(navigator.share){await navigator.share({title:${JSON.stringify('مطالبة '+r19Doc('claim',c.id))},text});return}}catch(e){if(e&&e.name==='AbortError')return}window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener')}<\/script>
   </body></html>`;
 }
 printClaim=function(enc){

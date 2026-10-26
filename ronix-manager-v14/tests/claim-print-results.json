@@ -1,5 +1,5 @@
 {
-  "passed": 56,
+  "passed": 58,
   "checks": [
     "claim-reference: no changes to financial records",
     "reference claim fits one A4 portrait page",
@@ -10,6 +10,8 @@
     "missing project name uses dash",
     "total and empty receipt message retained",
     "no empty settlement tables or duplicate items",
+    "mobile claim has back share and PDF controls",
+    "claim controls are excluded from PDF",
     "claim-with-receipts: no changes to financial records",
     "three projects with photos and receipts fit one page",
     "project images finish decoding before print",
@@ -48,7 +50,7 @@
     "designer statement payments are green",
     "designer statement required balances are red",
     "editor has larger photos and red monetary inputs",
-    "editor shows green receipt amounts",
+    "editor retains the registered-payments section",
     "viewing and editing without saving leave finance data unchanged",
     "claim-long: no changes to financial records",
     "long claims paginate without dropping project rows",

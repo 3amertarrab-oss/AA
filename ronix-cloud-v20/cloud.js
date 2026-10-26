@@ -134,7 +134,16 @@ const R20Cloud=(()=>{
       S.disk=localStorage.getItem(S.key);const cached=readEnvelope(S.disk,S.user.id);if(cached)adopt(cached);
       if(!cached){const env=await loadRemote();if(epoch!==S.epoch)return;write(env)}
       else if(navigator.onLine){const head=await rpc('ronix_head');if(epoch!==S.epoch)return;if(!cached.dirty&&head!==cached.revision){const env=await loadRemote();if(epoch!==S.epoch)return;write(env)}}
-      if(epoch!==S.epoch)return;S.ready=true;gate.hidden=true;document.body.classList.remove('r20-locked');$('r20Password').value='';render();status();if(S.env.dirty)await flush();
+      if(epoch!==S.epoch)return;S.ready=true;gate.hidden=true;document.body.classList.remove('r20-locked');$('r20Password').value='';
+      if(S.env.dirty)await flush();
+      // Repair obsolete automatic matches created by older releases. A receipt
+      // before the claim already reduced the suggested claim and cannot settle
+      // that new claim a second time.
+      if(!S.env?.dirty&&!S.conflict&&!S.error){
+        const repaired=R16.reconcile(data).data;
+        if(JSON.stringify(repaired.claimSettlements)!==JSON.stringify(data.claimSettlements))persist(repaired,'تصحيح الربط الزمني للمطالبات');
+      }
+      render();status();
     }catch(e){if(epoch===S.epoch){$('r20LoginStatus').textContent=errorText(e);S.error=errorText(e);status()}}
   }
   $('r20LoginForm').onsubmit=async e=>{

@@ -70,6 +70,10 @@ try:
         check('missing project name uses dash', popup.locator('.project-name').nth(2).inner_text() == '—')
         check('total and empty receipt message retained', '12,000' in popup.locator('.claim-total').inner_text() and 'لا توجد دفعات مسجلة' in popup.locator('.receipts-table').inner_text())
         check('no empty settlement tables or duplicate items', 'بنود المستند' not in popup.locator('body').inner_text() and popup.locator('.claim-summary .paid').inner_text().endswith('0 ج.م'))
+        check('mobile claim has back share and PDF controls', popup.locator('.claim-actions button').all_inner_texts() == ['رجوع', 'مشاركة / واتساب', 'طباعة / PDF'])
+        popup.emulate_media(media='print')
+        check('claim controls are excluded from PDF', popup.locator('.claim-actions').evaluate("e=>getComputedStyle(e).display") == 'none')
+        popup.emulate_media(media='screen')
         pdf[0].get_pixmap(matrix=fitz.Matrix(1.5, 1.5)).save(str(ARTIFACTS / 'claim-reference.png'))
         pdf.close(); popup.close()
 
@@ -78,8 +82,8 @@ try:
         for p in with_receipts['projects']:
             p['photos'] = [{'id': 'COVER', 'src': image}]; p['coverId'] = 'COVER'
         with_receipts['clientReceipts'] = [
-            {'id': 'R1', 'batchId': 'RC-00000000-1111-2222-3333-444444444444', 'code': 'DEMO-01', 'date': '2026-10-24', 'amount': 2000.25},
-            {'id': 'R2', 'batchId': 'RC-00000000-1111-2222-3333-444444444444', 'code': 'DEMO-02', 'date': '2026-10-24', 'amount': 750},
+            {'id': 'R1', 'batchId': 'RC-00000000-1111-2222-3333-444444444444', 'code': 'DEMO-01', 'client': 'شركة المثال — نموذج تجريبي', 'date': '2026-10-21', 'amount': 2000.25},
+            {'id': 'R2', 'batchId': 'RC-00000000-1111-2222-3333-444444444444', 'code': 'DEMO-02', 'client': 'شركة المثال — نموذج تجريبي', 'date': '2026-10-21', 'amount': 750},
         ]
         with_receipts['claimSettlements'] = [{'claimId': 'CL-DEMO-001', 'receiptId': 'R1', 'code': 'DEMO-01', 'amount': 1000.25}]
         popup, pdf = export_pdf(with_receipts, 'claim-with-receipts')
@@ -137,7 +141,7 @@ try:
         tones('designer statement')
         page.evaluate("go('claims');openClaim(null,'CL-DEMO-001')")
         check('editor has larger photos and red monetary inputs', page.locator('.r14-claim-photo').first.evaluate("e=>e.clientWidth>=126&&e.clientHeight>=94") and page.locator('#claimRows input').first.evaluate("e=>getComputedStyle(e).color==='rgb(198, 40, 40)'"))
-        check('editor shows green receipt amounts', page.locator('#claimReceipts .r14-paid').count()==2)
+        check('editor retains the registered-payments section', page.locator('#claimReceipts').count()==1)
         page.evaluate('closeModal()')
         check('viewing and editing without saving leave finance data unchanged', page.evaluate('JSON.stringify(data)')==snapshot)
 
@@ -157,7 +161,7 @@ try:
         legacy['claims'][0]['note'] = '<script>window.unwantedExecution=true</script>'
         popup, pdf = export_pdf(legacy, 'claim-legacy-details')
         check('custom legacy descriptions remain printable', 'تفاصيل عمل متفق عليها' in popup.locator('.details').inner_text())
-        check('notes remain escaped text', popup.locator('script').count() == 0 and popup.locator('.note').inner_text() == legacy['claims'][0]['note'])
+        check('notes remain escaped text', popup.locator('script').count() == 1 and popup.locator('.note').inner_text() == legacy['claims'][0]['note'] and not popup.evaluate('Boolean(window.unwantedExecution)'))
         pdf.close(); popup.close()
         check('print workflows have no JavaScript exceptions', not errors)
         result = {'passed': len(checks), 'checks': checks, 'errors': errors}
