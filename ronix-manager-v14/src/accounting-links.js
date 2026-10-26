@@ -33,15 +33,16 @@ const R16 = ((R) => {
   }
   function reconcile(value,at=new Date().toISOString()) {
     const d=R.normalize(value),previous=d.claimSettlements;
+    const onOrAfterClaim=(c,r)=>Boolean(c?.date&&r?.date&&String(r.date).slice(0,10)>=String(c.date).slice(0,10));
+    const eligiblePrevious=previous.filter(s=>onOrAfterClaim(d.claims.find(c=>c.id===s.claimId),d.clientReceipts.find(r=>r.id===s.receiptId)));
     // Manual choices are authoritative; invalid manual links must be corrected explicitly.
-    for(const c of d.claims)if(c.matchMode==null&&previous.some(s=>s.claimId===c.id&&s.mode!=='auto'))c.matchMode='manual';
-    d.claimSettlements=previous.filter(s=>s.mode!=='auto');R.validate(d);
+    for(const c of d.claims)if(c.matchMode==null&&eligiblePrevious.some(s=>s.claimId===c.id&&s.mode!=='auto'))c.matchMode='manual';
+    d.claimSettlements=eligiblePrevious.filter(s=>s.mode!=='auto');R.validate(d);
     const changes=[];
     // Cash received before a claim reduces the project's unbilled balance, but
     // must not also settle that later claim. Only same-day or later receipts
     // are eligible for automatic matching. Explicit manual matches remain
     // authoritative for corrections and imported historical records.
-    const onOrAfterClaim=(c,r)=>Boolean(c.date&&r.date&&String(r.date).slice(0,10)>=String(c.date).slice(0,10));
     const valid=(c,r,code)=>c&&r&&R.active(c)&&c.matchMode!=='manual'&&onOrAfterClaim(c,r)&&r.code===code&&
       R.claimRows(c).some(x=>x.code===code)&&R.claimClient(d,c)===R.receiptClient(d,r);
     const available=(c,r)=>Math.max(0,Math.min(R.cents(R.delta(r.amount,R.usedReceipt(d,r.id))),R.cents(R.delta(R.claimAmount(c,r.code),R.settled(d,c.id,r.code)))));

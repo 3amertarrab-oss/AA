@@ -1,0 +1,11 @@
+{
+  "passed": 6,
+  "checks": [
+    "claim creates quantity price and total from contract item",
+    "editing quantity recalculates claim project total",
+    "saved claim retains exact line calculation",
+    "project editor shows contract quantity price and calculated total",
+    "project quantity editor fits iPhone width",
+    "printed claim includes quantity unit price and total table"
+  ]
+}
