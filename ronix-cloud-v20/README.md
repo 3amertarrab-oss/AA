@@ -1,8 +1,8 @@
-# RONIX V20 cloud edition
+# RONIX V20.1 cloud edition
 
-Adds a shared, authenticated account to the existing V19 project-finance application. The accounting engine, customer directory, short display numbers, whole-pound presentation, FX entry, claims, project photographs, and receipt/payment evidence remain available. Laptop and iPhone use the same authenticated account; this release adds a responsive navigation drawer and an installable web app shell.
+Adds a shared, authenticated account to the project-finance application. V20.1 adds separate contract tax/discount rows, cash-first cross-currency receipt allocation, protected project/designer removal and restoration, fuller project Excel exports, and guarded modal closing. Laptop and iPhone use the same authenticated account through the responsive installable web app.
 
-**Deployment status:** packaged and locally tested; the user's Supabase schema, Auth user, and web deployment have not been activated from this workspace. The environment's network proxy rejects access to the project endpoint, so production access and cross-device operation still require verification after setup. No real Safari/iPhone test has been performed; browser tests use Chromium with a 390 × 844 mobile viewport.
+**Deployment status:** packaged and locally tested. Supabase setup and the initial Cloudflare deployment were completed by the owner; this updated ZIP still needs to be uploaded as a new Cloudflare deployment. No real Safari/iPhone device test has been performed; browser tests use Chromium at 320, 390, and 430 px widths.
 
 ## Installation
 

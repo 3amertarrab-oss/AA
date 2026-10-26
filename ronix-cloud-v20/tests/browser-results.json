@@ -30,7 +30,7 @@
     "service worker never caches auth or accounting API responses",
     "every main screen stays inside the iPhone viewport",
     "financial cards use one non-overlapping column on iPhone",
-    "project form fits the iPhone viewport",
+    "project tax form fits the iPhone viewport",
     "receipt and evidence form fits the iPhone viewport",
     "all screens fit compact and large iPhone widths",
     "cloud workflows have no script exceptions"

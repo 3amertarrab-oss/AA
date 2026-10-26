@@ -127,7 +127,8 @@ try:
   check('every main screen stays inside the iPhone viewport',True)
   check('financial cards use one non-overlapping column on iPhone',bool(mobile_columns) and all(x['columns']==1 for x in mobile_columns))
   q.evaluate('editProject()');q.wait_for_timeout(80)
-  check('project form fits the iPhone viewport',q.evaluate("()=>{const r=document.querySelector('.modal').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&document.documentElement.scrollWidth<=innerWidth+1}"));q.evaluate('closeModal()')
+  q.get_by_role('button',name='+ إضافة ضريبة',exact=True).click();q.wait_for_timeout(80)
+  check('project tax form fits the iPhone viewport',q.evaluate("()=>{const r=document.querySelector('.modal').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&document.documentElement.scrollWidth<=innerWidth+1&&document.querySelectorAll('.r20-tax-row').length===1}"));q.screenshot(path=str(OUT/'iphone-project-tax.png'),full_page=True);q.evaluate('closeModal()')
   q.evaluate('openCustomerReceipt()');q.wait_for_timeout(80)
   check('receipt and evidence form fits the iPhone viewport',q.evaluate("()=>{const r=document.querySelector('.modal').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&document.documentElement.scrollWidth<=innerWidth+1}"));q.screenshot(path=str(OUT/'iphone-receipt-form.png'),full_page=True);q.evaluate('closeModal()')
   for width,height in [(320,568),(430,932)]:

@@ -49,7 +49,15 @@ const R14 = (() => {
   const projectCurrency=p=>p?.contractCurrency??'EGP';
   const projectRate=p=>p?.contractRate??1;
   const originalContract=p=>p?.originalContract??p?.contract??0;
-  const projectOriginalTotal=p=>sum([{amount:originalContract(p)},...(p.contractExtras||[])]);
+  const projectSubtotal=p=>sum([{amount:originalContract(p)},...(p.contractExtras||[])]);
+  function projectTaxAmount(p,t){
+    if(!t||!['add','deduct'].includes(t.type)||!['percent','fixed'].includes(t.mode))throw Error('بند ضريبة غير صالح');
+    const value=amount(t.value);if(value<0)throw Error('قيمة الضريبة لا تكون سالبة');
+    const n=t.mode==='percent'?amount((projectSubtotal(p)*value/100).toFixed(2)):value;
+    return t.type==='deduct'?-n:n;
+  }
+  const projectTaxTotal=p=>sum((p?.taxItems||[]).map(t=>({amount:projectTaxAmount(p,t)})));
+  const projectOriginalTotal=p=>sum([{amount:projectSubtotal(p)},{amount:projectTaxTotal(p)}]);
   const projectBookTotal=p=>fx(projectOriginalTotal(p),projectRate(p));
   const assignmentTotal=a=>sum([{amount:a.baseFee??a.fee},...(a.extraWorks||[]),...(a.feeAdjustments||[]).map(r=>({amount:r.type==='discount'?-r.amount:r.amount}))]);
   const cashReceipt=r=>r.cashAmount??r.amount;
@@ -171,6 +179,8 @@ const R14 = (() => {
         if(p.originalContract!=null){
           if(!/^[A-Z]{3}$/.test(projectCurrency(p)))add('عملة مشروع غير صالحة');rate(projectRate(p));if(projectCurrency(p)==='EGP'&&projectRate(p)!==1)add('سعر صرف الجنيه يجب أن يساوي 1');
           monetary(p.originalContract,'العقد الأصلي');detailRows(p.contractExtras||[],'تعاقد إضافي');
+          if(!Array.isArray(p.taxItems||[]))add('ضرائب المشروع: جدول غير صالح');
+          else {unique(p.taxItems||[],t=>t.id,'ضرائب المشروع');for(const t of p.taxItems||[]){if(!String(t.name||'').trim())add('اسم الضريبة مطلوب');if(!['add','deduct'].includes(t.type)||!['percent','fixed'].includes(t.mode))add('نوع الضريبة غير صالح');monetary(t.value,'قيمة الضريبة');if(t.mode==='percent'&&Number(t.value)>100)add('نسبة الضريبة تتجاوز 100%');projectTaxAmount(p,t)}}
           if(cents(p.contract)!==cents(projectBookTotal(p)))add('إجمالي العقد لا يطابق الأصل والإضافات وسعر الصرف');
         }
       }
@@ -210,6 +220,6 @@ const R14 = (() => {
     const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);
     validate(next);return next;
   }
-  return {rate,fx,unfx,projectCurrency,projectRate,originalContract,projectOriginalTotal,projectBookTotal,assignmentTotal,cashReceipt,fxDifference,receivedOriginal,foreignReceiptEdit,arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
+  return {rate,fx,unfx,projectCurrency,projectRate,originalContract,projectSubtotal,projectTaxAmount,projectTaxTotal,projectOriginalTotal,projectBookTotal,assignmentTotal,cashReceipt,fxDifference,receivedOriginal,foreignReceiptEdit,arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
 })();
 if(typeof module!=='undefined')module.exports=R14;
