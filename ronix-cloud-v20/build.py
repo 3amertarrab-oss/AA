@@ -43,6 +43,11 @@ self.addEventListener('fetch',e=>{
 (DIST/'_headers').write_text('/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  X-Frame-Options: DENY\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n/sw.js\n  Cache-Control: no-cache\n/index.html\n  Cache-Control: no-cache\n/config.js\n  Cache-Control: no-cache\n')
 with zipfile.ZipFile(ROOT/'RONIX-Cloud-V20.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for p in sorted(DIST.iterdir()):z.write(p,p.name)
+# Deployment-only package. The setup utility and instructions are deliberately
+# excluded because an existing installation needs only the application files.
+deploy_names=['_headers','config.js','fflate-LICENSE.txt','icon.png','index.html','manifest.webmanifest','supabase-LICENSE.txt','supabase.js','sw.js']
+with zipfile.ZipFile(ROOT/'RONIX-V20.1-Update.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+ for name in deploy_names:z.write(DIST/name,name)
 with zipfile.ZipFile(ROOT/'RONIX-Setup.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  z.writestr('RONIX_Setup.html',setup)
 print('Built cloud package:',len(html.encode()),'HTML bytes; service worker',revision)
