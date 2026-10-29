@@ -73,3 +73,12 @@ test('project photo deletion preserves bytes order and cover state for restore',
  const out=L.remove(d,{...opts,kind:'photo',code:'P',targetId:'PH1'});assert.deepEqual(out.data.projects[0].photos.map(x=>x.id),['PH2']);assert.equal(out.data.projects[0].coverId,'PH2');
  const restored=L.restore(out.data,'T');assert.deepEqual(restored.projects[0].photos,d.projects[0].photos);assert.equal(restored.projects[0].coverId,'PH1')
 });
+test('restore keeps original ordering for claims receipts projects and assignments',()=>{
+ const d=claimReceiptFixture();d.claims.unshift({id:'CL0',client:'C',code:'P',projectRows:[{code:'P',amount:10}],date:'2026-10-19',status:'مسودة',total:10,items:[{desc:'Old',amount:10}]});
+ d.claims.push({id:'CL2',client:'C',code:'P',projectRows:[{code:'P',amount:20}],date:'2026-10-22',status:'مسودة',total:20,items:[{desc:'New',amount:20}]});
+ d.clientReceipts.unshift({id:'R0',batchId:'B0',code:'P',client:'C',date:'2026-10-18',amount:5,method:'نقدي'});d.clientReceipts.push({id:'R3',batchId:'B2',code:'P',client:'C',date:'2026-10-23',amount:6,method:'نقدي'});R.validate(d);
+ let out=L.remove(d,{...opts,kind:'claim',targetId:'CL1'});let restored=L.restore(out.data,'T');assert.deepEqual(restored.claims,d.claims);assert.deepEqual(restored.claimSettlements,d.claimSettlements);
+ out=L.remove(d,{...opts,kind:'receipt',targetId:'B1'});restored=L.restore(out.data,'T');assert.deepEqual(restored.clientReceipts,d.clientReceipts);assert.deepEqual(restored.claimSettlements,d.claimSettlements);
+ const clean=R.normalize({projects:[{code:'A',name:'A',client:'C',contract:1},{code:'P',name:'Project',client:'C',contract:1000},{code:'Z',name:'Z',client:'C',contract:1}],assignments:[{id:'A0',code:'A',designer:'D0',fee:1},{id:'A1',code:'P',designer:'D1',fee:2},{id:'A2',code:'P',designer:'D2',fee:3},{id:'A3',code:'Z',designer:'D3',fee:1}],payments:[]});
+ out=L.remove(clean,opts);restored=L.restore(out.data,'T');assert.deepEqual(restored.projects,clean.projects);assert.deepEqual(restored.assignments,clean.assignments)
+});
