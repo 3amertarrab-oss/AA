@@ -1,0 +1,16 @@
+{
+  "passed": 10,
+  "checks": [
+    "one bank receipt plus one advance appear once each",
+    "single receipt shows both projects and unallocated balance",
+    "cash and allocation totals do not double count advance",
+    "two project circles show exact collection percentages",
+    "project circle filters payments dynamically",
+    "customer view removes internal matching designer and profit panels",
+    "statement fits iPhone without page overflow",
+    "PDF view contains project balances and grouped distributions",
+    "PDF excludes internal accounting sections",
+    "print and customer views have no script exceptions"
+  ],
+  "errors": []
+}
