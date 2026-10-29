@@ -106,6 +106,13 @@ const R14 = (() => {
       if(d[key]==null||(Array.isArray(d[key])&&d[key].length===0))d[key]={};
       if(!d[key]||typeof d[key]!=='object'||Array.isArray(d[key]))throw Error('مرفقات الإيصالات غير صالحة: '+key);
     }
+    // Older recycle-bin entries only stored project/assignment arrays.  Keep
+    // those entries readable while allowing newer record bundles to use a
+    // payload object without forcing a schema migration on existing backups.
+    for(const x of d.trashRecords){
+      if(x&&x.projects==null)x.projects=[];
+      if(x&&x.assignments==null)x.assignments=[];
+    }
     if (d.currency && d.currency!=='EGP') throw Error('هذه النسخة تعمل بالجنيه المصري');
     for(const c of d.claims)if(c.items==null)c.items=claimRows(c).map(r=>({desc:String(r.code||''),amount:r.amount}));
     return d;
@@ -129,7 +136,15 @@ const R14 = (() => {
     const projects=new Map(d.projects.map(p=>[p.code,p]));
     unique(d.trashRecords,x=>x.id,'سلة المحذوفات');
     unique(d.archivedDesigners,x=>x.name,'المصممون المؤرشفون');
-    for(const x of d.trashRecords)if(!['project','assignment','designer'].includes(x.kind)||!x.reason||!x.at||!Array.isArray(x.projects)||!Array.isArray(x.assignments))add('سجل محذوفات غير صالح');
+    const trashKinds=['project','assignment','designer','claim','receipt','advance','expense','opening','customer','photo'];
+    for(const x of d.trashRecords){
+      if(!x||!trashKinds.includes(x.kind)||!x.reason||!x.at||!Array.isArray(x.projects)||!Array.isArray(x.assignments)){add('سجل محذوفات غير صالح');continue}
+      if(!['project','assignment','designer'].includes(x.kind)&&(!x.payload||typeof x.payload!=='object'||Array.isArray(x.payload)))add('حمولة سجل محذوفات غير صالحة');
+      if(x.kind==='claim'&&(!x.payload?.record||!Array.isArray(x.payload?.settlements)))add('مطالبة محذوفة غير صالحة');
+      if(x.kind==='receipt'&&(!Array.isArray(x.payload?.records)||!Array.isArray(x.payload?.settlements)||!Array.isArray(x.payload?.sourceAdvances||[])))add('سند قبض محذوف غير صالح');
+      if(x.kind==='advance'&&(!x.payload?.record||!Array.isArray(x.payload?.receipts)||!Array.isArray(x.payload?.settlements)))add('مقدمة محذوفة غير صالحة');
+      if(['expense','opening','customer','photo'].includes(x.kind)&&!x.payload?.record)add('سجل محذوف غير مكتمل: '+x.kind);
+    }
     for(const x of d.archivedDesigners)if(!x.name||!x.reason||!x.at)add('أرشيف مصمم غير صالح');
     const linked=(code,label)=>{if(!projects.has(code))add(label+': مشروع غير موجود '+code)};
     for(const p of d.projects){if(typeof p.code!=='string'||!p.code.trim()||typeof p.name!=='string')add('بيانات مشروع غير صالحة');monetary(p.contract||0,'عقد '+p.code)}

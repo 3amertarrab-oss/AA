@@ -1,0 +1,22 @@
+{
+  "passed": 16,
+  "checks": [
+    "claim delete preview explains cash is retained",
+    "claim deletion releases matching and preserves receipt cash",
+    "claim restore returns exact matching",
+    "receipt preview is batch level",
+    "receipt batch deletion is atomic",
+    "receipt restore returns rows proof and matching",
+    "advance deletion removes its generated allocations once",
+    "advance bundle restore is exact",
+    "expense deletion recalculates cost center",
+    "expense restore returns amount and audit event",
+    "opening balance deletes without changing cash",
+    "linked customer is archived and hidden without changing projects",
+    "project photo moves to recycle bin with cover update",
+    "photo restore preserves bytes and cover",
+    "recycle center fits iPhone and exposes search and filters",
+    "unified deletion workflows have no script exceptions"
+  ],
+  "errors": []
+}
