@@ -20,7 +20,7 @@
     "larger project photos preserve their full proportions",
     "logo has transparent pixels outside and inside the ring",
     "actual offline RONIX logo is embedded",
-    "required total deducts only this claim settlement",
+    "project table uses one quantity price total layout without paid or due duplication",
     "payment and required text use consistent colors",
     "green and red survive PDF printing with backgrounds disabled",
     "claim table and total fit the paper width",
@@ -56,7 +56,7 @@
     "long claims paginate without dropping project rows",
     "long claims keep portrait orientation",
     "claim-legacy-details: no changes to financial records",
-    "custom legacy descriptions remain printable",
+    "custom legacy descriptions remain printable without repeating totals",
     "notes remain escaped text",
     "print workflows have no JavaScript exceptions"
   ],

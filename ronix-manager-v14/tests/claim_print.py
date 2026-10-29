@@ -94,7 +94,7 @@ try:
         check('larger project photos preserve their full proportions', popup.locator('.photo img').evaluate_all("els=>els.every(e=>e.clientWidth>=140&&e.clientHeight>=96&&getComputedStyle(e).objectFit==='contain')"))
         check('logo has transparent pixels outside and inside the ring', popup.evaluate("() => {const img=document.querySelector('.brand-logo'),c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;const ctx=c.getContext('2d');ctx.drawImage(img,0,0);return ctx.getImageData(0,0,1,1).data[3]===0&&ctx.getImageData(c.width/2,c.height*.16,1,1).data[3]===0}"))
         check('actual offline RONIX logo is embedded', popup.locator('.brand-logo').evaluate("e=>e.src.startsWith('data:image/png;base64,')&&e.naturalWidth>1000"))
-        check('required total deducts only this claim settlement', popup.locator('.projects-table tbody tr').first.locator('td.due').inner_text() == '5,000' and '11,000' in popup.locator('.claim-total').inner_text())
+        check('project table uses one quantity price total layout without paid or due duplication', popup.locator('.projects-table th').all_inner_texts() == ['صورة المشروع','المشروع','البند','الوحدة','الكمية','سعر الوحدة','الإجمالي'] and popup.locator('.projects-table tbody tr').first.locator('td').nth(3).inner_text() == 'عدد' and popup.locator('.projects-table tbody tr').first.locator('td').nth(4).inner_text() == '1' and '11,000' in popup.locator('.claim-total').inner_text())
         check('payment and required text use consistent colors', popup.locator('.paid').evaluate_all("els=>els.every(e=>getComputedStyle(e).color==='rgb(8, 127, 70)')") and popup.locator('.due').evaluate_all("els=>els.every(e=>getComputedStyle(e).color==='rgb(198, 40, 40)')"))
         colors={span['color'] for sheet in pdf for block in sheet.get_text('dict')['blocks'] if 'lines' in block for line in block['lines'] for span in line['spans']}
         check('green and red survive PDF printing with backgrounds disabled', 0x087f46 in colors and 0xc62828 in colors)
@@ -160,7 +160,7 @@ try:
         legacy['claims'][0]['items'] = [{'desc': 'تفاصيل عمل متفق عليها', 'amount': 12000}]
         legacy['claims'][0]['note'] = '<script>window.unwantedExecution=true</script>'
         popup, pdf = export_pdf(legacy, 'claim-legacy-details')
-        check('custom legacy descriptions remain printable', 'تفاصيل عمل متفق عليها' in popup.locator('.details').inner_text())
+        check('custom legacy descriptions remain printable without repeating totals', 'تفاصيل عمل متفق عليها' in popup.locator('.details').inner_text() and '12,000' not in popup.locator('.details').inner_text())
         check('notes remain escaped text', popup.locator('script').count() == 1 and popup.locator('.note').inner_text() == legacy['claims'][0]['note'] and not popup.evaluate('Boolean(window.unwantedExecution)'))
         pdf.close(); popup.close()
         check('print workflows have no JavaScript exceptions', not errors)

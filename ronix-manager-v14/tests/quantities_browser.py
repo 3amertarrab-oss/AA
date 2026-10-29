@@ -28,6 +28,6 @@ try:
   p.evaluate('closeModal();go("claims")')
   with p.expect_popup() as pop: p.evaluate('printClaim(r14Encode(data.claims[0].id))')
   q=pop.value;q.wait_for_load_state()
-  check('printed claim includes quantity unit price and total table','تفاصيل الكميات والأسعار' in q.locator('body').inner_text() and q.locator('.claim-items-table tbody tr').count()==1)
+  check('printed claim merges quantity unit price and total into one project table',q.locator('.projects-table th').all_inner_texts()==['صورة المشروع','المشروع','البند','الوحدة','الكمية','سعر الوحدة','الإجمالي'] and q.locator('.projects-table tbody tr').count()==1 and q.locator('.claim-items-table').count()==0)
   result={'passed':len(checks),'checks':checks};(ROOT/'tests/quantities-browser-results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));b.close()
 finally: server.shutdown()

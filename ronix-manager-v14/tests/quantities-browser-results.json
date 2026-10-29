@@ -6,6 +6,6 @@
     "saved claim retains exact line calculation",
     "project editor shows contract quantity price and calculated total",
     "project quantity editor fits iPhone width",
-    "printed claim includes quantity unit price and total table"
+    "printed claim merges quantity unit price and total into one project table"
   ]
 }

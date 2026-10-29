@@ -172,13 +172,11 @@ function r14Print(title,tabs,extra=''){
 printCustomerStatement=function(enc){const n=decodeURIComponent(enc);r14Print('كشف حساب '+n,clientStatementTabs(n),'<p class="hint">القبض الفعلي يشمل المقدمات مرة واحدة. توزيع المقدمة حركة تخصيص. الأرصدة الافتتاحية مرجعية منفصلة.</p>')};
 function r14ClaimDocument(c){
   const rows=R14.claimRows(c),codes=new Set(rows.map(r=>r.code));
-  const lineItems=rows.flatMap(r=>(r.items||[]).map(x=>({...x,code:r.code})));
   const receipts=data.clientReceipts.filter(r=>codes.has(r.code)).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   const settled=R14.settled(data,c.id),remaining=R14.remaining(data,c);
   const shareText=`مطالبة مالية ${r19Doc('claim',c.id)}\nالعميل: ${R14.claimClient(data,c)||'—'}\nقيمة المطالبة: ${R19.formatAmount(c.total)} ج.م\nالمسدد: ${R19.formatAmount(settled)} ج.م\nالمطلوب سداده: ${R19.formatAmount(remaining)} ج.م`;
-  // Preserve custom legacy descriptions without repeating generated project rows.
-  const descriptions=(c.items||[]).filter(item=>!rows.some(r=>
-    item.desc===(getP(r.code)?.name||r.code)||item.desc===r.code));
+  const customDescriptions=(c.items||[]).filter(item=>!rows.some(r=>item.desc===(getP(r.code)?.name||r.code)||item.desc===r.code));
+  const printGroups=rows.map(r=>{const p=getP(r.code);let items=(r.items||[]).map(x=>({...x,unit:x.unit||'عدد'}));if(!items.length&&rows.length===1&&customDescriptions.length)items=customDescriptions.map(x=>({description:x.desc,unit:'عدد',quantity:1,unitPrice:x.amount,amount:x.amount}));if(!items.length)items=[{description:p?.name||r.code,unit:'عدد',quantity:1,unitPrice:r.amount,amount:r.amount}];return{row:r,project:p,items}});
   const printAmount=R19.formatAmount;
   return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(r19Doc('claim',c.id))}</title>
@@ -229,12 +227,11 @@ function r14ClaimDocument(c){
   <p class="client">السادة / ${esc(R14.claimClient(data,c)||'—')}</p>
   <p class="claim-meta">تاريخ الاستحقاق: ${esc(c.due||'غير محدد')} | الحالة: ${esc(R14.status(c))} | جميع المبالغ بالجنيه المصري</p>
   <p class="claim-intro">نشكر لكم ثقتكم وتعاونكم، ويسعدنا مواصلة العمل معكم. نرفق أدناه بيان المشاريع والدفعات المسجلة، مع توضيح المبلغ المطلوب في نهاية البيان.</p>
-  <table class="projects-table"><colgroup><col style="width:25%"><col style="width:27%"><col style="width:16%"><col style="width:16%"><col style="width:16%"></colgroup>
-  <thead><tr><th>صورة المشروع</th><th>المشروع</th><th>قيمة المطالبة</th><th class="paid">المسدد منها</th><th class="due">المطلوب سداده</th></tr></thead><tbody>
-  ${rows.map(r=>{const p=getP(r.code),img=p&&cover(p),paid=R14.settled(data,c.id,r.code);return `<tr><td class="photo">${img?`<img src="${esc(new URL(img.src,location.href).href)}" alt="${esc(r.code)}">`:'<div class="photo-placeholder">صورة المشروع</div>'}</td><td><bdi class="project-code">${esc(r.code)}</bdi><span class="project-name">${esc(p?.name||'—')}</span><span class="project-contract">العقد: <bdi>${printAmount(p?.contract||0)}</bdi> ج.م${p&&R14.projectCurrency(p)!=='EGP'?`<br>${printAmount(R14.projectOriginalTotal(p))} ${esc(R14.projectCurrency(p))}`:''}</span></td><td class="amount"><bdi>${printAmount(r.amount)}</bdi></td><td class="amount paid"><bdi>${printAmount(paid)}</bdi></td><td class="amount due"><bdi>${printAmount(R14.delta(r.amount,paid))}</bdi></td></tr>`}).join('')}
+  <table class="projects-table"><colgroup><col style="width:23%"><col style="width:18%"><col style="width:17%"><col style="width:8%"><col style="width:8%"><col style="width:13%"><col style="width:13%"></colgroup>
+  <thead><tr><th>صورة المشروع</th><th>المشروع</th><th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr></thead><tbody>
+  ${printGroups.map(g=>g.items.map((x,i)=>{const img=g.project&&cover(g.project),span=` rowspan="${g.items.length}"`;return `<tr>${i===0?`<td class="photo"${span}>${img?`<img src="${esc(new URL(img.src,location.href).href)}" alt="${esc(g.row.code)}">`:'<div class="photo-placeholder">صورة المشروع</div>'}</td><td${span}><bdi class="project-code">${esc(g.row.code)}</bdi><span class="project-name">${esc(g.project?.name||'—')}</span><span class="project-contract">العقد: <bdi>${printAmount(g.project?.contract||0)}</bdi> ج.م</span></td>`:''}<td>${esc(x.description||g.project?.name||g.row.code)}</td><td>${esc(x.unit||'عدد')}</td><td class="amount"><bdi>${esc(x.quantity??1)}</bdi></td><td class="amount"><bdi>${printAmount(x.unitPrice??x.amount)}</bdi></td><td class="amount"><bdi><strong>${printAmount(x.amount)}</strong></bdi></td></tr>`}).join('')).join('')}
   </tbody></table>
-  ${lineItems.length?`<h2>تفاصيل الكميات والأسعار</h2><table class="claim-items-table"><thead><tr><th>المشروع</th><th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr></thead><tbody>${lineItems.map(x=>`<tr><td>${esc(x.code)}</td><td>${esc(x.description)}</td><td>${esc(x.unit||'—')}</td><td class="amount">${esc(x.quantity)}</td><td class="amount">${printAmount(x.unitPrice)}</td><td class="amount due">${printAmount(x.amount)}</td></tr>`).join('')}</tbody></table>`:''}
-  ${descriptions.length?`<div class="details">${descriptions.map(item=>`<p>${esc(item.desc)} — <bdi>${printAmount(item.amount)}</bdi> ج.م</p>`).join('')}</div>`:''}
+  ${rows.length>1&&customDescriptions.length?`<div class="details"><p><b>بيان إضافي:</b> ${customDescriptions.map(x=>esc(x.desc)).join('، ')}</p></div>`:''}
   <h2>الدفعات المسجلة على المشاريع</h2>
   <table class="receipts-table"><colgroup><col style="width:30%"><col style="width:40%"><col style="width:30%"></colgroup>
   <thead><tr><th>التاريخ</th><th>المشروع</th><th class="paid">السداد المخصص (ج.م)</th></tr></thead><tbody>
