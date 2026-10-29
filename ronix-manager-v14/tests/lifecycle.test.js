@@ -82,3 +82,22 @@ test('restore keeps original ordering for claims receipts projects and assignmen
  const clean=R.normalize({projects:[{code:'A',name:'A',client:'C',contract:1},{code:'P',name:'Project',client:'C',contract:1000},{code:'Z',name:'Z',client:'C',contract:1}],assignments:[{id:'A0',code:'A',designer:'D0',fee:1},{id:'A1',code:'P',designer:'D1',fee:2},{id:'A2',code:'P',designer:'D2',fee:3},{id:'A3',code:'Z',designer:'D3',fee:1}],payments:[]});
  out=L.remove(clean,opts);restored=L.restore(out.data,'T');assert.deepEqual(restored.projects,clean.projects);assert.deepEqual(restored.assignments,clean.assignments)
 });
+test('archived project with only an already deleted payment moves to trash and restores exactly',()=>{
+ let d=fixture();d.projects[0].archivedAt=opts.at;d.projects[0].archiveReason='duplicate';d.assignments[0].archivedAt=opts.at;d.assignments[0].archiveReason='duplicate';
+ d.deletedPayments=[{payment:{id:'DP',code:'P',designer:'D',date:'2026-10-20',amount:50},deletedAt:opts.at,reason:'wrong payment'}];d.paymentAttachments.DP={name:'proof.png',data:'data:image/png;base64,AAAA'};d=R.validate(d);const before=R.copy(d);
+ const out=L.remove(d,{...opts,fromArchive:true});assert.equal(out.archived,false);assert.equal(out.data.projects.length,0);assert.equal(out.data.assignments.length,0);assert.equal(out.data.deletedPayments.length,0);assert.equal(out.data.paymentAttachments.DP,undefined);
+ const restored=L.restore(out.data,'T');assert.deepEqual(restored,before)
+});
+test('archived project with live accounting links refuses deletion without changing data',()=>{
+ let d=fixture();d.projects[0].archivedAt=opts.at;d.projects[0].archiveReason='old';d.clientReceipts=[{id:'R',batchId:'B',code:'P',client:'C',date:'2026-10-20',amount:10}];d=R.validate(d);const before=R.copy(d);
+ assert.throws(()=>L.remove(d,{...opts,fromArchive:true}),/سندات قبض عميل/);assert.deepEqual(d,before);assert.deepEqual(L.archiveBlockers(d,{kind:'project',code:'P'}),[{label:'سندات قبض عميل',count:1}])
+});
+test('archived assignment bundles its deleted payment while a paid assignment stays protected',()=>{
+ let d=fixture();d.assignments[0].archivedAt=opts.at;d.assignments[0].archiveReason='duplicate';d.deletedPayments=[{payment:{id:'DP',code:'P',designer:'D',date:'2026-10-20',amount:50},deletedAt:opts.at,reason:'wrong'}];d=R.validate(d);const before=R.copy(d);
+ let out=L.remove(d,{...opts,kind:'assignment',fromArchive:true});assert.equal(out.data.projects.length,1);assert.equal(out.data.assignments.length,0);assert.equal(out.data.deletedPayments.length,0);assert.deepEqual(L.restore(out.data,'T'),before);
+ d=R.copy(before);d.payments=[{id:'LIVE',code:'P',designer:'D',date:'2026-10-21',amount:25}];d=R.validate(d);assert.throws(()=>L.remove(d,{...opts,kind:'assignment',fromArchive:true}),/دفعات مصمم نشطة/)
+});
+test('archived designer marker is included in delete and restore',()=>{
+ let d=fixture();d.archivedDesigners=[{name:'D',at:opts.at,reason:'inactive'}];d=R.validate(d);const before=R.copy(d),out=L.remove(d,{...opts,kind:'designer',fromArchive:true});
+ assert.equal(out.data.assignments.length,0);assert.equal(out.data.archivedDesigners.length,0);assert.deepEqual(L.restore(out.data,'T'),before)
+});

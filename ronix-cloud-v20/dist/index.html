@@ -66,6 +66,8 @@ button:disabled{opacity:.6;cursor:wait}
 .r20-cash-allocation{display:grid;grid-template-columns:minmax(120px,1fr) auto;gap:7px;align-items:center;min-width:300px}.r20-cash-allocation .btn{padding:9px 11px;white-space:normal}@media(max-width:700px){.r20-cash-allocation{grid-template-columns:1fr;min-width:220px}}
 .r23-row-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.danger-link{color:#c62828!important}.r23-impact{background:#fff8e8;border:1px solid #efd9a7;border-radius:12px;padding:14px;margin-bottom:14px}.r23-impact h3{margin:0 0 9px}.r23-impact ul{margin:8px 0 0;padding-inline-start:22px;line-height:1.9}.r23-trash-filters{display:grid;grid-template-columns:minmax(220px,2fr) minmax(170px,1fr);gap:10px;margin:18px 0}.r23-trash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.r23-trash-card{border:1px solid #dce2ea;border-radius:12px;padding:14px;background:#fff;min-width:0}.r23-trash-card>div:first-child{display:flex;justify-content:space-between;gap:8px;align-items:center}.r23-trash-card h3{font-size:16px;margin:12px 0 8px;overflow-wrap:anywhere}.r23-trash-card strong{display:block;font-size:18px;color:#172b45}.r23-trash-card p{color:#647188;min-height:2.4em}.r23-trash-card small{direction:ltr;unicode-bidi:isolate;color:#647188}
 @media(max-width:600px){.r23-trash-filters{grid-template-columns:1fr}.r23-trash-grid{grid-template-columns:1fr}.r23-row-actions{min-width:150px}.r23-delete-form .modalfoot{position:sticky;bottom:-14px;background:#fff;padding-top:10px}}
+.r23-archive-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}.r23-archive-actions .btn,.r23-archive-actions .link{min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center}
+@media(max-width:600px){.r23-archive-actions{grid-template-columns:1fr 1fr;min-width:0}.r23-archive-actions .btn,.r23-archive-actions .link{width:100%;white-space:normal}}
 
 </style><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#172b45"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="RONIX"><link rel="apple-touch-icon" href="icon.png"><style>html,body{max-width:100%;overflow-x:hidden}body.r20-locked .layout,body.r20-locked #overlay,body.r20-locked #toast{display:none!important}
 #r20Gate{min-height:100vh;display:grid;place-items:center;background:#f1f4f8;padding:22px}#r20Gate[hidden]{display:none}
@@ -438,15 +440,47 @@ if(typeof module!=='undefined')module.exports=R16Media;
 /* Reversible deletion for operational records; document numbers and audit history stay reserved. */
 const R17Life=((R)=>{
  const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
- function payments(d,code,name){return [...d.payments,...d.deletedPayments.map(x=>x.payment)].filter(p=>(!code||p.code===code)&&(!name||p.designer===name))}
+ function activePayments(d,code,name){return d.payments.filter(p=>(!code||p.code===code)&&(!name||p.designer===name))}
+ function removedPayments(d,code,name){return d.deletedPayments.filter(x=>(!code||x.payment.code===code)&&(!name||x.payment.designer===name))}
+ function payments(d,code,name){return [...activePayments(d,code,name),...removedPayments(d,code,name).map(x=>x.payment)]}
  function projectLocked(d,code){return payments(d,code).length>0||d.clientReceipts.some(r=>r.code===code)||d.claims.some(c=>R.claimRows(c).some(r=>r.code===code))||d.projectExpenses.some(x=>x.code===code)||d.advances.some(a=>(a.allocations||[]).some(x=>x.code===code))}
- function entry({id,kind,reason,at}){return{id,kind,reason:String(reason||'').trim(),at,projects:[],assignments:[]}}
+ function entry({id,kind,reason,at}){return{id,kind,reason:String(reason||'').trim(),at,projects:[],assignments:[],deletedPayments:[],deletedPaymentProofs:[]}}
  function target(o){return o.targetId||o.code||o.name}
+ function addBlocker(rows,label,count){if(count)rows.push({label,count})}
+ function archiveBlockersFor(d,{kind,code,name,targetId}){
+  const rows=[];
+  if(kind==='project'){
+   addBlocker(rows,'دفعات مصممين نشطة',activePayments(d,code).length);addBlocker(rows,'سندات قبض عميل',d.clientReceipts.filter(x=>x.code===code).length);
+   addBlocker(rows,'مطالبات عميل',d.claims.filter(c=>R.claimRows(c).some(x=>x.code===code)).length);addBlocker(rows,'مصروفات مشروع',d.projectExpenses.filter(x=>x.code===code).length);
+   addBlocker(rows,'توزيعات دفعات مقدمة',d.advances.reduce((n,a)=>n+(a.allocations||[]).filter(x=>x.code===code).length,0));
+  }else if(kind==='assignment')addBlocker(rows,'دفعات مصمم نشطة',activePayments(d,code,name).length);
+  else if(kind==='designer')addBlocker(rows,'دفعات مصمم نشطة',activePayments(d,'',name).length);
+  else if(kind==='customer'){
+   const customer=d.customers.find(x=>x.id===targetId),client=R.normName(customer?.name||name);
+   addBlocker(rows,'مشاريع',d.projects.filter(x=>R.normName(x.client)===client).length);addBlocker(rows,'مطالبات عميل',d.claims.filter(x=>R.claimClient(d,x)===client).length);
+   addBlocker(rows,'سندات قبض عميل',d.clientReceipts.filter(x=>R.receiptClient(d,x)===client).length);addBlocker(rows,'دفعات مقدمة',d.advances.filter(x=>R.normName(x.client)===client).length);
+   addBlocker(rows,'أرصدة افتتاحية',d.openingBalances.filter(x=>R.normName(x.client)===client).length);
+  }
+  return rows;
+ }
+ function archiveBlockers(value,options){return archiveBlockersFor(R.normalize(value),options)}
+ function blockerError(rows){return 'لا يمكن حذف السجل المؤرشف قبل معالجة الروابط التالية: '+rows.map(x=>x.label+' ('+x.count+')').join('، ')}
  function attachmentTake(d,key){const present=own(d.receiptAttachments,key),attachment=present?R.copy(d.receiptAttachments[key]):null;if(present)delete d.receiptAttachments[key];return{attachmentPresent:present,attachment}}
  function attachmentRestore(d,key,p){if(!p.attachmentPresent)return;if(own(d.receiptAttachments,key))throw Error('يوجد مستند آخر بالمفتاح نفسه؛ لا يمكن الاستعادة');d.receiptAttachments[key]=R.copy(p.attachment)}
  function insertMany(target,records,indexes){
   if(!records.length)return;if(!Array.isArray(indexes)||indexes.length!==records.length||indexes.some(i=>!Number.isSafeInteger(i)||i<0)){target.push(...records);return}
   records.map((record,i)=>({record,index:indexes[i]})).sort((a,b)=>a.index-b.index).forEach(x=>target.splice(Math.min(x.index,target.length),0,x.record));
+ }
+ function takeRemovedPayments(d,x,code,name){
+  const rows=removedPayments(d,code,name);x.deletedPayments=rows;x.deletedPaymentIndexes=rows.map(row=>d.deletedPayments.indexOf(row));
+  for(const row of rows){const id=row.payment.id;if(own(d.paymentAttachments,id)){x.deletedPaymentProofs.push({id,attachment:R.copy(d.paymentAttachments[id])});delete d.paymentAttachments[id]}}
+  if(rows.length)d.deletedPayments=d.deletedPayments.filter(row=>!rows.includes(row));
+ }
+ function restoreRemovedPayments(d,x){
+  const rows=x.deletedPayments||[],ids=new Set(rows.map(row=>row.payment.id));if(!rows.length)return;
+  if(d.payments.some(p=>ids.has(p.id))||d.deletedPayments.some(row=>ids.has(row.payment.id)))throw Error('إحدى دفعات المصممين المحذوفة موجودة بالفعل');
+  for(const proof of x.deletedPaymentProofs||[])if(own(d.paymentAttachments,proof.id))throw Error('يوجد مستند دفعة آخر بالمفتاح نفسه؛ لا يمكن الاستعادة');
+  insertMany(d.deletedPayments,rows,x.deletedPaymentIndexes);for(const proof of x.deletedPaymentProofs||[])d.paymentAttachments[proof.id]=R.copy(proof.attachment);
  }
  function rebuildAdvance(d,id){
   const a=d.advances.find(a=>a.id===id);if(!a)throw Error('المقدمة المرتبطة غير موجودة');
@@ -456,20 +490,24 @@ const R17Life=((R)=>{
  function ensureProjects(d,codes){for(const code of new Set(codes.filter(Boolean)))if(!d.projects.some(p=>p.code===code))throw Error('استعد المشروع المرتبط أولًا: '+code)}
  function customerLinked(d,name){name=R.normName(name);return d.projects.some(x=>R.normName(x.client)===name)||d.claims.some(x=>R.claimClient(d,x)===name)||d.clientReceipts.some(x=>R.receiptClient(d,x)===name)||d.advances.some(x=>R.normName(x.client)===name)||d.openingBalances.some(x=>R.normName(x.client)===name)}
  function remove(value,options){
-  const d=R.normalize(value),{kind,code,name,reason,id,at}=options,targetId=target(options);if(!String(reason||'').trim())throw Error('اكتب سبب الحذف');
+  const d=R.normalize(value),{kind,code,name,reason,id,at}=options,targetId=target(options),fromArchive=!!options.fromArchive;if(!String(reason||'').trim())throw Error('اكتب سبب الحذف');
   const x=entry({id,kind,reason,at});
   if(kind==='project'){
    const p=d.projects.find(p=>p.code===code);if(!p)throw Error('المشروع غير موجود');
-   if(projectLocked(d,code)){p.archivedAt=at;p.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
+   if(fromArchive){if(!p.archivedAt)throw Error('المشروع ليس مؤرشفًا');const blockers=archiveBlockersFor(d,{kind,code});if(blockers.length)throw Error(blockerError(blockers));takeRemovedPayments(d,x,code,'')}
+   else if(projectLocked(d,code)){p.archivedAt=at;p.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
    x.projects=[p];x.projectIndexes=[d.projects.indexOf(p)];x.assignments=d.assignments.filter(a=>a.code===code);x.assignmentIndexes=x.assignments.map(a=>d.assignments.indexOf(a));
    d.projects=d.projects.filter(p=>p.code!==code);d.assignments=d.assignments.filter(a=>a.code!==code);
   }else if(kind==='assignment'){
    const a=d.assignments.find(a=>a.code===code&&a.designer===name);if(!a)throw Error('التكليف غير موجود');
-   if(payments(d,code,name).length){a.archivedAt=at;a.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
+   if(fromArchive){if(!a.archivedAt)throw Error('التكليف ليس مؤرشفًا');const blockers=archiveBlockersFor(d,{kind,code,name});if(blockers.length)throw Error(blockerError(blockers));takeRemovedPayments(d,x,code,name)}
+   else if(payments(d,code,name).length){a.archivedAt=at;a.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
    x.assignments=[a];x.assignmentIndexes=[d.assignments.indexOf(a)];d.assignments=d.assignments.filter(b=>b!==a);
   }else if(kind==='designer'){
    const as=d.assignments.filter(a=>a.designer===name);if(!as.length)throw Error('المصمم غير موجود');
-   if(payments(d,'',name).length){d.archivedDesigners=d.archivedDesigners.filter(y=>y.name!==name);d.archivedDesigners.push({name,at,reason:x.reason});return {data:R.validate(d),archived:true}}
+   const marker=d.archivedDesigners.find(y=>y.name===name);
+   if(fromArchive){if(!marker)throw Error('المصمم ليس مؤرشفًا');const blockers=archiveBlockersFor(d,{kind,name});if(blockers.length)throw Error(blockerError(blockers));takeRemovedPayments(d,x,'',name);x.archivedDesigner=marker;x.archivedDesignerIndex=d.archivedDesigners.indexOf(marker);d.archivedDesigners=d.archivedDesigners.filter(y=>y!==marker)}
+   else if(payments(d,'',name).length){d.archivedDesigners=d.archivedDesigners.filter(y=>y.name!==name);d.archivedDesigners.push({name,at,reason:x.reason});return {data:R.validate(d),archived:true}}
    x.assignments=as;x.assignmentIndexes=as.map(a=>d.assignments.indexOf(a));d.assignments=d.assignments.filter(a=>a.designer!==name);
   }else if(kind==='claim'){
    const record=d.claims.find(c=>c.id===targetId);if(!record)throw Error('المطالبة غير موجودة');
@@ -494,7 +532,8 @@ const R17Life=((R)=>{
    const record=d.openingBalances.find(o=>R.normName(o.client)===R.normName(targetId||name));if(!record)throw Error('الرصيد الافتتاحي غير موجود');x.payload={record,index:d.openingBalances.indexOf(record)};d.openingBalances=d.openingBalances.filter(o=>o!==record);
   }else if(kind==='customer'){
    const record=d.customers.find(c=>c.id===targetId);if(!record)throw Error('العميل غير موجود');
-   if(customerLinked(d,record.name)){record.archivedAt=at;record.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
+   if(fromArchive){if(!record.archivedAt)throw Error('العميل ليس مؤرشفًا');const blockers=archiveBlockersFor(d,{kind,targetId});if(blockers.length)throw Error(blockerError(blockers))}
+   else if(customerLinked(d,record.name)){record.archivedAt=at;record.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
    x.payload={record,index:d.customers.indexOf(record)};d.customers=d.customers.filter(c=>c!==record);
   }else if(kind==='photo'){
    const p=d.projects.find(p=>p.code===code),photos=p?.photos||[],index=photos.findIndex(photo=>photo.id===targetId);if(!p||index<0)throw Error('صورة المشروع غير موجودة');
@@ -507,7 +546,9 @@ const R17Life=((R)=>{
   if(x.projects.some(p=>d.projects.some(a=>a.code===p.code)))throw Error('كود المشروع مستخدم؛ غيّر الكود الحالي قبل الاستعادة');
   const codes=new Set([...d.projects,...x.projects].map(p=>p.code));
   for(const a of x.assignments){if(!codes.has(a.code))throw Error('استعد المشروع المرتبط أولًا');if(d.assignments.some(b=>b.code===a.code&&R.normName(b.designer)===R.normName(a.designer)))throw Error('التكليف موجود؛ لا يمكن تكراره')}
+  if(x.archivedDesigner&&d.archivedDesigners.some(y=>y.name===x.archivedDesigner.name))throw Error('المصمم موجود بالفعل في الأرشيف');
   insertMany(d.projects,x.projects,x.projectIndexes);insertMany(d.assignments,x.assignments,x.assignmentIndexes);
+  restoreRemovedPayments(d,x);if(x.archivedDesigner)insertMany(d.archivedDesigners,[x.archivedDesigner],[x.archivedDesignerIndex]);
   const p=x.payload||{};
   if(x.kind==='claim'){
    if(d.claims.some(c=>c.id===p.record.id))throw Error('المطالبة موجودة بالفعل');ensureProjects(d,R.claimRows(p.record).map(r=>r.code));insertMany(d.claims,[p.record],[p.index]);insertMany(d.claimSettlements,p.settlements,p.settlementIndexes);
@@ -529,7 +570,7 @@ const R17Life=((R)=>{
   }
   d.trashRecords=d.trashRecords.filter(a=>a.id!==id);return R.validate(d);
  }
- return {payments,projectLocked,customerLinked,rebuildAdvance,remove,restore};
+ return {payments,projectLocked,customerLinked,archiveBlockers,rebuildAdvance,remove,restore};
 })(typeof module!=='undefined'?require('./finance-core.js'):R14);
 if(typeof module!=='undefined')module.exports=R17Life;
 
@@ -1938,19 +1979,32 @@ function r23Impact(kind,targetId='',code='',name=''){
  if(kind==='photo'&&target)return {title:`صورة مشروع ${projectCode}`,lines:['ستُزال الصورة من بطاقة المشروع وتبقى محفوظة في السلة للاستعادة.']};
  return {title:R23_KIND_LABELS[kind]||'السجل',lines:['سيُنقل السجل إلى سلة المحذوفات، ويمكن استعادته لاحقًا.']};
 }
-function r23Delete(kind,targetId='',code='',name=''){
- [kind,targetId,code,name]=[kind,targetId,code,name].map(r23Decode);const info=r23Impact(kind,targetId,code,name),encoded=[kind,targetId,code,name].map(x=>r14Encode(x||''));
- modal('حذف / أرشفة بشكل آمن',`<form class="r23-delete-form" onsubmit="r23ConfirmDelete(event,'${encoded[0]}','${encoded[1]}','${encoded[2]}','${encoded[3]}')"><div class="r23-impact"><h3>${esc(info.title)}</h3><b>ما الذي سيتغير؟</b><ul>${info.lines.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>${field('r23DeleteReason','سبب الحذف / الأرشفة','','text','required minlength="3" placeholder="مثال: إدخال مكرر أو تصحيح سند"')}<p class="hint">العملية قابلة للاستعادة من «المحذوفات». أرقام المستندات وسجل التدقيق لا تُحذف.</p><div class="modalfoot"><button class="btn danger" type="submit">تأكيد ونقل إلى المحذوفات</button><button class="btn" type="button" onclick="r20RequestClose()">إلغاء</button></div></form>`)
+function r23Delete(kind,targetId='',code='',name='',fromArchive=false){
+ [kind,targetId,code,name]=[kind,targetId,code,name].map(r23Decode);fromArchive=fromArchive===true||fromArchive==='1';const info=r23Impact(kind,targetId,code,name),encoded=[kind,targetId,code,name].map(x=>r14Encode(x||''));
+ if(fromArchive)info.lines=[...info.lines,'سيُنقل السجل المؤرشف إلى المحذوفات، ويمكن استعادته بحالته المؤرشفة.'];
+ modal(fromArchive?'حذف سجل مؤرشف':'حذف / أرشفة بشكل آمن',`<form class="r23-delete-form" onsubmit="r23ConfirmDelete(event,'${encoded[0]}','${encoded[1]}','${encoded[2]}','${encoded[3]}','${fromArchive?'1':'0'}')"><div class="r23-impact"><h3>${esc(info.title)}</h3><b>ما الذي سيتغير؟</b><ul>${info.lines.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>${field('r23DeleteReason',fromArchive?'سبب حذف السجل المؤرشف':'سبب الحذف / الأرشفة','','text','required minlength="3" placeholder="مثال: إدخال مكرر أو تصحيح سند"')}<p class="hint">العملية قابلة للاستعادة من «المحذوفات». أرقام المستندات وسجل التدقيق لا تُحذف.</p><div class="modalfoot"><button class="btn danger" type="submit">${fromArchive?'حذف من الأرشيف':'تأكيد ونقل إلى المحذوفات'}</button><button class="btn" type="button" onclick="r20RequestClose()">إلغاء</button></div></form>`)
 }
-function r23ConfirmDelete(e,kindEnc,targetEnc,codeEnc,nameEnc){
+function r23ConfirmDelete(e,kindEnc,targetEnc,codeEnc,nameEnc,fromArchive='0'){
  e.preventDefault();try{
   const kind=r23Decode(kindEnc),targetId=r23Decode(targetEnc),code=r23Decode(codeEnc),name=r23Decode(nameEnc),reason=val('r23DeleteReason').trim(),trashId=r14Id('TRASH');
   if(reason.length<3)throw Error('اكتب سببًا واضحًا للحذف');
-  const result=R17Life.remove(data,{kind,targetId,code,name,reason,id:trashId,at:new Date().toISOString()});
-  if(r14Persist(result.data,result.archived?'أرشفة سجل مرتبط':'حذف سجل إلى السلة',{kind,targetId,code,name,reason,trashId})){
-   projectFocus='';designerFocus='';r14Done(result.archived?'تمت الأرشفة مع حفظ الحسابات':'نُقل السجل إلى المحذوفات ويمكن استعادته');
+  const deletingArchive=fromArchive==='1',result=R17Life.remove(data,{kind,targetId,code,name,reason,id:trashId,at:new Date().toISOString(),fromArchive:deletingArchive});
+  if(r14Persist(result.data,result.archived?'أرشفة سجل مرتبط':deletingArchive?'حذف سجل مؤرشف إلى السلة':'حذف سجل إلى السلة',{kind,targetId,code,name,reason,trashId,fromArchive:deletingArchive})){
+   projectFocus='';designerFocus='';r14Done(result.archived?'تمت الأرشفة مع حفظ الحسابات':deletingArchive?'حُذف السجل من الأرشيف ونُقل إلى المحذوفات':'نُقل السجل إلى المحذوفات ويمكن استعادته');
   }
  }catch(error){alert(error.message)}
+}
+function r23ArchivedLabel(kind,targetId='',code='',name=''){
+ if(kind==='project'){const p=getP(code);return p?`${p.code} — ${p.name}`:code}if(kind==='assignment')return `${name} / ${code}`;if(kind==='designer')return name;
+ if(kind==='customer')return data.customers.find(x=>x.id===targetId)?.name||'العميل';return R23_KIND_LABELS[kind]||'السجل';
+}
+function r23DeleteArchived(kind,targetId='',code='',name=''){
+ [kind,targetId,code,name]=[kind,targetId,code,name].map(r23Decode);const blockers=R17Life.archiveBlockers(data,{kind,targetId,code,name}),label=r23ArchivedLabel(kind,targetId,code,name);
+ if(blockers.length)return modal('لا يمكن حذف السجل الآن',`<div class="r23-impact"><h3>${esc(label)}</h3><p>هذا السجل مرتبط بحركات نشطة. احذف أو صحح الحركات التالية أولًا حتى لا تتغير حسابات مشروع أو عميل آخر:</p><ul>${blockers.map(x=>`<li>${esc(x.label)}: <b>${x.count}</b></li>`).join('')}</ul></div><p class="hint">دفعات المصممين المحذوفة سابقًا ليست عائقًا؛ ستنتقل تلقائيًا مع السجل ومستنداتها إلى سلة المحذوفات.</p><div class="modalfoot"><button class="btn" type="button" onclick="closeModal()">إغلاق</button></div>`);
+ r23Delete(kind,targetId,code,name,true)
+}
+function r23ArchiveActions(kind,targetId='',code='',name='',unarchive=''){
+ const args=[kind,targetId,code,name].map(x=>r14Encode(x||''));return `<div class="r23-row-actions r23-archive-actions">${unarchive}<button type="button" class="btn danger" onclick="r23DeleteArchived('${args[0]}','${args[1]}','${args[2]}','${args[3]}')">حذف</button></div>`
 }
 function r23RestoreRecord(enc){
  try{const id=r23Decode(enc),next=R17Life.restore(data,id);if(r14Persist(next,'استعادة سجل من المحذوفات',{trashId:id}))r14Done('تمت استعادة السجل وكل روابطه المحاسبية')}
@@ -1975,10 +2029,10 @@ function r23TrashMeta(x){
 function r23RecycleRows(){
  const rows=data.trashRecords.map(x=>{const m=r23TrashMeta(x);return {type:x.kind,label:m.label,amount:m.amount,reason:x.reason,at:x.at,action:`<button class="btn" onclick="r23RestoreRecord('${r14Encode(x.id)}')">استعادة السجل</button>`}});
  for(const x of data.deletedPayments){rows.push({type:'payment',label:`${x.payment.designer} / ${x.payment.code}`,amount:x.payment.amount,reason:x.reason,at:x.deletedAt,action:`<button class="btn" onclick="r15RestorePayment('${r14Encode(x.payment.id)}')">استعادة</button>`})}
- for(const p of data.projects.filter(x=>x.archivedAt))rows.push({type:'project',label:`${p.code} — ${p.name}`,amount:p.contract,reason:p.archiveReason,at:p.archivedAt,action:r17ArchiveButton('project',p.code)});
- for(const a of data.assignments.filter(x=>x.archivedAt))rows.push({type:'assignment',label:`${a.designer} / ${a.code}`,amount:a.fee,reason:a.archiveReason,at:a.archivedAt,action:r17ArchiveButton('assignment',a.code,a.designer)});
- for(const x of data.archivedDesigners)rows.push({type:'designer',label:x.name,amount:0,reason:x.reason,at:x.at,action:r17ArchiveButton('designer','',x.name)});
- for(const c of data.customers.filter(x=>x.archivedAt))rows.push({type:'customer',label:c.name,amount:0,reason:c.archiveReason,at:c.archivedAt,action:`<button class="btn" onclick="r23UnarchiveCustomer('${r14Encode(c.id)}')">إلغاء الأرشفة</button>`});
+ for(const p of data.projects.filter(x=>x.archivedAt))rows.push({type:'project',label:`${p.code} — ${p.name}`,amount:p.contract,reason:p.archiveReason,at:p.archivedAt,action:r23ArchiveActions('project','',p.code,'',r17ArchiveButton('project',p.code))});
+ for(const a of data.assignments.filter(x=>x.archivedAt))rows.push({type:'assignment',label:`${a.designer} / ${a.code}`,amount:a.fee,reason:a.archiveReason,at:a.archivedAt,action:r23ArchiveActions('assignment','',a.code,a.designer,r17ArchiveButton('assignment',a.code,a.designer))});
+ for(const x of data.archivedDesigners)rows.push({type:'designer',label:x.name,amount:0,reason:x.reason,at:x.at,action:r23ArchiveActions('designer','','',x.name,r17ArchiveButton('designer','',x.name))});
+ for(const c of data.customers.filter(x=>x.archivedAt))rows.push({type:'customer',label:c.name,amount:0,reason:c.archiveReason,at:c.archivedAt,action:r23ArchiveActions('customer',c.id,'','',`<button class="btn" onclick="r23UnarchiveCustomer('${r14Encode(c.id)}')">إلغاء الأرشفة</button>`)});
  return rows.sort((a,b)=>String(b.at||'').localeCompare(String(a.at||'')));
 }
 function r23RecycleTable(){

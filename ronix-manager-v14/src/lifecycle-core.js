@@ -1,15 +1,47 @@
 /* Reversible deletion for operational records; document numbers and audit history stay reserved. */
 const R17Life=((R)=>{
  const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
- function payments(d,code,name){return [...d.payments,...d.deletedPayments.map(x=>x.payment)].filter(p=>(!code||p.code===code)&&(!name||p.designer===name))}
+ function activePayments(d,code,name){return d.payments.filter(p=>(!code||p.code===code)&&(!name||p.designer===name))}
+ function removedPayments(d,code,name){return d.deletedPayments.filter(x=>(!code||x.payment.code===code)&&(!name||x.payment.designer===name))}
+ function payments(d,code,name){return [...activePayments(d,code,name),...removedPayments(d,code,name).map(x=>x.payment)]}
  function projectLocked(d,code){return payments(d,code).length>0||d.clientReceipts.some(r=>r.code===code)||d.claims.some(c=>R.claimRows(c).some(r=>r.code===code))||d.projectExpenses.some(x=>x.code===code)||d.advances.some(a=>(a.allocations||[]).some(x=>x.code===code))}
- function entry({id,kind,reason,at}){return{id,kind,reason:String(reason||'').trim(),at,projects:[],assignments:[]}}
+ function entry({id,kind,reason,at}){return{id,kind,reason:String(reason||'').trim(),at,projects:[],assignments:[],deletedPayments:[],deletedPaymentProofs:[]}}
  function target(o){return o.targetId||o.code||o.name}
+ function addBlocker(rows,label,count){if(count)rows.push({label,count})}
+ function archiveBlockersFor(d,{kind,code,name,targetId}){
+  const rows=[];
+  if(kind==='project'){
+   addBlocker(rows,'دفعات مصممين نشطة',activePayments(d,code).length);addBlocker(rows,'سندات قبض عميل',d.clientReceipts.filter(x=>x.code===code).length);
+   addBlocker(rows,'مطالبات عميل',d.claims.filter(c=>R.claimRows(c).some(x=>x.code===code)).length);addBlocker(rows,'مصروفات مشروع',d.projectExpenses.filter(x=>x.code===code).length);
+   addBlocker(rows,'توزيعات دفعات مقدمة',d.advances.reduce((n,a)=>n+(a.allocations||[]).filter(x=>x.code===code).length,0));
+  }else if(kind==='assignment')addBlocker(rows,'دفعات مصمم نشطة',activePayments(d,code,name).length);
+  else if(kind==='designer')addBlocker(rows,'دفعات مصمم نشطة',activePayments(d,'',name).length);
+  else if(kind==='customer'){
+   const customer=d.customers.find(x=>x.id===targetId),client=R.normName(customer?.name||name);
+   addBlocker(rows,'مشاريع',d.projects.filter(x=>R.normName(x.client)===client).length);addBlocker(rows,'مطالبات عميل',d.claims.filter(x=>R.claimClient(d,x)===client).length);
+   addBlocker(rows,'سندات قبض عميل',d.clientReceipts.filter(x=>R.receiptClient(d,x)===client).length);addBlocker(rows,'دفعات مقدمة',d.advances.filter(x=>R.normName(x.client)===client).length);
+   addBlocker(rows,'أرصدة افتتاحية',d.openingBalances.filter(x=>R.normName(x.client)===client).length);
+  }
+  return rows;
+ }
+ function archiveBlockers(value,options){return archiveBlockersFor(R.normalize(value),options)}
+ function blockerError(rows){return 'لا يمكن حذف السجل المؤرشف قبل معالجة الروابط التالية: '+rows.map(x=>x.label+' ('+x.count+')').join('، ')}
  function attachmentTake(d,key){const present=own(d.receiptAttachments,key),attachment=present?R.copy(d.receiptAttachments[key]):null;if(present)delete d.receiptAttachments[key];return{attachmentPresent:present,attachment}}
  function attachmentRestore(d,key,p){if(!p.attachmentPresent)return;if(own(d.receiptAttachments,key))throw Error('يوجد مستند آخر بالمفتاح نفسه؛ لا يمكن الاستعادة');d.receiptAttachments[key]=R.copy(p.attachment)}
  function insertMany(target,records,indexes){
   if(!records.length)return;if(!Array.isArray(indexes)||indexes.length!==records.length||indexes.some(i=>!Number.isSafeInteger(i)||i<0)){target.push(...records);return}
   records.map((record,i)=>({record,index:indexes[i]})).sort((a,b)=>a.index-b.index).forEach(x=>target.splice(Math.min(x.index,target.length),0,x.record));
+ }
+ function takeRemovedPayments(d,x,code,name){
+  const rows=removedPayments(d,code,name);x.deletedPayments=rows;x.deletedPaymentIndexes=rows.map(row=>d.deletedPayments.indexOf(row));
+  for(const row of rows){const id=row.payment.id;if(own(d.paymentAttachments,id)){x.deletedPaymentProofs.push({id,attachment:R.copy(d.paymentAttachments[id])});delete d.paymentAttachments[id]}}
+  if(rows.length)d.deletedPayments=d.deletedPayments.filter(row=>!rows.includes(row));
+ }
+ function restoreRemovedPayments(d,x){
+  const rows=x.deletedPayments||[],ids=new Set(rows.map(row=>row.payment.id));if(!rows.length)return;
+  if(d.payments.some(p=>ids.has(p.id))||d.deletedPayments.some(row=>ids.has(row.payment.id)))throw Error('إحدى دفعات المصممين المحذوفة موجودة بالفعل');
+  for(const proof of x.deletedPaymentProofs||[])if(own(d.paymentAttachments,proof.id))throw Error('يوجد مستند دفعة آخر بالمفتاح نفسه؛ لا يمكن الاستعادة');
+  insertMany(d.deletedPayments,rows,x.deletedPaymentIndexes);for(const proof of x.deletedPaymentProofs||[])d.paymentAttachments[proof.id]=R.copy(proof.attachment);
  }
  function rebuildAdvance(d,id){
   const a=d.advances.find(a=>a.id===id);if(!a)throw Error('المقدمة المرتبطة غير موجودة');
@@ -19,20 +51,24 @@ const R17Life=((R)=>{
  function ensureProjects(d,codes){for(const code of new Set(codes.filter(Boolean)))if(!d.projects.some(p=>p.code===code))throw Error('استعد المشروع المرتبط أولًا: '+code)}
  function customerLinked(d,name){name=R.normName(name);return d.projects.some(x=>R.normName(x.client)===name)||d.claims.some(x=>R.claimClient(d,x)===name)||d.clientReceipts.some(x=>R.receiptClient(d,x)===name)||d.advances.some(x=>R.normName(x.client)===name)||d.openingBalances.some(x=>R.normName(x.client)===name)}
  function remove(value,options){
-  const d=R.normalize(value),{kind,code,name,reason,id,at}=options,targetId=target(options);if(!String(reason||'').trim())throw Error('اكتب سبب الحذف');
+  const d=R.normalize(value),{kind,code,name,reason,id,at}=options,targetId=target(options),fromArchive=!!options.fromArchive;if(!String(reason||'').trim())throw Error('اكتب سبب الحذف');
   const x=entry({id,kind,reason,at});
   if(kind==='project'){
    const p=d.projects.find(p=>p.code===code);if(!p)throw Error('المشروع غير موجود');
-   if(projectLocked(d,code)){p.archivedAt=at;p.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
+   if(fromArchive){if(!p.archivedAt)throw Error('المشروع ليس مؤرشفًا');const blockers=archiveBlockersFor(d,{kind,code});if(blockers.length)throw Error(blockerError(blockers));takeRemovedPayments(d,x,code,'')}
+   else if(projectLocked(d,code)){p.archivedAt=at;p.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
    x.projects=[p];x.projectIndexes=[d.projects.indexOf(p)];x.assignments=d.assignments.filter(a=>a.code===code);x.assignmentIndexes=x.assignments.map(a=>d.assignments.indexOf(a));
    d.projects=d.projects.filter(p=>p.code!==code);d.assignments=d.assignments.filter(a=>a.code!==code);
   }else if(kind==='assignment'){
    const a=d.assignments.find(a=>a.code===code&&a.designer===name);if(!a)throw Error('التكليف غير موجود');
-   if(payments(d,code,name).length){a.archivedAt=at;a.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
+   if(fromArchive){if(!a.archivedAt)throw Error('التكليف ليس مؤرشفًا');const blockers=archiveBlockersFor(d,{kind,code,name});if(blockers.length)throw Error(blockerError(blockers));takeRemovedPayments(d,x,code,name)}
+   else if(payments(d,code,name).length){a.archivedAt=at;a.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
    x.assignments=[a];x.assignmentIndexes=[d.assignments.indexOf(a)];d.assignments=d.assignments.filter(b=>b!==a);
   }else if(kind==='designer'){
    const as=d.assignments.filter(a=>a.designer===name);if(!as.length)throw Error('المصمم غير موجود');
-   if(payments(d,'',name).length){d.archivedDesigners=d.archivedDesigners.filter(y=>y.name!==name);d.archivedDesigners.push({name,at,reason:x.reason});return {data:R.validate(d),archived:true}}
+   const marker=d.archivedDesigners.find(y=>y.name===name);
+   if(fromArchive){if(!marker)throw Error('المصمم ليس مؤرشفًا');const blockers=archiveBlockersFor(d,{kind,name});if(blockers.length)throw Error(blockerError(blockers));takeRemovedPayments(d,x,'',name);x.archivedDesigner=marker;x.archivedDesignerIndex=d.archivedDesigners.indexOf(marker);d.archivedDesigners=d.archivedDesigners.filter(y=>y!==marker)}
+   else if(payments(d,'',name).length){d.archivedDesigners=d.archivedDesigners.filter(y=>y.name!==name);d.archivedDesigners.push({name,at,reason:x.reason});return {data:R.validate(d),archived:true}}
    x.assignments=as;x.assignmentIndexes=as.map(a=>d.assignments.indexOf(a));d.assignments=d.assignments.filter(a=>a.designer!==name);
   }else if(kind==='claim'){
    const record=d.claims.find(c=>c.id===targetId);if(!record)throw Error('المطالبة غير موجودة');
@@ -57,7 +93,8 @@ const R17Life=((R)=>{
    const record=d.openingBalances.find(o=>R.normName(o.client)===R.normName(targetId||name));if(!record)throw Error('الرصيد الافتتاحي غير موجود');x.payload={record,index:d.openingBalances.indexOf(record)};d.openingBalances=d.openingBalances.filter(o=>o!==record);
   }else if(kind==='customer'){
    const record=d.customers.find(c=>c.id===targetId);if(!record)throw Error('العميل غير موجود');
-   if(customerLinked(d,record.name)){record.archivedAt=at;record.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
+   if(fromArchive){if(!record.archivedAt)throw Error('العميل ليس مؤرشفًا');const blockers=archiveBlockersFor(d,{kind,targetId});if(blockers.length)throw Error(blockerError(blockers))}
+   else if(customerLinked(d,record.name)){record.archivedAt=at;record.archiveReason=x.reason;return {data:R.validate(d),archived:true}}
    x.payload={record,index:d.customers.indexOf(record)};d.customers=d.customers.filter(c=>c!==record);
   }else if(kind==='photo'){
    const p=d.projects.find(p=>p.code===code),photos=p?.photos||[],index=photos.findIndex(photo=>photo.id===targetId);if(!p||index<0)throw Error('صورة المشروع غير موجودة');
@@ -70,7 +107,9 @@ const R17Life=((R)=>{
   if(x.projects.some(p=>d.projects.some(a=>a.code===p.code)))throw Error('كود المشروع مستخدم؛ غيّر الكود الحالي قبل الاستعادة');
   const codes=new Set([...d.projects,...x.projects].map(p=>p.code));
   for(const a of x.assignments){if(!codes.has(a.code))throw Error('استعد المشروع المرتبط أولًا');if(d.assignments.some(b=>b.code===a.code&&R.normName(b.designer)===R.normName(a.designer)))throw Error('التكليف موجود؛ لا يمكن تكراره')}
+  if(x.archivedDesigner&&d.archivedDesigners.some(y=>y.name===x.archivedDesigner.name))throw Error('المصمم موجود بالفعل في الأرشيف');
   insertMany(d.projects,x.projects,x.projectIndexes);insertMany(d.assignments,x.assignments,x.assignmentIndexes);
+  restoreRemovedPayments(d,x);if(x.archivedDesigner)insertMany(d.archivedDesigners,[x.archivedDesigner],[x.archivedDesignerIndex]);
   const p=x.payload||{};
   if(x.kind==='claim'){
    if(d.claims.some(c=>c.id===p.record.id))throw Error('المطالبة موجودة بالفعل');ensureProjects(d,R.claimRows(p.record).map(r=>r.code));insertMany(d.claims,[p.record],[p.index]);insertMany(d.claimSettlements,p.settlements,p.settlementIndexes);
@@ -92,6 +131,6 @@ const R17Life=((R)=>{
   }
   d.trashRecords=d.trashRecords.filter(a=>a.id!==id);return R.validate(d);
  }
- return {payments,projectLocked,customerLinked,rebuildAdvance,remove,restore};
+ return {payments,projectLocked,customerLinked,archiveBlockers,rebuildAdvance,remove,restore};
 })(typeof module!=='undefined'?require('./finance-core.js'):R14);
 if(typeof module!=='undefined')module.exports=R17Life;

@@ -1,5 +1,5 @@
 {
-  "passed": 16,
+  "passed": 20,
   "checks": [
     "claim delete preview explains cash is retained",
     "claim deletion releases matching and preserves receipt cash",
@@ -15,7 +15,11 @@
     "linked customer is archived and hidden without changing projects",
     "project photo moves to recycle bin with cover update",
     "photo restore preserves bytes and cover",
-    "recycle center fits iPhone and exposes search and filters",
+    "archived project exposes unarchive and delete actions",
+    "archive delete bundles assignment old payment and proof",
+    "restoring archive delete returns its exact archived links",
+    "linked archive delete explains blockers without changing balances",
+    "recycle center fits iPhone and archive buttons do not overlap",
     "unified deletion workflows have no script exceptions"
   ],
   "errors": []

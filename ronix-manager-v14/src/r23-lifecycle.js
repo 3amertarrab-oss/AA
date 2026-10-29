@@ -27,19 +27,32 @@ function r23Impact(kind,targetId='',code='',name=''){
  if(kind==='photo'&&target)return {title:`صورة مشروع ${projectCode}`,lines:['ستُزال الصورة من بطاقة المشروع وتبقى محفوظة في السلة للاستعادة.']};
  return {title:R23_KIND_LABELS[kind]||'السجل',lines:['سيُنقل السجل إلى سلة المحذوفات، ويمكن استعادته لاحقًا.']};
 }
-function r23Delete(kind,targetId='',code='',name=''){
- [kind,targetId,code,name]=[kind,targetId,code,name].map(r23Decode);const info=r23Impact(kind,targetId,code,name),encoded=[kind,targetId,code,name].map(x=>r14Encode(x||''));
- modal('حذف / أرشفة بشكل آمن',`<form class="r23-delete-form" onsubmit="r23ConfirmDelete(event,'${encoded[0]}','${encoded[1]}','${encoded[2]}','${encoded[3]}')"><div class="r23-impact"><h3>${esc(info.title)}</h3><b>ما الذي سيتغير؟</b><ul>${info.lines.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>${field('r23DeleteReason','سبب الحذف / الأرشفة','','text','required minlength="3" placeholder="مثال: إدخال مكرر أو تصحيح سند"')}<p class="hint">العملية قابلة للاستعادة من «المحذوفات». أرقام المستندات وسجل التدقيق لا تُحذف.</p><div class="modalfoot"><button class="btn danger" type="submit">تأكيد ونقل إلى المحذوفات</button><button class="btn" type="button" onclick="r20RequestClose()">إلغاء</button></div></form>`)
+function r23Delete(kind,targetId='',code='',name='',fromArchive=false){
+ [kind,targetId,code,name]=[kind,targetId,code,name].map(r23Decode);fromArchive=fromArchive===true||fromArchive==='1';const info=r23Impact(kind,targetId,code,name),encoded=[kind,targetId,code,name].map(x=>r14Encode(x||''));
+ if(fromArchive)info.lines=[...info.lines,'سيُنقل السجل المؤرشف إلى المحذوفات، ويمكن استعادته بحالته المؤرشفة.'];
+ modal(fromArchive?'حذف سجل مؤرشف':'حذف / أرشفة بشكل آمن',`<form class="r23-delete-form" onsubmit="r23ConfirmDelete(event,'${encoded[0]}','${encoded[1]}','${encoded[2]}','${encoded[3]}','${fromArchive?'1':'0'}')"><div class="r23-impact"><h3>${esc(info.title)}</h3><b>ما الذي سيتغير؟</b><ul>${info.lines.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>${field('r23DeleteReason',fromArchive?'سبب حذف السجل المؤرشف':'سبب الحذف / الأرشفة','','text','required minlength="3" placeholder="مثال: إدخال مكرر أو تصحيح سند"')}<p class="hint">العملية قابلة للاستعادة من «المحذوفات». أرقام المستندات وسجل التدقيق لا تُحذف.</p><div class="modalfoot"><button class="btn danger" type="submit">${fromArchive?'حذف من الأرشيف':'تأكيد ونقل إلى المحذوفات'}</button><button class="btn" type="button" onclick="r20RequestClose()">إلغاء</button></div></form>`)
 }
-function r23ConfirmDelete(e,kindEnc,targetEnc,codeEnc,nameEnc){
+function r23ConfirmDelete(e,kindEnc,targetEnc,codeEnc,nameEnc,fromArchive='0'){
  e.preventDefault();try{
   const kind=r23Decode(kindEnc),targetId=r23Decode(targetEnc),code=r23Decode(codeEnc),name=r23Decode(nameEnc),reason=val('r23DeleteReason').trim(),trashId=r14Id('TRASH');
   if(reason.length<3)throw Error('اكتب سببًا واضحًا للحذف');
-  const result=R17Life.remove(data,{kind,targetId,code,name,reason,id:trashId,at:new Date().toISOString()});
-  if(r14Persist(result.data,result.archived?'أرشفة سجل مرتبط':'حذف سجل إلى السلة',{kind,targetId,code,name,reason,trashId})){
-   projectFocus='';designerFocus='';r14Done(result.archived?'تمت الأرشفة مع حفظ الحسابات':'نُقل السجل إلى المحذوفات ويمكن استعادته');
+  const deletingArchive=fromArchive==='1',result=R17Life.remove(data,{kind,targetId,code,name,reason,id:trashId,at:new Date().toISOString(),fromArchive:deletingArchive});
+  if(r14Persist(result.data,result.archived?'أرشفة سجل مرتبط':deletingArchive?'حذف سجل مؤرشف إلى السلة':'حذف سجل إلى السلة',{kind,targetId,code,name,reason,trashId,fromArchive:deletingArchive})){
+   projectFocus='';designerFocus='';r14Done(result.archived?'تمت الأرشفة مع حفظ الحسابات':deletingArchive?'حُذف السجل من الأرشيف ونُقل إلى المحذوفات':'نُقل السجل إلى المحذوفات ويمكن استعادته');
   }
  }catch(error){alert(error.message)}
+}
+function r23ArchivedLabel(kind,targetId='',code='',name=''){
+ if(kind==='project'){const p=getP(code);return p?`${p.code} — ${p.name}`:code}if(kind==='assignment')return `${name} / ${code}`;if(kind==='designer')return name;
+ if(kind==='customer')return data.customers.find(x=>x.id===targetId)?.name||'العميل';return R23_KIND_LABELS[kind]||'السجل';
+}
+function r23DeleteArchived(kind,targetId='',code='',name=''){
+ [kind,targetId,code,name]=[kind,targetId,code,name].map(r23Decode);const blockers=R17Life.archiveBlockers(data,{kind,targetId,code,name}),label=r23ArchivedLabel(kind,targetId,code,name);
+ if(blockers.length)return modal('لا يمكن حذف السجل الآن',`<div class="r23-impact"><h3>${esc(label)}</h3><p>هذا السجل مرتبط بحركات نشطة. احذف أو صحح الحركات التالية أولًا حتى لا تتغير حسابات مشروع أو عميل آخر:</p><ul>${blockers.map(x=>`<li>${esc(x.label)}: <b>${x.count}</b></li>`).join('')}</ul></div><p class="hint">دفعات المصممين المحذوفة سابقًا ليست عائقًا؛ ستنتقل تلقائيًا مع السجل ومستنداتها إلى سلة المحذوفات.</p><div class="modalfoot"><button class="btn" type="button" onclick="closeModal()">إغلاق</button></div>`);
+ r23Delete(kind,targetId,code,name,true)
+}
+function r23ArchiveActions(kind,targetId='',code='',name='',unarchive=''){
+ const args=[kind,targetId,code,name].map(x=>r14Encode(x||''));return `<div class="r23-row-actions r23-archive-actions">${unarchive}<button type="button" class="btn danger" onclick="r23DeleteArchived('${args[0]}','${args[1]}','${args[2]}','${args[3]}')">حذف</button></div>`
 }
 function r23RestoreRecord(enc){
  try{const id=r23Decode(enc),next=R17Life.restore(data,id);if(r14Persist(next,'استعادة سجل من المحذوفات',{trashId:id}))r14Done('تمت استعادة السجل وكل روابطه المحاسبية')}
@@ -64,10 +77,10 @@ function r23TrashMeta(x){
 function r23RecycleRows(){
  const rows=data.trashRecords.map(x=>{const m=r23TrashMeta(x);return {type:x.kind,label:m.label,amount:m.amount,reason:x.reason,at:x.at,action:`<button class="btn" onclick="r23RestoreRecord('${r14Encode(x.id)}')">استعادة السجل</button>`}});
  for(const x of data.deletedPayments){rows.push({type:'payment',label:`${x.payment.designer} / ${x.payment.code}`,amount:x.payment.amount,reason:x.reason,at:x.deletedAt,action:`<button class="btn" onclick="r15RestorePayment('${r14Encode(x.payment.id)}')">استعادة</button>`})}
- for(const p of data.projects.filter(x=>x.archivedAt))rows.push({type:'project',label:`${p.code} — ${p.name}`,amount:p.contract,reason:p.archiveReason,at:p.archivedAt,action:r17ArchiveButton('project',p.code)});
- for(const a of data.assignments.filter(x=>x.archivedAt))rows.push({type:'assignment',label:`${a.designer} / ${a.code}`,amount:a.fee,reason:a.archiveReason,at:a.archivedAt,action:r17ArchiveButton('assignment',a.code,a.designer)});
- for(const x of data.archivedDesigners)rows.push({type:'designer',label:x.name,amount:0,reason:x.reason,at:x.at,action:r17ArchiveButton('designer','',x.name)});
- for(const c of data.customers.filter(x=>x.archivedAt))rows.push({type:'customer',label:c.name,amount:0,reason:c.archiveReason,at:c.archivedAt,action:`<button class="btn" onclick="r23UnarchiveCustomer('${r14Encode(c.id)}')">إلغاء الأرشفة</button>`});
+ for(const p of data.projects.filter(x=>x.archivedAt))rows.push({type:'project',label:`${p.code} — ${p.name}`,amount:p.contract,reason:p.archiveReason,at:p.archivedAt,action:r23ArchiveActions('project','',p.code,'',r17ArchiveButton('project',p.code))});
+ for(const a of data.assignments.filter(x=>x.archivedAt))rows.push({type:'assignment',label:`${a.designer} / ${a.code}`,amount:a.fee,reason:a.archiveReason,at:a.archivedAt,action:r23ArchiveActions('assignment','',a.code,a.designer,r17ArchiveButton('assignment',a.code,a.designer))});
+ for(const x of data.archivedDesigners)rows.push({type:'designer',label:x.name,amount:0,reason:x.reason,at:x.at,action:r23ArchiveActions('designer','','',x.name,r17ArchiveButton('designer','',x.name))});
+ for(const c of data.customers.filter(x=>x.archivedAt))rows.push({type:'customer',label:c.name,amount:0,reason:c.archiveReason,at:c.archivedAt,action:r23ArchiveActions('customer',c.id,'','',`<button class="btn" onclick="r23UnarchiveCustomer('${r14Encode(c.id)}')">إلغاء الأرشفة</button>`)});
  return rows.sort((a,b)=>String(b.at||'').localeCompare(String(a.at||'')));
 }
 function r23RecycleTable(){
