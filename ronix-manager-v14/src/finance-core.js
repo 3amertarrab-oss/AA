@@ -114,7 +114,11 @@ const R14 = (() => {
       if(x&&x.assignments==null)x.assignments=[];
     }
     if (d.currency && d.currency!=='EGP') throw Error('هذه النسخة تعمل بالجنيه المصري');
-    for(const c of d.claims)if(c.items==null)c.items=claimRows(c).map(r=>({desc:String(r.code||''),amount:r.amount}));
+    for(const p of d.projects)for(const x of p.contractItems||[])if(x.unit==null)x.unit='عدد';
+    for(const c of d.claims){
+      if(c.items==null)c.items=claimRows(c).map(r=>({desc:String(r.code||''),amount:r.amount}));
+      for(const r of claimRows(c))for(const x of r.items||[])if(x.unit==null)x.unit='عدد';
+    }
     return d;
   }
   const dateOK = s => typeof s==='string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s)) && new Date(s).toISOString().slice(0,10)===s;
@@ -159,7 +163,7 @@ const R14 = (() => {
       if(!Array.isArray(c.items))add('بنود مطالبة غير صالحة: '+c.id);
       else {for(const item of c.items)monetary(item.amount,'بند مطالبة',1);try{if(cents(sum(c.items))!==cents(c.total))add('بنود المطالبة لا تساوي إجماليها: '+c.id)}catch{}}
       unique(claimRows(c),r=>r.code,'مشاريع المطالبة');
-      for(const r of claimRows(c)){linked(r.code,'مطالبة');monetary(r.amount,'بند مطالبة',1);if(projects.has(r.code)&&normName(projects.get(r.code).client)!==claimClient(d,c))add('مطالبة تجمع عملاء مختلفين: '+c.id);if(r.items!=null){if(!Array.isArray(r.items)||!r.items.length)add('تفاصيل كمية المطالبة غير صالحة: '+c.id);else{for(const x of r.items){if(!String(x.description||'').trim())add('بيان بند المطالبة مطلوب');if(!Number.isFinite(Number(x.quantity))||Number(x.quantity)<=0)add('كمية المطالبة غير صالحة');monetary(x.unitPrice,'سعر وحدة المطالبة');monetary(x.amount,'إجمالي بند المطالبة');if(cents(x.amount)!==cents(amount((Number(x.quantity)*Number(x.unitPrice)).toFixed(2))))add('إجمالي بند المطالبة لا يطابق الكمية والسعر')}if(cents(sum(r.items))!==cents(r.amount))add('تفاصيل المطالبة لا تساوي إجمالي المشروع')}}}
+      for(const r of claimRows(c)){linked(r.code,'مطالبة');monetary(r.amount,'بند مطالبة',1);if(projects.has(r.code)&&normName(projects.get(r.code).client)!==claimClient(d,c))add('مطالبة تجمع عملاء مختلفين: '+c.id);if(r.items!=null){if(!Array.isArray(r.items)||!r.items.length)add('تفاصيل كمية المطالبة غير صالحة: '+c.id);else{for(const x of r.items){if(!String(x.description||'').trim())add('بيان بند المطالبة مطلوب');if(!String(x.unit||'').trim())add('وحدة بند المطالبة مطلوبة');if(!Number.isFinite(Number(x.quantity))||Number(x.quantity)<=0)add('كمية المطالبة غير صالحة');monetary(x.unitPrice,'سعر وحدة المطالبة');monetary(x.amount,'إجمالي بند المطالبة');if(cents(x.amount)!==cents(amount((Number(x.quantity)*Number(x.unitPrice)).toFixed(2))))add('إجمالي بند المطالبة لا يطابق الكمية والسعر')}if(cents(sum(r.items))!==cents(r.amount))add('تفاصيل المطالبة لا تساوي إجمالي المشروع')}}}
       try{if(cents(claimAmount(c))!==cents(c.total))add('إجمالي المطالبة لا يطابق توزيعها: '+c.id)}catch{}
     }
     const batchClients=new Map();
@@ -192,7 +196,7 @@ const R14 = (() => {
       for(const p of d.projects){
         if(p.projectDate)dated(p.projectDate,'تاريخ المشروع');
         if(!Array.isArray(p.contractItems||[]))add('بنود العقد: جدول غير صالح');
-        else {unique(p.contractItems||[],x=>x.id,'بنود العقد');for(const x of p.contractItems||[]){if(!String(x.description||'').trim())add('اسم بند العقد مطلوب');if(!Number.isFinite(Number(x.quantity))||Number(x.quantity)<=0)add('كمية بند العقد غير صالحة');monetary(x.unitPrice,'سعر وحدة بند العقد');monetary(x.amount,'إجمالي بند العقد');if(cents(x.amount)!==cents(amount((Number(x.quantity)*Number(x.unitPrice)).toFixed(2))))add('إجمالي بند العقد لا يطابق الكمية والسعر')}}
+        else {unique(p.contractItems||[],x=>x.id,'بنود العقد');for(const x of p.contractItems||[]){if(!String(x.description||'').trim())add('اسم بند العقد مطلوب');if(!String(x.unit||'').trim())add('وحدة بند العقد مطلوبة');if(!Number.isFinite(Number(x.quantity))||Number(x.quantity)<=0)add('كمية بند العقد غير صالحة');monetary(x.unitPrice,'سعر وحدة بند العقد');monetary(x.amount,'إجمالي بند العقد');if(cents(x.amount)!==cents(amount((Number(x.quantity)*Number(x.unitPrice)).toFixed(2))))add('إجمالي بند العقد لا يطابق الكمية والسعر')}}
         if(!Array.isArray(p.statementItems||[]))add('بنود المستخلص: جدول غير صالح');
         else {unique(p.statementItems||[],x=>x.id,'بنود المستخلص');for(const x of p.statementItems||[]){dated(x.date,'تاريخ بند المستخلص');if(!String(x.description||'').trim())add('بيان المستخلص مطلوب');if(!Number.isFinite(Number(x.quantity))||Number(x.quantity)<0)add('كمية المستخلص غير صالحة');monetary(x.unitPrice,'سعر بند المستخلص');monetary(x.amount,'قيمة بند المستخلص');if(cents(x.amount)!==cents(amount((Number(x.quantity)*Number(x.unitPrice)).toFixed(2))))add('قيمة بند المستخلص لا تطابق الكمية والسعر')}}
         if(p.originalContract!=null){

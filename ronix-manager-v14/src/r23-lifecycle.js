@@ -122,6 +122,25 @@ const r23SaveProject=saveProject;
 saveProject=function(e,original){const archived=data.customers.find(c=>c.archivedAt&&R14.normName(c.name)===R14.normName(val('pclient')));if(archived&&!original)return alert('هذا العميل مؤرشف. ألغِ أرشفته قبل إنشاء مشروع جديد.');return r23SaveProject(e,original)};
 const r23SaveClaim=saveClaim;
 saveClaim=function(e,id){const archived=data.customers.find(c=>c.archivedAt&&R14.normName(c.name)===R14.normName(val('claimClient')));if(archived&&!id)return alert('هذا العميل مؤرشف. ألغِ أرشفته قبل إنشاء مطالبة جديدة.');return r23SaveClaim(e,id)};
+
+// Keep long pages usable on desktop and mobile: every navigation action reveals
+// the content it has just rendered and gives it keyboard/screen-reader focus.
+function r23RevealContent(target,focus=true){
+ if(typeof r22Reveal==='function'){r22Reveal(target,focus);return}
+ requestAnimationFrame(()=>{const element=typeof target==='string'?document.querySelector(target):target;if(!element)return;const reduce=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;element.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});if(focus){element.tabIndex=-1;element.focus({preventScroll:true})}})
+}
+function r23ScrollTop(){requestAnimationFrame(()=>{const reduce=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;window.scrollTo({top:0,left:0,behavior:reduce?'auto':'smooth'})})}
+const r23DynamicGo=go;
+go=function(next){const result=r23DynamicGo(next);r23ScrollTop();return result};
+const r23DynamicOpenProject=openProject;
+openProject=function(enc){if(page!=='projects'||!document.querySelector('.nav[data-page="projects"].active'))go('projects');const result=r23DynamicOpenProject(enc);r23RevealContent('#content .projecthead',true);return result};
+const r23DynamicShowDesigner=showDesigner;
+showDesigner=function(enc){if(page!=='designers'||!document.querySelector('.nav[data-page="designers"].active'))go('designers');const result=r23DynamicShowDesigner(enc);r23RevealContent('#content .panel h1',true);return result};
+const r23DynamicOpenAdvancedClient=openAdvancedClient;
+openAdvancedClient=function(enc){if(page!=='advanced'||!document.querySelector('.nav[data-page="advanced"].active'))go('advanced');const result=r23DynamicOpenAdvancedClient(enc);r23RevealContent('#advancedDetail .panel',true);return result};
+const r23DynamicDone=r14Done;
+r14Done=function(message){const selected=page==='clients'&&$('clientSelect')?val('clientSelect'):'';const result=r23DynamicDone(message);if(selected&&page==='clients'&&$('clientSelect')){$('clientSelect').value=selected;if(val('clientSelect')){displayClientLedger();r23RevealContent('.r22-client-statement',true)}}return result};
+
 const r23TrashNav=document.createElement('button');r23TrashNav.className='nav';r23TrashNav.dataset.page='trash';r23TrashNav.innerHTML='<span>♲</span>المحذوفات';r23TrashNav.onclick=()=>go('trash');document.querySelector('.nav[data-page="reports"]').after(r23TrashNav);
 r17Trash=function(){go('trash')};
 const r23Render=render;

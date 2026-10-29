@@ -1,15 +1,23 @@
 {
-  "passed": 10,
+  "passed": 18,
   "checks": [
+    "opening a customer moves focus and viewport to the statement",
     "one bank receipt plus one advance appear once each",
     "single receipt shows both projects and unallocated balance",
     "cash and allocation totals do not double count advance",
-    "two project circles show exact collection percentages",
+    "project circles show exact collection percentages including zero",
+    "zero and nonzero progress circles stay inside their cards",
+    "project cards show the stored image and clear missing-image placeholders",
     "project circle filters payments dynamically",
+    "project filtering reveals the matching payments section",
+    "customer statement and project filter survive save-style rerender",
     "customer view removes internal matching designer and profit panels",
     "statement fits iPhone without page overflow",
     "PDF view contains project balances and grouped distributions",
+    "PDF customer statement includes the stored project image",
+    "PDF back control works both as popup close and mobile history fallback",
     "PDF excludes internal accounting sections",
+    "opening a project updates navigation and reveals its header",
     "print and customer views have no script exceptions"
   ],
   "errors": []

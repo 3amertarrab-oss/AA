@@ -1,11 +1,15 @@
 {
-  "passed": 6,
+  "passed": 10,
   "checks": [
-    "claim creates quantity price and total from contract item",
-    "editing quantity recalculates claim project total",
-    "saved claim retains exact line calculation",
-    "project editor shows contract quantity price and calculated total",
+    "claim inherits unit quantity price and total from contract item",
+    "contract-origin badge is visible and project total is calculated output",
+    "claim quantity editor fits iPhone width",
+    "free unit quantity and price update totals live without losing focus",
+    "saved claim retains free unit and exact line calculation",
+    "project editor shows freely editable contract unit quantity price and calculated total",
+    "contract unit accepts arbitrary text",
     "project quantity editor fits iPhone width",
-    "printed claim merges quantity unit price and total into one project table"
+    "printed claim merges quantity unit price and total into one project table",
+    "printed claim retains edited unit quantity price total and project image"
   ]
 }
