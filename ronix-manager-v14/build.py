@@ -42,7 +42,7 @@ if not SOURCE.exists():
     SOURCE.write_text(base)
 logo='data:image/png;base64,'+base64.b64encode((ROOT/'src/assets/ronix-logo-transparent.png').read_bytes()).decode('ascii')
 ui=(ROOT/'src/finance-ui.js').read_text()
-css='\n'.join((ROOT/'src'/n).read_text() for n in ['finance-ui.css','r24-cashflow.css','r24-financial-ui.css'] if (ROOT/'src'/n).exists())
+css='\n'.join((ROOT/'src'/n).read_text() for n in ['finance-ui.css','r24-cashflow.css','r24-financial-ui.css','r24-financial-simple.css'] if (ROOT/'src'/n).exists())
 base=base.replace('</head>', '<style>\n'+css+'\n</style></head>',1)
 base=base.replace('<script>', '<script>\n'+core+'\n'+storage+'\n'+ui+'\nconst R14_LOGO="'+logo+'";\n</script><script>',1)
 scripts='\n'.join((ROOT/'src'/n).read_text() for n in ['upgrade.js','attachments.js','r15-projects.js','r15-payments.js','xlsx-export.js','r15-integration.js','import.js','r16-integration.js','media-recovery.js','r17-review.js','r18-customers.js','r19-rates.js','r22-client-statement.js','r23-lifecycle.js','r24-cashflow.js','r24-project-ops.js','r24-claims.js','r24-financial-ui.js'] if (ROOT/'src'/n).exists())

@@ -1,7 +1,8 @@
 {
-  "passed": 14,
+  "passed": 15,
   "checks": [
     "financial workspace opens on the dedicated route",
+    "owner view shows plain financial cards and keeps accountant details closed",
     "confirmed multi-currency records are ready without review blockers",
     "trial balance, position, and cash flow reconcile",
     "foreign settlement records the actual EGP cash and realized FX gain",

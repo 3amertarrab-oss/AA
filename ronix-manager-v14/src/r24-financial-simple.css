@@ -1,0 +1,20 @@
+.r24-owner-summary{display:grid;grid-template-columns:repeat(3,minmax(190px,1fr));gap:12px;margin:0 0 16px}
+.r24-owner-summary>div{background:#fff;border:1px solid #dfe5ed;border-radius:14px;padding:18px;min-height:128px}
+.r24-owner-summary>div.cash{border-color:#93bfe7;background:#f4f9ff}
+.r24-owner-summary>div.profit{border-color:#9dd5b4;background:#f3fbf6}
+.r24-owner-summary>div.loss{border-color:#efb0a9;background:#fff6f5}
+.r24-owner-summary small,.r24-owner-summary span{display:block;color:#697789}
+.r24-owner-summary strong{display:block;font-size:24px;margin:10px 0;color:#172337}
+.r24-owner-summary .profit strong{color:#087745}
+.r24-owner-summary .loss strong{color:#b33131}
+.r24-fin-advanced{padding:0;overflow:hidden}
+.r24-fin-advanced>summary{cursor:pointer;list-style:none;padding:18px;display:flex;align-items:center;justify-content:space-between;background:#f6f8fb}
+.r24-fin-advanced>summary::-webkit-details-marker{display:none}
+.r24-fin-advanced>summary:after{content:'＋';font-size:22px}
+.r24-fin-advanced[open]>summary:after{content:'−'}
+.r24-fin-advanced>summary span{display:flex;flex-direction:column;gap:4px}
+.r24-fin-advanced>summary small{color:#697789;font-weight:400}
+.r24-fin-advanced>.r24-accountant-actions,.r24-fin-advanced>.r24-fin-grid,.r24-fin-advanced>.r24-fin-section{margin:16px}
+.r24-accountant-actions{display:flex;flex-wrap:wrap;gap:8px}
+@media(max-width:850px){.r24-owner-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.r24-owner-summary{grid-template-columns:1fr}.r24-accountant-actions{display:grid;grid-template-columns:1fr}.r24-fin-advanced>.r24-fin-grid,.r24-fin-advanced>.r24-fin-section{margin:10px}}

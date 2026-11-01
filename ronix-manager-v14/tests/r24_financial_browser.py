@@ -255,7 +255,23 @@ try:
             "financial workspace opens on the dedicated route",
             page.evaluate("page==='financialStatements'")
             and page.locator(".r24-fin-head h2").inner_text()
-            == "القوائم المالية والإقفال",
+            == "ملخص الشركة المالي",
+        )
+        check(
+            "owner view shows plain financial cards and keeps accountant details closed",
+            page.locator(".r24-owner-summary").count() == 1
+            and all(
+                title in page.locator(".r24-owner-summary").inner_text()
+                for title in [
+                    "النقد المتاح في نهاية الفترة",
+                    "دخل المشاريع",
+                    "التكاليف والمصروفات",
+                    "الربح",
+                    "ما تملكه الشركة",
+                    "ما على الشركة",
+                ]
+            )
+            and not page.locator(".r24-fin-advanced").evaluate("el=>el.open"),
         )
         report = page.evaluate(
             """() => {
@@ -286,6 +302,7 @@ try:
             and report["fxGain"] == 50
             and report["closingCash"] == 1850,
         )
+        page.locator(".r24-fin-advanced").evaluate("el=>el.open=true")
         headings = page.locator(".r24-fin-section h2").all_inner_texts()
         check(
             "all four closing statements render",

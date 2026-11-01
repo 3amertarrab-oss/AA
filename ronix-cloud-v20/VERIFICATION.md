@@ -15,13 +15,13 @@ The V24 accounting and presentation layer was also verified before it was packed
 | Suite | Passed |
 | --- | ---: |
 | Node accounting, currency, lifecycle, claims, quantities, project hours, and cash-flow tests | 169 |
-| V24 closing statements, multi-currency claims, and 390 px iPhone browser checks | 14 |
+| Simplified owner financial summary, optional accountant details, multi-currency claims, and 390 px iPhone browser checks | 15 |
 | Claim print, PDF, mobile back/share, long-document, and legacy checks | 58 |
 | Latest supplied backup and full review workflow | 31 |
 | Quantity, unit, price, total, project image, and mobile editor checks | 10 |
 | Unified deletion, archive, restore, and mobile recycle-bin checks | 20 |
 
-The supplied V20 backup was normalized without changing recorded amounts, IDs, links, receipts, or settlements. It generated balanced journal entries and reconciled trial balance, financial position, and cash flow. It intentionally remains a draft until the owner reviews the old opening setup, undated designer accruals, two historical foreign receipts, and one historical foreign claim. No private backup, account email, document bytes, or private screenshots are included in this repository or package.
+The supplied V20 backup was normalized without changing recorded amounts, IDs, links, receipts, or settlements. It generated balanced journal entries and reconciled trial balance, financial position, and cash flow. It intentionally remains a draft until the owner reviews the old opening setup, undated designer accruals, four historical foreign receipts, and one historical foreign claim. No private backup, account email, document bytes, or private screenshots are included in this repository or package.
 
 The financial engine now verifies all expense groups, retains recognized archived assignments in accounting history, reports only the current period's exchange-rate movement, signs the chart of accounts and cash-flow classification at close, and ignores known future review items when closing an earlier period. Work-hour accruals affect project cost and payables without being counted as cash until a real payment is recorded.
 
@@ -33,7 +33,7 @@ The update ZIP passed `unzip -t`. The browser tests use Chromium at iPhone width
 
 1. Upload `RONIX-V20.2-Update.zip` as a new deployment in the existing Cloudflare Worker/Pages project.
 2. Open the site and confirm that the sidebar reads V20.2; refresh once if an older service-worker shell is still visible.
-3. Open **القوائم المالية والإقفال** and use **مراجعة البيانات القديمة**. Confirm the opening setup, recognition dates, and historical currency rates before closing any period.
+3. Open **الملخص المالي** and use **استكمال البيانات الناقصة**. Confirm the opening setup, old designer-cost dates, and historical currency rates before approving any period.
 4. Test one small receipt and one draft claim, then remove or archive the test records.
 5. Download a fresh JSON backup and retain the pre-update backup separately.
 
