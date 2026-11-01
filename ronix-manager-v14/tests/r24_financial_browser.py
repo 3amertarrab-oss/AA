@@ -382,6 +382,80 @@ try:
         )
         printed.close()
 
+        page.evaluate("go('dashboard')")
+        page.wait_for_timeout(250)
+        check(
+            "owner navigation removes redundant standalone screens",
+            page.locator('.nav[data-page="costcenters"]').count() == 0
+            and page.locator('.nav[data-page="clients"]').count() == 0
+            and page.locator('.nav[data-page="advanced"]').count() == 0
+            and not any(
+                value in page.locator(".side").inner_text()
+                for value in ["استعادة صور المشاريع", "فحص البيانات", "ما الجديد", "بدء العمل والمساعدة"]
+            ),
+        )
+        check(
+            "cash timeline exposes project and movement filters",
+            page.locator("#r24Cashflow .r25-flow-controls").count() == 1
+            and page.locator("#r24Cashflow .r25-timeline-filters button").count() == 4
+            and page.locator("#r24Cashflow .r25-cash-events .r25-event").count() == 2,
+        )
+        page.locator("#r24Cashflow .r25-timeline-filters button").filter(
+            has_text="الأموال الداخلة"
+        ).click()
+        check(
+            "cash timeline recalculates dynamically for inflows",
+            page.locator("#r24Cashflow .r25-cash-events .r25-event").count() == 2
+            and "1,850" in page.locator("#r24Cashflow .r24-flow-summary").inner_text(),
+        )
+
+        page.evaluate("openProject(r14Encode('SAR1'))")
+        page.wait_for_timeout(250)
+        check(
+            "project card offers the complete printable dossier",
+            page.locator(".r25-project-file").count() == 1
+            and page.locator("#r25ProjectTimeline").count() == 1,
+        )
+        page.locator("#r25ProjectTimeline .r25-timeline-filters button").filter(
+            has_text="المطالبات"
+        ).click()
+        check(
+            "project timeline filters events without leaving the project",
+            page.locator("#r25ProjectTimeline .r25-event").count() == 1
+            and "مطالبة" in page.locator("#r25ProjectTimeline").inner_text(),
+        )
+        with page.expect_popup() as project_popup_info:
+            page.evaluate("r25PrintProject(r14Encode('SAR1'))")
+        project_report = project_popup_info.value
+        project_report.wait_for_load_state("domcontentloaded")
+        project_text = project_report.locator("body").inner_text()
+        check(
+            "project dossier separates financial meanings and includes all ledgers",
+            all(
+                value in project_text
+                for value in [
+                    "قيمة العقد",
+                    "التحصيل الفعلي",
+                    "إجمالي التكلفة",
+                    "المطالبات",
+                    "دفعات العميل",
+                    "أتعاب المصممين",
+                    "المصروفات وساعات العمل",
+                ]
+            ),
+        )
+        check(
+            "project dossier fits an iPhone viewport and supports back share and print",
+            project_report.locator(".actions button").count() == 3
+            and project_report.evaluate(
+                "document.documentElement.scrollWidth<=document.documentElement.clientWidth"
+            ),
+        )
+        project_report.screenshot(
+            path=str(ARTIFACTS / "project-dossier-iphone.png"), full_page=True
+        )
+        project_report.close()
+
         check("finance and claim flows have no script exceptions", not errors)
         result = {"passed": len(checks), "checks": checks, "errors": errors}
         RESULT.write_text(json.dumps(result, ensure_ascii=False, indent=2))
