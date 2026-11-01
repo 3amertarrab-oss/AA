@@ -46,7 +46,7 @@ with zipfile.ZipFile(ROOT/'RONIX-Cloud-V20.zip','w',zipfile.ZIP_DEFLATED,compres
 # Deployment-only package. The setup utility and instructions are deliberately
 # excluded because an existing installation needs only the application files.
 deploy_names=['_headers','config.js','fflate-LICENSE.txt','icon.png','index.html','manifest.webmanifest','supabase-LICENSE.txt','supabase.js','sw.js']
-with zipfile.ZipFile(ROOT/'RONIX-V20.1-Update.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+with zipfile.ZipFile(ROOT/'RONIX-V20.2-Update.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for name in deploy_names:z.write(DIST/name,name)
 with zipfile.ZipFile(ROOT/'RONIX-Setup.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  z.writestr('RONIX_Setup.html',setup)

@@ -1,30 +1,40 @@
-# Verification — 2026-10-25 UTC / 2026-10-26 Cairo
+# Verification — 2026-11-02 Cairo
 
-This V20.1 package is ready for a new Cloudflare deployment. The owner has already created the Supabase project, schema, and Auth user and deployed the earlier V20 package. This workspace validated the updated package locally; it did not log into the live private account.
+This V20.2 package is ready for a new deployment in the existing Cloudflare project. The tests use synthetic accounts and the supplied private backup locally; they do not sign in to the production Supabase account or change live data.
 
 | Suite | Passed | Evidence |
 | --- | ---: | --- |
-| PostgreSQL 17 authorization, RLS, atomic commits, concurrency, replay, private Storage policies | 18 | `tests/database-results.json` |
-| Media encoding, hashing, ownership, failed upload, integrity, exact roundtrip | 6 | `node --test tests/media.test.js` |
-| Real Supabase browser SDK with local mock service, laptop and iPhone contexts from 320–430 px, including tax form | 33 | `tests/browser-results.json` |
-| Setup generation, escaped email, project links, clipboard fallback, no email persistence | 4 | `tests/setup-results.json` |
-| **Automated cloud checks** | **61** | No failed checks in these final runs |
+| PostgreSQL 17 authorization, RLS, atomic commits, concurrency, replay, and private Storage policies | 18 | `tests/database-results.json` |
+| Media encoding, hashing, ownership, failed upload, integrity, and exact roundtrip | 6 | `node --test tests/media.test.js` |
+| Cloud browser with the bundled Supabase SDK, synchronization, offline recovery, conflicts, documents, and iPhone widths | 34 | `tests/browser-results.json` |
+| Setup generation, escaped email, project links, clipboard fallback, and no email persistence | 4 | `tests/setup-results.json` |
+| **Automated cloud checks** | **62** | No failed checks in the final runs |
 
-An additional private-data check packed and restored the supplied V16 JSON: 33 projects and 12 unique embedded files. Deep equality passed for the complete original JSON, including all financial fields. The original compact snapshot was 721,222 bytes; its packed metadata was 21,006 bytes. This was an in-memory local verification only. No private records, file bytes, account email, or private screenshots are included in the public package, and this older backup is not used to seed the app.
+The V24 accounting and presentation layer was also verified before it was packed into V20.2:
 
-The browser suite tests pending offline edits, reconnection, failed document uploads, quota rollback, same-tab storage changes, conflict preservation and recovery, ambiguous network failures after commit, exact decimal financial values, portable backups, account separation, sign-out, mobile navigation, every screen at compact and large iPhone widths, key input forms, and service worker caching boundaries. It uses synthetic records and two separate Chromium contexts. It does not use the real Supabase backend.
+| Suite | Passed |
+| --- | ---: |
+| Node accounting, currency, lifecycle, claims, quantities, project hours, and cash-flow tests | 169 |
+| V24 closing statements, multi-currency claims, and 390 px iPhone browser checks | 14 |
+| Claim print, PDF, mobile back/share, long-document, and legacy checks | 58 |
+| Latest supplied backup and full review workflow | 31 |
+| Quantity, unit, price, total, project image, and mobile editor checks | 10 |
+| Unified deletion, archive, restore, and mobile recycle-bin checks | 20 |
 
-The updated accounting core passed 106 checks. The private browser review passed 25 workflows against the supplied backup, including EGP-to-SAR collection, one cash input with calculated contract settlement, full project Excel, protected close, project/designer deletion and restoration, and ledger-preserving archive behavior.
+The supplied V20 backup was normalized without changing recorded amounts, IDs, links, receipts, or settlements. It generated balanced journal entries and reconciled trial balance, financial position, and cash flow. It intentionally remains a draft until the owner reviews the old opening setup, undated designer accruals, two historical foreign receipts, and one historical foreign claim. No private backup, account email, document bytes, or private screenshots are included in this repository or package.
 
-The setup page was tested over localhost with clipboard access deliberately unavailable to exercise manual-copy fallback. The environment blocks `file://` navigation in Chromium, so opening the setup file directly in a desktop browser has not been browser-tested here.
+The financial engine now verifies all expense groups, retains recognized archived assignments in accounting history, reports only the current period's exchange-rate movement, signs the chart of accounts and cash-flow classification at close, and ignores known future review items when closing an earlier period. Work-hour accruals affect project cost and payables without being counted as cash until a real payment is recorded.
 
-The existing V19 accounting suite previously passed 382 checks; those are historical offline results and are **not** counted as new cloud checks. The V19 financial core is used unchanged.
+The cloud browser suite tests pending offline edits, reconnection, failed document uploads, quota rollback, same-tab changes, conflict preservation and recovery, ambiguous responses after commit, exact decimal amounts, portable backups, account separation, sign-out, mobile navigation, all main screens at compact and large iPhone widths, and service-worker cache boundaries. It uses two isolated Chromium contexts and a deterministic local Auth/REST/Storage service.
 
-## Checks still required after uploading V20.1
+The update ZIP passed `unzip -t`. The browser tests use Chromium at iPhone widths; a physical Safari/iPhone test remains a post-deployment check.
 
-1. Upload `RONIX-Cloud-V20.zip` as a new deployment in the existing Cloudflare Worker/Pages project.
-2. Open the site on the laptop and iPhone and confirm that the header reads V20.1.
-3. Test one tax row and one small receipt, then remove the test records.
-4. Download a portable JSON backup and retain the pre-update backup separately.
+## Checks after uploading V20.2
 
-Direct network access to the user's Supabase endpoint returned a proxy tunnel restriction in this workspace. No live project status, policy behavior, account creation, or production synchronization is claimed. Provider free-plan quotas and availability continue to apply.
+1. Upload `RONIX-V20.2-Update.zip` as a new deployment in the existing Cloudflare Worker/Pages project.
+2. Open the site and confirm that the sidebar reads V20.2; refresh once if an older service-worker shell is still visible.
+3. Open **القوائم المالية والإقفال** and use **مراجعة البيانات القديمة**. Confirm the opening setup, recognition dates, and historical currency rates before closing any period.
+4. Test one small receipt and one draft claim, then remove or archive the test records.
+5. Download a fresh JSON backup and retain the pre-update backup separately.
+
+No production Supabase access, live account state, or provider availability is claimed by these local checks. Provider quotas and service availability continue to apply.

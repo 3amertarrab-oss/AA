@@ -140,7 +140,7 @@ try:
         page.evaluate("go('designers');showDesigner(r14Encode('مصمم تجريبي'))")
         tones('designer statement')
         page.evaluate("go('claims');openClaim(null,'CL-DEMO-001')")
-        check('editor has larger photos and red monetary inputs', page.locator('.r14-claim-photo').first.evaluate("e=>e.clientWidth>=126&&e.clientHeight>=94") and page.locator('#claimRows input').first.evaluate("e=>getComputedStyle(e).color==='rgb(198, 40, 40)'"))
+        check('editor has larger photos and a visibly marked calculated total', page.locator('.r14-claim-photo').first.evaluate("e=>e.clientWidth>=126&&e.clientHeight>=94") and page.locator('.r22-claim-project-total').first.evaluate("e=>getComputedStyle(e).backgroundColor==='rgb(255, 247, 247)'"))
         check('editor retains the registered-payments section', page.locator('#claimReceipts').count()==1)
         page.evaluate('closeModal()')
         check('viewing and editing without saving leave finance data unchanged', page.evaluate('JSON.stringify(data)')==snapshot)

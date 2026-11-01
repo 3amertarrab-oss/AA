@@ -17,12 +17,12 @@ const R16 = ((R) => {
     const contract=R.cents(p.contract||0)/100,received=R.sum(receipts),cash=R.sum(receipts,R.cashReceipt);
     const claims=R.sum(d.claims.filter(R.active),c=>R.claimAmount(c,code));
     const matched=R.sum(d.claimSettlements.filter(s=>s.code===code));
-    const expenses=R.sum(d.projectExpenses.filter(x=>x.code===code));
+    const projectExpenses=d.projectExpenses.filter(x=>x.code===code),expenses=R.sum(projectExpenses),cashExpenses=R.sum(projectExpenses.filter(x=>x.cashEffect!==false));
     return {code,contract,received,cash,fx:balance(cash,received),contractBalance:balance(contract,received),
       claims,matched,claimDue:balance(claims,matched),unmatched:balance(received,matched),
-      designers:ds,expenses,cost:R.sum([{amount:ds.fees},{amount:expenses}]),
+      designers:ds,expenses,cashExpenses,cost:R.sum([{amount:ds.fees},{amount:expenses}]),
       profit:balance(contract,R.sum([{amount:ds.fees},{amount:expenses}])),
-      operatingCash:balance(balance(cash,ds.paid),expenses)};
+      operatingCash:balance(balance(cash,ds.paid),cashExpenses)};
   }
   function client(d,name) {
     const t=R.totals(d,name),cs=d.claims.filter(c=>R.active(c)&&R.claimClient(d,c)===name);

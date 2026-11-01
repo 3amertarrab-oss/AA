@@ -49,7 +49,7 @@
     "client statement required balances are red",
     "designer statement payments are green",
     "designer statement required balances are red",
-    "editor has larger photos and red monetary inputs",
+    "editor has larger photos and a visibly marked calculated total",
     "editor retains the registered-payments section",
     "viewing and editing without saving leave finance data unchanged",
     "claim-long: no changes to financial records",

@@ -119,11 +119,33 @@ button:disabled{opacity:.6;cursor:wait}
 @media(max-width:600px){.r23-trash-filters{grid-template-columns:1fr}.r23-trash-grid{grid-template-columns:1fr}.r23-row-actions{min-width:150px}.r23-delete-form .modalfoot{position:sticky;bottom:-14px;background:#fff;padding-top:10px}}
 .r23-archive-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}.r23-archive-actions .btn,.r23-archive-actions .link{min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center}
 @media(max-width:600px){.r23-archive-actions{grid-template-columns:1fr 1fr;min-width:0}.r23-archive-actions .btn,.r23-archive-actions .link{width:100%;white-space:normal}}
+.r24-claim-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 10px}.r24-claim-title h3{margin:0}.r24-claim-rate{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px;align-items:end;padding:12px;border:1px solid #dce3ec;border-radius:12px;background:#f8fafc}.r24-claim-rate.foreign{border-color:#dfc58f;background:#fffbf1}.r24-claim-rate label{display:grid;gap:6px;font-size:11px;font-weight:700;color:#526175}.r24-claim-rate .hint,.r24-rate-warning{grid-column:1/-1;margin:0}.r24-project-values{font-size:12px;line-height:1.8;min-width:0}.r24-claim-row>button.danger{min-width:40px}@media(max-width:760px){.r24-claim-rate{grid-template-columns:1fr 1fr}.r24-project-values{overflow-wrap:anywhere}}@media(max-width:480px){.r24-claim-rate{grid-template-columns:1fr}.r24-claim-title{align-items:stretch}.r24-claim-title .btn{flex:none}}
+
+.r24-cashflow{scroll-margin-top:18px}
+.r24-flow-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:20px 0}
+.r24-flow-summary>div{border:1px solid #d9e1eb;border-radius:12px;padding:14px;background:#fff}
+.r24-flow-summary small{display:block;color:#66758a;margin-bottom:7px}
+.r24-flow-summary strong{font-size:20px;color:#172b45}
+.r24-flow-legend{display:flex;gap:18px;justify-content:flex-end;color:#526277;font-size:12px;margin-bottom:8px}
+.r24-flow-legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-left:5px;background:#087f46}
+.r24-flow-legend .out::before{background:#c62828}
+.r24-flow-timeline{display:flex;align-items:stretch;gap:10px;overflow-x:auto;padding:6px 2px 12px;scroll-snap-type:x proximity}
+.r24-flow-period{flex:0 0 126px;min-width:0;border:1px solid #d9e1eb;border-radius:12px;padding:10px;background:#fff;text-align:center;scroll-snap-align:start}
+.r24-flow-period>strong{display:block;min-height:36px;font-size:12px;color:#172b45}
+.r24-flow-period>span{display:block;font-size:11px;margin-top:8px;white-space:nowrap}
+.r24-flow-bars{height:132px;display:flex;align-items:flex-end;justify-content:center;gap:8px;border-bottom:1px solid #cbd5e1;padding:0 7px}
+.r24-flow-bar{display:flex;align-items:flex-start;justify-content:center;width:33px;height:var(--value);min-height:3px;border-radius:6px 6px 0 0;background:#087f46;position:relative;transition:height .25s ease}
+.r24-flow-bar.out{background:#c62828}
+.r24-flow-bar small{position:absolute;bottom:calc(100% + 3px);font-size:9px;color:#526277;white-space:nowrap}
+@media(max-width:700px){.r24-flow-summary{grid-template-columns:1fr 1fr}.r24-flow-summary strong{font-size:16px}.r24-cashflow .panel-title{align-items:flex-start}.r24-cashflow .actions{width:100%}.r24-cashflow .actions .btn{flex:1}.r24-flow-period{flex-basis:112px}}
+@media(prefers-reduced-motion:reduce){.r24-flow-bar{transition:none}}
+
+.r24-fin-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:16px}.r24-fin-head h2{font-size:25px;margin:4px 0}.r24-fin-toolbar{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.r24-fin-toolbar label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700}.r24-fin-toolbar .field{min-width:155px}.r24-fin-status{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:16px 18px;border-radius:14px;margin-bottom:14px;border:1px solid}.r24-fin-status strong{font-size:16px}.r24-fin-status span{font-size:12px}.r24-fin-status.certified{background:#eaf8ef;border-color:#9dd5b4;color:#086b3f}.r24-fin-status.ready{background:#edf5ff;border-color:#adccec;color:#174f80}.r24-fin-status.blocked{background:#fff4ec;border-color:#efb99d;color:#9c3e21}.r24-fin-issues{background:#fff;border:1px solid #efc2b1;border-radius:14px;padding:16px;margin-bottom:14px}.r24-fin-issues-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.r24-fin-issues-head h3{margin:0}.r24-fin-issues ul{margin:10px 0 0;padding-right:22px}.r24-fin-issues li{padding:5px}.r24-fin-issues li.error{color:#9e2e2e}.r24-fin-issues li.warning{color:#8a651b}.r24-fin-check.ok{background:#eaf8ef;color:#086b3f;border:1px solid #a7d9ba;border-radius:12px;padding:13px;margin-bottom:14px}.r24-fin-kpis{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:12px;margin-bottom:16px}.r24-fin-kpis>div{background:#fff;border:1px solid #dfe5ed;border-radius:14px;padding:16px}.r24-fin-kpis small{display:block;color:#697789}.r24-fin-kpis strong{display:block;font-size:20px;margin-top:9px}.r24-fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.r24-fin-section tfoot th{background:#e5eaf1;color:#172337}.r24-fin-badge{padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800}.r24-fin-badge.ok{background:#e7f6ed;color:#087745}.r24-fin-badge.bad{background:#fdeceb;color:#ae3838}.r24-fin-statement{max-width:760px}.r24-fin-line{display:flex;justify-content:space-between;gap:12px;padding:9px;border-bottom:1px solid #e8edf3}.r24-fin-line.subtotal{background:#f4f7fa;font-weight:700;border-top:1px solid #cad4e0}.r24-fin-line.grand{background:#172337;color:#fff;font-size:15px;font-weight:800;border-radius:8px;margin-top:7px}.r24-fin-columns{display:grid;grid-template-columns:1fr 1fr;gap:24px}.r24-fin-columns h3{border-bottom:2px solid #b58a48;padding-bottom:7px}.r24-fin-reconcile{padding:9px;border-radius:8px;margin-top:12px}.r24-fin-reconcile.ok{background:#eaf8ef;color:#086b3f}.r24-fin-reconcile.bad{background:#fdeceb;color:#a63131}.r24-fin-confirm{display:flex!important;flex-direction:row!important;align-items:center!important;padding:12px;background:#fff8e8;border-radius:9px}.r24-closing-rates{display:grid;gap:10px}.r24-closing-rates>div{display:grid;grid-template-columns:90px 1fr 1fr;align-items:end;gap:10px;border:1px solid #e0e5ed;border-radius:10px;padding:10px}.r24-closing-rates label{display:flex;flex-direction:column;gap:6px;font-size:12px}.r24-journal-balance{margin:12px 0;padding:12px;border-radius:9px}.r24-journal-balance.ok{background:#eaf8ef;color:#086b3f}.r24-journal-balance.bad{background:#fdeceb;color:#a63131}.r24-review-section{margin-top:22px;padding-top:4px;border-top:1px solid #dfe5ed}.r24-review-section h3{margin-bottom:10px}.r24-review-bulk{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin-bottom:10px}.r24-review-bulk label{display:flex;flex-direction:column;gap:6px}.r24-review-table .field{min-width:160px}.r24-review-complete{padding:13px;border-radius:10px;background:#eaf8ef;color:#086b3f;font-weight:700}@media(max-width:850px){.r24-fin-grid,.r24-fin-columns{grid-template-columns:1fr}.r24-fin-kpis{grid-template-columns:1fr 1fr}}@media(max-width:600px){.r24-fin-head .actions,.r24-fin-toolbar{display:grid;grid-template-columns:1fr 1fr;width:100%}.r24-fin-head .actions .btn,.r24-fin-toolbar .btn,.r24-fin-toolbar label{width:100%}.r24-fin-toolbar .field{min-width:0}.r24-fin-status{align-items:flex-start;flex-direction:column}.r24-fin-kpis{grid-template-columns:1fr}.r24-closing-rates>div{grid-template-columns:1fr}.r24-fin-section{padding:14px}.r24-fin-line{font-size:12px}.r24-fin-head h2{font-size:21px}.r24-fin-issues-head .btn,.r24-review-bulk>*{width:100%}}
 
 </style></head><body><div class="layout"><aside class="side"><div><div class="logo">RONIX</div><div class="sublogo">DESIGNER FINANCE</div></div><button class="nav active" data-page="dashboard" onclick="go('dashboard')"><span>◈</span>الرئيسية</button><button class="nav" data-page="projects" onclick="go('projects')"><span>▣</span>المشاريع</button><button class="nav" data-page="designers" onclick="go('designers')"><span>♟</span>المصممون</button><button class="nav" data-page="payments" onclick="go('payments')"><span>▤</span>الدفعات</button><button class="nav" data-page="clients" onclick="go('clients')"><span>◉</span>كشف حساب العملاء</button><button class="nav" data-page="claims" onclick="go('claims')"><span>▤</span>مطالبات العملاء</button><button class="nav" data-page="advanced" onclick="go('advanced')"><span>✦</span>*** المالية المتقدمة</button><button class="nav" data-page="reports" onclick="go('reports')"><span>▥</span>التقارير</button><div class="sidebar-footer">RONIX ENGINEERING<br>نسخة تشغيل محلية · البيانات تحفظ على هذا المتصفح</div></aside><main class="main"><header class="top"><div><div class="eyebrow">RONIX / PROJECT ACCOUNTS</div><h1 id="title">لوحة التحكم</h1><div class="subtitle" id="sub">إدارة المشروع والمصمم والمدفوعات من مكان واحد</div></div><div class="actions"><button class="btn" onclick="backup()">↓ نسخة احتياطية</button><button class="btn" onclick="document.getElementById('restore').click()">↑ استعادة</button><input id="restore" type="file" accept=".json" hidden onchange="restoreData(this)"><button class="btn gold" onclick="openPayment()">+ دفعة جديدة</button></div></header><section id="content"></section><footer class="footer">RONIX © 2026 · يُرجى الاحتفاظ بنسخة احتياطية منتظمة</footer></main></div><div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modalhead"><h2 id="modalTitle">إضافة</h2><button class="close" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div><div id="toast" class="toast"></div><script>
 /* RONIX V14. Monetary arithmetic in integer piastres; no network or storage. */
 const R14 = (() => {
-  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers','documentNumbers'];
+  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers','documentNumbers','manualJournals','laborEntries','generalExpenses','accounts','closingRates','fiscalClosings'];
   const copy = v => JSON.parse(JSON.stringify(v));
   const normName = v => String(v || '').trim();
   function cents(v) {
@@ -171,6 +193,27 @@ const R14 = (() => {
   function unfx(v,r=1){const n=BigInt(cents(v))*1000000n,d=rateUnits(r),q=n<0n?-((-n+d/2n)/d):(n+d/2n)/d;return Number(q)/100}
   const projectCurrency=p=>p?.contractCurrency??'EGP';
   const projectRate=p=>p?.contractRate??1;
+  function projectSettlementRate(r,p){
+    if(!p)throw Error('المشروع غير موجود');
+    if(projectCurrency(p)==='EGP')return 1;
+    if(r?.projectSettlementRate!=null)return rate(r.projectSettlementRate);
+    const native=Number(r?.projectAmount||0),cash=Number(cashReceipt(r)||0);
+    if(native>0&&cash>0)return rate((cash/native).toFixed(6));
+    return projectRate(p);
+  }
+  function projectRateSummary(d,p){
+    if(!p)throw Error('المشروع غير موجود');
+    const rows=d.clientReceipts.filter(r=>r.code===p.code),usable=[],unconfirmed=[];
+    for(const r of rows){
+      const native=Number(r.projectAmount||0),cash=Number(r.cashAmount||0);
+      if(native>0&&cash>0)usable.push(r);else unconfirmed.push(r);
+    }
+    const originalPaid=sum(usable,r=>r.projectAmount),cashPaid=sum(usable,r=>r.cashAmount);
+    const weightedRate=originalPaid>0?rate((cashPaid/originalPaid).toFixed(6)):0;
+    const latest=usable.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.id).localeCompare(String(a.id)))[0];
+    return {currency:projectCurrency(p),contractRate:projectRate(p),weightedRate,effectiveRate:weightedRate||projectRate(p),originalPaid,cashPaid,confirmedCount:usable.length,unconfirmedCount:unconfirmed.length,latestRate:latest?projectSettlementRate(latest,p):0,latestDate:latest?.settlementRateAsOf||latest?.date||''};
+  }
+  const projectWeightedRate=(d,p)=>projectRateSummary(d,p).weightedRate;
   const originalContract=p=>p?.originalContract??p?.contract??0;
   const projectSubtotal=p=>sum([{amount:originalContract(p)},...(p.contractExtras||[])]);
   function projectTaxAmount(p,t){
@@ -199,7 +242,13 @@ const R14 = (() => {
       const native=amount(a.projectAmount),cash=amount(a.receiptOriginal);if(native<0||cash<0||(native===0)!==(cash===0))throw Error('راجع تخصيص العقد والمبلغ المخصص من السند');
       if(!native)continue;
       if(projectCurrency(p)===currency&&cents(native)!==cents(cash))throw Error('عند تطابق العملتين يجب أن يتساوى مبلغ العقد والجزء المخصص من السند');
-      entries.push({...base,id:old.find(r=>r.code===a.code)?.id||id(),code:a.code,projectAmount:native,projectCurrency:projectCurrency(p),bookRate:projectRate(p),receiptOriginal:cash,amount:fx(native,projectRate(p)),cashAmount:fx(cash,exchangeRate)});
+      const actualCash=fx(cash,exchangeRate),settlementRate=projectCurrency(p)==='EGP'?1:rate(a.settlementRate??(actualCash/native).toFixed(6));
+      // The project settlement rate describes one unit of the contract currency
+      // in EGP on this receipt date. Keep it separate from the incoming-currency
+      // rate and from the immutable historical contract rate.
+      const expectedCash=fx(native,settlementRate),tolerance=Math.max(1,Math.ceil(settlementRate/2));
+      if(Math.abs(cents(actualCash)-cents(expectedCash))>tolerance)throw Error('مبلغ سداد العقد لا يطابق النقد الفعلي وسعر تسوية المشروع: '+a.code);
+      entries.push({...base,id:old.find(r=>r.code===a.code)?.id||id(),code:a.code,projectAmount:native,projectCurrency:projectCurrency(p),bookRate:projectRate(p),projectSettlementRate:settlementRate,settlementRateAsOf:a.settlementRateAsOf||date,settlementRateSource:a.settlementRateSource||'manual',receiptOriginal:cash,amount:fx(native,projectRate(p)),cashAmount:actualCash});
     }
     const rest=delta(total,sum(entries,'receiptOriginal'));if(rest<0)throw Error('التوزيع أكبر من إجمالي السند');
     if(rest)entries.push({...base,id:old.find(r=>!r.code)?.id||id(),code:'',unallocated:true,receiptOriginal:rest,amount:fx(rest,exchangeRate),cashAmount:fx(rest,exchangeRate)});
@@ -240,6 +289,9 @@ const R14 = (() => {
     for(const p of d.projects)for(const x of p.contractItems||[])if(x.unit==null)x.unit='عدد';
     for(const c of d.claims){
       if(c.items==null)c.items=claimRows(c).map(r=>({desc:String(r.code||''),amount:r.amount}));
+      // Historical claims remain byte-for-byte compatible. Their currency is
+      // hydrated as legacy EGP only in the V24 claim editor/report layer, where
+      // foreign-project rows are visibly flagged for review.
       for(const r of claimRows(c))for(const x of r.items||[])if(x.unit==null)x.unit='عدد';
     }
     return d;
@@ -287,7 +339,18 @@ const R14 = (() => {
       else {for(const item of c.items)monetary(item.amount,'بند مطالبة',1);try{if(cents(sum(c.items))!==cents(c.total))add('بنود المطالبة لا تساوي إجماليها: '+c.id)}catch{}}
       unique(claimRows(c),r=>r.code,'مشاريع المطالبة');
       for(const r of claimRows(c)){linked(r.code,'مطالبة');monetary(r.amount,'بند مطالبة',1);if(projects.has(r.code)&&normName(projects.get(r.code).client)!==claimClient(d,c))add('مطالبة تجمع عملاء مختلفين: '+c.id);if(r.items!=null){if(!Array.isArray(r.items)||!r.items.length)add('تفاصيل كمية المطالبة غير صالحة: '+c.id);else{for(const x of r.items){if(!String(x.description||'').trim())add('بيان بند المطالبة مطلوب');if(!String(x.unit||'').trim())add('وحدة بند المطالبة مطلوبة');if(!Number.isFinite(Number(x.quantity))||Number(x.quantity)<=0)add('كمية المطالبة غير صالحة');monetary(x.unitPrice,'سعر وحدة المطالبة');monetary(x.amount,'إجمالي بند المطالبة');if(cents(x.amount)!==cents(amount((Number(x.quantity)*Number(x.unitPrice)).toFixed(2))))add('إجمالي بند المطالبة لا يطابق الكمية والسعر')}if(cents(sum(r.items))!==cents(r.amount))add('تفاصيل المطالبة لا تساوي إجمالي المشروع')}}}
+      for(const r of claimRows(c))if(r.originalAmount!=null){
+        if(!/^[A-Z]{3}$/.test(String(r.currency||'')))add('عملة مطالبة غير صالحة: '+c.id);else if(r.currency==='EGP'&&Number(r.claimRate)!==1)add('سعر مطالبة بالجنيه يجب أن يساوي 1: '+c.id);
+        try{rate(r.claimRate)}catch(e){add('سعر مطالبة غير صالح: '+c.id)}dated(r.rateDate||c.date,'تاريخ سعر مطالبة');monetary(r.originalAmount,'قيمة مطالبة أصلية',1);
+        const p=projects.get(r.code),bookRate=p?projectRate(p):1;
+        if(p&&r.currency!==projectCurrency(p))add('عملة المطالبة لا تطابق عملة عقد المشروع: '+c.id);
+        if(!r.legacyCurrencyUnconfirmed&&cents(r.amount)!==cents(fx(r.originalAmount,bookRate)))add('القيمة الدفترية للمطالبة لا تطابق سعر التعاقد: '+c.id);
+        if(r.accountingAmount!=null&&cents(r.accountingAmount)!==cents(fx(r.originalAmount,r.claimRate)))add('قيمة إصدار المطالبة لا تطابق سعر الإصدار: '+c.id);
+        for(const x of r.items||[]){monetary(x.originalAmount,'إجمالي بند أصلي');monetary(x.originalUnitPrice,'سعر وحدة أصلي');if(cents(x.originalAmount)!==cents(amount((Number(x.quantity)*Number(x.originalUnitPrice)).toFixed(2))))add('إجمالي البند الأصلي لا يطابق الكمية والسعر');if(x.accountingAmount!=null&&cents(x.accountingAmount)!==cents(fx(x.originalAmount,r.claimRate)))add('قيمة إصدار بند المطالبة غير مطابقة')}
+        if((r.items||[]).length&&r.accountingAmount!=null&&cents(sum(r.items,'accountingAmount'))!==cents(r.accountingAmount))add('بنود الإصدار لا تساوي إجمالي المشروع في المطالبة')
+      }
       try{if(cents(claimAmount(c))!==cents(c.total))add('إجمالي المطالبة لا يطابق توزيعها: '+c.id)}catch{}
+      if(c.accountingTotal!=null)try{if(claimRows(c).some(r=>r.accountingAmount==null)||cents(sum(claimRows(c),'accountingAmount'))!==cents(c.accountingTotal))add('قيمة إصدار المطالبة لا تطابق توزيع المشاريع: '+c.id)}catch{}
     }
     const batchClients=new Map();
     for(const r of d.clientReceipts){
@@ -336,7 +399,7 @@ const R14 = (() => {
       const batches=new Map();
       for(const r of d.clientReceipts)if(r.incomingCurrency){
         if(!/^[A-Z]{3}$/.test(r.incomingCurrency)||(r.incomingCurrency==='EGP'&&r.receiptRate!==1))add('عملة سند غير صالحة');rate(r.receiptRate);monetary(r.receiptOriginal,'قبض بعملة السند',1);monetary(r.cashAmount,'نقد فعلي',1);monetary(r.receiptTotal,'إجمالي السند',1);
-        if(r.code){const p=projects.get(r.code);if(!p||r.projectCurrency!==projectCurrency(p)||r.bookRate!==projectRate(p))add('عملة أو سعر العقد لا يطابق تخصيصه');monetary(r.projectAmount,'سداد بعملة العقد',1);if(cents(r.amount)!==cents(fx(r.projectAmount,r.bookRate)))add('قيمة تسوية العقد غير مطابقة');if(r.projectCurrency===r.incomingCurrency&&cents(r.projectAmount)!==cents(r.receiptOriginal))add('تخصيص بنفس العملة غير متساو')}
+        if(r.code){const p=projects.get(r.code);if(!p||r.projectCurrency!==projectCurrency(p)||r.bookRate!==projectRate(p))add('عملة أو سعر العقد لا يطابق تخصيصه');monetary(r.projectAmount,'سداد بعملة العقد',1);if(cents(r.amount)!==cents(fx(r.projectAmount,r.bookRate)))add('قيمة تسوية العقد غير مطابقة');if(r.projectCurrency===r.incomingCurrency&&cents(r.projectAmount)!==cents(r.receiptOriginal))add('تخصيص بنفس العملة غير متساو');if(r.projectSettlementRate!=null){try{rate(r.projectSettlementRate);dated(r.settlementRateAsOf||r.date,'تاريخ سعر تسوية المشروع');if(Math.abs(cents(r.cashAmount)-cents(fx(r.projectAmount,r.projectSettlementRate)))>Math.max(1,Math.ceil(Number(r.projectSettlementRate)/2)))add('النقد الفعلي لا يطابق سعر تسوية المشروع: '+r.id)}catch(e){add('سعر تسوية مشروع غير صالح: '+r.id)}}}
         else if(cents(r.amount)!==cents(r.cashAmount))add('الرصيد غير الموزع لا يساوي نقده');
         const key=r.batchId||r.id;if(!batches.has(key))batches.set(key,[]);batches.get(key).push(r);
       }
@@ -366,7 +429,7 @@ const R14 = (() => {
     const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);
     validate(next);return next;
   }
-  return {rate,fx,unfx,projectCurrency,projectRate,originalContract,projectSubtotal,projectTaxAmount,projectTaxTotal,projectOriginalTotal,projectBookTotal,assignmentTotal,cashReceipt,fxDifference,receivedOriginal,foreignReceiptEdit,arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
+  return {rate,fx,unfx,projectCurrency,projectRate,projectSettlementRate,projectRateSummary,projectWeightedRate,originalContract,projectSubtotal,projectTaxAmount,projectTaxTotal,projectOriginalTotal,projectBookTotal,assignmentTotal,cashReceipt,fxDifference,receivedOriginal,foreignReceiptEdit,arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
 })();
 if(typeof module!=='undefined')module.exports=R14;
 
@@ -389,12 +452,12 @@ const R16 = ((R) => {
     const contract=R.cents(p.contract||0)/100,received=R.sum(receipts),cash=R.sum(receipts,R.cashReceipt);
     const claims=R.sum(d.claims.filter(R.active),c=>R.claimAmount(c,code));
     const matched=R.sum(d.claimSettlements.filter(s=>s.code===code));
-    const expenses=R.sum(d.projectExpenses.filter(x=>x.code===code));
+    const projectExpenses=d.projectExpenses.filter(x=>x.code===code),expenses=R.sum(projectExpenses),cashExpenses=R.sum(projectExpenses.filter(x=>x.cashEffect!==false));
     return {code,contract,received,cash,fx:balance(cash,received),contractBalance:balance(contract,received),
       claims,matched,claimDue:balance(claims,matched),unmatched:balance(received,matched),
-      designers:ds,expenses,cost:R.sum([{amount:ds.fees},{amount:expenses}]),
+      designers:ds,expenses,cashExpenses,cost:R.sum([{amount:ds.fees},{amount:expenses}]),
       profit:balance(contract,R.sum([{amount:ds.fees},{amount:expenses}])),
-      operatingCash:balance(balance(cash,ds.paid),expenses)};
+      operatingCash:balance(balance(cash,ds.paid),cashExpenses)};
   }
   function client(d,name) {
     const t=R.totals(d,name),cs=d.claims.filter(c=>R.active(c)&&R.claimClient(d,c)===name);
@@ -722,6 +785,404 @@ const R19 = ((R) => {
   return {prefixes,sync,number,reference,formatAmount,parseQuote};
 })(typeof module!=='undefined'?require('./finance-core.js'):R14);
 if(typeof module!=='undefined')module.exports=R19;
+
+/* Project status and work-hour arithmetic. Pure helpers; no storage or DOM. */
+const R24ProjectOps=(()=>{
+  const OWNER_EMAIL='3amertarrab@gmail.com';
+  const closedStates=new Set(['مغلق','منتهي','مكتمل','closed','completed','finished']);
+  const normalize=value=>String(value??'').trim().toLowerCase();
+  function isClosed(project){return !!project&&(!!project.closedAt||closedStates.has(normalize(project.state)))}
+  function canClose(email,owner=OWNER_EMAIL){return normalize(email)===normalize(owner)}
+  function scaled(value,places,label){
+    const raw=String(value??'').trim();
+    if(!new RegExp(`^\\d+(?:\\.\\d{1,${places}})?$`).test(raw))throw Error(`${label} غير صالحة`);
+    const [whole,fraction='']=raw.split('.'),out=BigInt(whole)*(10n**BigInt(places))+BigInt(fraction.padEnd(places,'0'));
+    if(out<=0n)throw Error(`${label} يجب أن تكون أكبر من صفر`);
+    return out;
+  }
+  function workAmount(hours,hourlyRate){
+    const h=scaled(hours,3,'عدد الساعات'),rate=scaled(hourlyRate,2,'تكلفة الساعة');
+    const cents=(h*rate+500n)/1000n;
+    if(cents>10000000000000n)throw Error('تكلفة الساعات تتجاوز الحد المدعوم');
+    return Number(cents)/100;
+  }
+  function workRows(rows,code=''){return (rows||[]).filter(x=>(!code||x.code===code)&&(x.expenseType==='work-hours'||(x.category==='ساعات عمل'&&x.workHours!=null)))}
+  function totals(rows,code=''){
+    const selected=workRows(rows,code),hours=selected.reduce((n,x)=>n+Number(x.workHours||0),0),amountCents=selected.reduce((n,x)=>n+BigInt(Math.round(Number(x.amount||0)*100)),0n);
+    return {count:selected.length,hours:Number(hours.toFixed(3)),amount:Number(amountCents)/100};
+  }
+  return {OWNER_EMAIL,isClosed,canClose,workAmount,workRows,totals};
+})();
+if(typeof module!=='undefined')module.exports=R24ProjectOps;
+
+/* RONIX V24 financial statements.
+ *
+ * This module projects the operational ledgers into balanced double-entry
+ * journals.  It never mutates the source data and it never calls a report
+ * "ready" until the accounting setup and legacy review are complete.
+ */
+const R24Financial = ((R) => {
+  const DEFAULT_ACCOUNTS = Object.freeze([
+    {id:'1100',code:'1100',name:'الصندوق والبنوك',type:'asset',group:'cash'},
+    {id:'1200',code:'1200',name:'العملاء',type:'asset',group:'receivable'},
+    {id:'1300',code:'1300',name:'مقدمات للمصممين',type:'asset',group:'designer-advance'},
+    {id:'1400',code:'1400',name:'الأصول الثابتة',type:'asset',group:'fixed-asset'},
+    {id:'1490',code:'1490',name:'مجمع الإهلاك',type:'asset',group:'contra-asset',contra:true},
+    {id:'2100',code:'2100',name:'دفعات مقدمة من العملاء',type:'liability',group:'client-advance'},
+    {id:'2200',code:'2200',name:'مستحقات المصممين',type:'liability',group:'designer-payable'},
+    {id:'2250',code:'2250',name:'أجور مستحقة',type:'liability',group:'wages-payable'},
+    {id:'2300',code:'2300',name:'الموردون',type:'liability',group:'supplier-payable'},
+    {id:'2400',code:'2400',name:'ضرائب مستحقة',type:'liability',group:'tax-payable'},
+    {id:'2500',code:'2500',name:'قروض والتزامات تمويلية',type:'liability',group:'loan'},
+    {id:'3100',code:'3100',name:'رأس المال',type:'equity',group:'capital'},
+    {id:'3200',code:'3200',name:'أرباح مرحلة',type:'equity',group:'retained-earnings'},
+    {id:'4100',code:'4100',name:'إيرادات المشاريع',type:'revenue',group:'project-revenue'},
+    {id:'4200',code:'4200',name:'أرباح فروق العملة',type:'revenue',group:'fx-gain'},
+    {id:'5100',code:'5100',name:'تكلفة المصممين',type:'expense',group:'project-cost'},
+    {id:'5200',code:'5200',name:'مصروفات المشاريع',type:'expense',group:'project-cost'},
+    {id:'5300',code:'5300',name:'تكلفة ساعات العمل',type:'expense',group:'project-cost'},
+    {id:'6100',code:'6100',name:'مصروفات إدارية وعمومية',type:'expense',group:'operating-expense'},
+    {id:'7100',code:'7100',name:'خسائر فروق العملة',type:'expense',group:'fx-loss'}
+  ]);
+
+  const ACCOUNT = Object.freeze({
+    cash:'1100',receivable:'1200',designerAdvance:'1300',clientAdvance:'2100',
+    designerPayable:'2200',wagesPayable:'2250',supplierPayable:'2300',
+    revenue:'4100',fxGain:'4200',designerCost:'5100',projectExpense:'5200',
+    laborCost:'5300',adminExpense:'6100',fxLoss:'7100'
+  });
+  // JavaScript's ISO parser does not treat year 0000 consistently.  Keep the
+  // default reporting window valid in browsers as well as Node.
+  const ISO_MIN='1900-01-01',ISO_MAX='9999-12-31';
+  const copy=v=>JSON.parse(JSON.stringify(v));
+  const cents=v=>R.cents(v||0);
+  const money=v=>cents(v)/100;
+  const add=(a,b)=>(cents(a)+cents(b))/100;
+  const subtract=(a,b)=>(cents(a)-cents(b))/100;
+  const rounded=v=>money(Number(v||0).toFixed(2));
+  const sum=(rows,key)=>R.sum(rows,key||'amount');
+  const dateOK=v=>R.dateOK(String(v||''));
+  const inRange=(date,from,to)=>String(date)>=from&&String(date)<=to;
+  const before=(date,from)=>String(date)<from;
+  const issue=(code,message,severity='error',source='')=>({code,message,severity,source});
+
+  function accounts(data={}){
+    const rows=[...DEFAULT_ACCOUNTS.map(copy),...((data.accounts||[]).map(copy))],seen=new Set(),out=[];
+    for(const row of rows){const id=String(row.id||row.code||'').trim();if(!id||seen.has(id))continue;seen.add(id);out.push({...row,id,code:String(row.code||id),name:String(row.name||id)})}
+    return out;
+  }
+  const accountMap=data=>new Map(accounts(data).map(x=>[x.id,x]));
+  const cashAccount=(row,settings,map)=>{
+    const candidate=String(row?.cashAccountId||settings.defaultCashAccountId||ACCOUNT.cash);
+    return map.get(candidate)?.group==='cash'?candidate:ACCOUNT.cash;
+  };
+  function line(account,debit=0,credit=0,dimensions={}){
+    debit=rounded(debit);credit=rounded(credit);
+    if(debit<0||credit<0||(debit&&credit))throw Error('طرف قيد غير صالح');
+    return {account:String(account),debit,credit,...dimensions};
+  }
+  function entry(id,date,description,source,lines,extra={}){
+    const debit=sum(lines,'debit'),credit=sum(lines,'credit');
+    if(cents(debit)!==cents(credit))throw Error('قيد غير متوازن: '+id);
+    return {id:String(id),date:String(date),description:String(description||''),source,lines,...extra};
+  }
+  function claimCurrency(c){return String(c.currency||c.claimCurrency||'EGP')}
+  function claimRate(c){return Number(c.exchangeRate||c.claimRate||1)}
+  function rowCurrency(c,row){return String(row?.currency||claimCurrency(c))}
+  function rowRate(c,row){return Number(row?.claimRate||claimRate(c)||1)}
+  function rowOriginal(c,row){return row?.originalAmount!=null?money(row.originalAmount):rowCurrency(c,row)==='EGP'?money(row.amount):R.unfx(row.amount,rowRate(c,row))}
+  function claimBook(c,value=c.total){return c.reportingTotal!=null&&value===c.total?money(c.reportingTotal):claimCurrency(c)==='EGP'?money(value):R.fx(value,claimRate(c))}
+  function claimRowBook(c,row){return row.accountingAmount!=null?money(row.accountingAmount):row.reportingAmount!=null?money(row.reportingAmount):row.originalAmount!=null?R.fx(row.originalAmount,rowRate(c,row)):claimBook(c,row.amount)}
+  function activeClaim(c){return typeof R.active==='function'?R.active(c):['صادرة','معتمدة'].includes(c.status)}
+  function recognitionDate(c){return c.recognitionDate||c.approvedDate||c.date}
+
+  function manualEntries(data,map,issues){
+    const rows=data.manualJournals||data.journalEntries||[],out=[];
+    for(const raw of rows){
+      if(raw.status==='draft'||raw.status==='reversed')continue;
+      if(!raw.id||!dateOK(raw.date)){issues.push(issue('manual-date','قيد يدوي بلا معرف أو تاريخ صالح','error',raw.id||''));continue}
+      const lines=[];
+      for(const x of raw.lines||[]){
+        const account=String(x.account||x.accountId||'');
+        if(!map.has(account)){issues.push(issue('manual-account','حساب غير معروف في القيد '+raw.id,'error',raw.id));continue}
+        try{lines.push(line(account,x.debit||0,x.credit||0,{code:x.code||'',client:x.client||'',designer:x.designer||'',currency:x.currency||'EGP',foreignAmount:x.foreignAmount||0,rate:x.rate||1}))}catch(e){issues.push(issue('manual-line',e.message,'error',raw.id))}
+      }
+      try{if(lines.length)out.push(entry('MAN:'+raw.id,raw.date,raw.description||'قيد يدوي',{kind:'manual',id:raw.id},lines,{kind:raw.kind||raw.type||'manual',cashFlowCategory:raw.cashFlowCategory||raw.cashFlow||'operating'}))}catch(e){issues.push(issue('manual-unbalanced',e.message,'error',raw.id))}
+    }
+    return out;
+  }
+
+  function claimEntries(data,issues){
+    const out=[];
+    for(const c of data.claims||[]){
+      if(!activeClaim(c))continue;
+      const date=recognitionDate(c);if(!dateOK(date)){issues.push(issue('claim-date','مطالبة فعالة بلا تاريخ اعتراف صالح','error',c.id));continue}
+      const rows=R.claimRows(c);
+      for(const [index,row] of rows.entries()){
+        let amount;try{amount=claimRowBook(c,row)}catch(e){issues.push(issue('claim-rate','سعر أو مبلغ مطالبة غير صالح','error',c.id));continue}
+        if(amount<=0)continue;
+        const dims={code:row.code||c.code||'',client:R.claimClient(data,c),currency:rowCurrency(c,row),foreignAmount:rowOriginal(c,row),rate:rowRate(c,row)};
+        out.push(entry(`CLAIM:${c.id}:${index}`,date,'إثبات مطالبة '+c.id,{kind:'claim',id:c.id},[
+          line(ACCOUNT.receivable,amount,0,dims),line(ACCOUNT.revenue,0,amount,dims)
+        ]));
+      }
+    }
+    return out;
+  }
+
+  function receiptEntries(data,settings,map,issues){
+    const out=[],groups=new Map();
+    for(const r of data.clientReceipts||[]){if(r.sourceAdvanceId)continue;const id=r.batchId||r.id;if(!groups.has(id))groups.set(id,[]);groups.get(id).push(r)}
+    for(const [id,rows] of groups){
+      const first=rows[0],date=first.date;if(!dateOK(date)){issues.push(issue('receipt-date','سند قبض بلا تاريخ صالح','error',id));continue}
+      let cash;try{cash=sum(rows,r=>R.cashReceipt(r))}catch(e){issues.push(issue('receipt-amount','قيمة قبض غير صالحة','error',id));continue}
+      if(cash<=0)continue;const client=R.receiptClient(data,first),account=cashAccount(first,settings,map);
+      out.push(entry('RECEIPT:'+id,date,'قبض من العميل '+client,{kind:'receipt',id},[
+        line(account,cash,0,{client}),line(ACCOUNT.clientAdvance,0,cash,{client})
+      ],{cashFlowCategory:'operating'}));
+    }
+    for(const a of data.advances||[]){
+      if(!dateOK(a.date)){issues.push(issue('advance-date','دفعة مقدمة بلا تاريخ صالح','error',a.id));continue}
+      const cash=a.cashAmount??a.total;if(Number(cash)<=0)continue;const account=cashAccount(a,settings,map),client=R.normName(a.client);
+      out.push(entry('ADVANCE:'+a.id,a.date,'دفعة مقدمة من العميل '+client,{kind:'advance',id:a.id},[
+        line(account,cash,0,{client}),line(ACCOUNT.clientAdvance,0,cash,{client})
+      ],{cashFlowCategory:'operating'}));
+    }
+    return out;
+  }
+
+  function settlementNative(data,c,row,s,r){
+    if(s.originalAmount!=null)return money(s.originalAmount);
+    if(r?.projectAmount!=null&&Number(r.amount))return rounded(Number(r.projectAmount)*Number(s.amount)/Number(r.amount));
+    if(rowCurrency(c,row)==='EGP')return money(s.amount);
+    const project=(data.projects||[]).find(x=>x.code===s.code),rate=project?R.projectRate(project):rowRate(c,row);
+    return R.unfx(s.amount,rate);
+  }
+  function settlementEntries(data,issues){
+    const out=[];
+    for(const [index,s] of (data.claimSettlements||[]).entries()){
+      const c=(data.claims||[]).find(x=>x.id===s.claimId),r=(data.clientReceipts||[]).find(x=>x.id===s.receiptId);
+      if(!c||!r||!activeClaim(c))continue;const date=s.date||r.date;if(!dateOK(date)){issues.push(issue('settlement-date','تسوية مطالبة بلا تاريخ صالح','error',s.claimId));continue}
+      const row=R.claimRows(c).find(x=>x.code===s.code)||R.claimRows(c)[0];
+      let book,cash,native;try{
+        native=settlementNative(data,c,row,s,r);
+        book=s.reportingAmount!=null?money(s.reportingAmount):row?.originalAmount!=null?R.fx(native,rowRate(c,row)):money(s.amount);
+        cash=s.cashAmount!=null?money(s.cashAmount):(cents(r.amount)?rounded(Number(R.cashReceipt(r))*Number(s.amount)/Number(r.amount)):book);
+      }catch(e){issues.push(issue('settlement-amount','قيمة تسوية مطالبة غير صالحة','error',s.claimId));continue}
+      const dims={code:s.code||r.code||'',client:R.claimClient(data,c),currency:rowCurrency(c,row),foreignAmount:native,rate:rowRate(c,row)};
+      const lines=[line(ACCOUNT.clientAdvance,cash,0,dims),line(ACCOUNT.receivable,0,book,dims)];
+      const difference=subtract(cash,book);
+      if(difference>0)lines.push(line(ACCOUNT.fxGain,0,difference,dims));
+      if(difference<0)lines.push(line(ACCOUNT.fxLoss,-difference,0,dims));
+      out.push(entry(`SETTLE:${s.claimId}:${s.receiptId}:${index}`,date,'تسوية مطالبة '+s.claimId,{kind:'settlement',id:s.claimId,receiptId:s.receiptId},lines));
+    }
+    return out;
+  }
+
+  const designerKey=x=>String(x.code||'')+'\u0000'+String(x.designer||'');
+  function designerEntries(data,settings,map,issues){
+    const out=[],events=[];
+    for(const a of data.assignments||[]){
+      // Archiving hides an assignment from day-to-day operations; it must not
+      // erase an accrued cost or its payable from the accounting history.
+      const date=a.recognizedDate||a.accruedDate||a.approvedDate;
+      if(!date){if(Number(a.fee||0)>0&&a.accountingStatus!=='commitment')issues.push(issue('assignment-unreviewed','أتعاب مصمم بلا تاريخ اعتماد: '+a.designer,'error',a.id||designerKey(a)));continue}
+      if(!dateOK(date)){issues.push(issue('assignment-date','تاريخ اعتماد أتعاب غير صالح','error',a.id||designerKey(a)));continue}
+      events.push({kind:'accrual',date,id:a.id||designerKey(a),row:a,amount:a.fee||0,key:designerKey(a)});
+    }
+    for(const p of data.payments||[]){if(!dateOK(p.date)){issues.push(issue('payment-date','دفعة مصمم بلا تاريخ صالح','error',p.id));continue}events.push({kind:'payment',date:p.date,id:p.id,row:p,amount:p.amount||0,key:designerKey(p)})}
+    events.sort((a,b)=>{const dated=String(a.date).localeCompare(String(b.date));if(dated)return dated;const kind=Number(a.kind==='payment')-Number(b.kind==='payment');return kind||String(a.id).localeCompare(String(b.id))});
+    const state=new Map();
+    for(const e of events){const s=state.get(e.key)||{payable:0,advance:0},r=e.row,dims={code:r.code||'',designer:r.designer||''};
+      if(e.kind==='accrual'){
+        const amount=money(e.amount);if(amount<=0)continue;
+        out.push(entry('FEE:'+e.id,e.date,'اعتماد أتعاب '+r.designer,{kind:'designer-fee',id:e.id},[
+          line(ACCOUNT.designerCost,amount,0,dims),line(ACCOUNT.designerPayable,0,amount,dims)
+        ]));s.payable=add(s.payable,amount);
+        const offset=Math.min(cents(s.payable),cents(s.advance))/100;
+        if(offset>0){out.push(entry('FEE-OFFSET:'+e.id,e.date,'تسوية مقدمة مصمم '+r.designer,{kind:'designer-offset',id:e.id},[
+          line(ACCOUNT.designerPayable,offset,0,dims),line(ACCOUNT.designerAdvance,0,offset,dims)
+        ]));s.payable=subtract(s.payable,offset);s.advance=subtract(s.advance,offset)}
+      }else{
+        const amount=money(e.amount);if(amount<=0)continue;const applied=Math.min(cents(s.payable),cents(amount))/100,advance=subtract(amount,applied),account=cashAccount(r,settings,map),lines=[];
+        if(applied)lines.push(line(ACCOUNT.designerPayable,applied,0,dims));
+        if(advance)lines.push(line(ACCOUNT.designerAdvance,advance,0,dims));
+        lines.push(line(account,0,amount,dims));
+        out.push(entry('PAYMENT:'+e.id,e.date,'دفع للمصمم '+r.designer,{kind:'designer-payment',id:e.id},lines,{cashFlowCategory:'operating'}));
+        s.payable=subtract(s.payable,applied);s.advance=add(s.advance,advance);
+      }
+      state.set(e.key,s);
+    }
+    return out;
+  }
+
+  function expenseEntries(data,settings,map,issues,to=ISO_MAX){
+    const out=[];
+    for(const x of data.projectExpenses||[]){
+      if(x.expenseType==='work-hours'||(x.category==='ساعات عمل'&&x.workHours!=null))continue;
+      if(!dateOK(x.date)){issues.push(issue('expense-date','مصروف مشروع بلا تاريخ صالح','error',x.id));continue}
+      if(x.date<=to&&x.accountingReviewed!==true&&(x.paymentStatus==null||x.accountId==null))issues.push(issue('expense-unreviewed','مصروف قديم يحتاج تحديد الحساب وحالة الدفع: '+(x.category||x.id),'error',x.id));
+      const amount=money(x.amount);if(amount<=0)continue;
+      const account=String(x.accountId||ACCOUNT.projectExpense),dims={code:x.code||'',payee:x.payee||''};
+      if(!map.has(account)){issues.push(issue('expense-account','حساب مصروف غير معروف','error',x.id));continue}
+      const paid=x.cashEffect!==false&&x.paymentStatus!=='unpaid'&&x.paymentStatus!=='accrued',credit=paid?cashAccount(x,settings,map):String(x.payableAccountId||ACCOUNT.supplierPayable);
+      out.push(entry('EXPENSE:'+x.id,x.date,'مصروف مشروع '+(x.category||''),{kind:'project-expense',id:x.id},[
+        line(account,amount,0,dims),line(credit,0,amount,dims)
+      ],{cashFlowCategory:paid?'operating':''}));
+    }
+    for(const x of data.generalExpenses||[]){
+      if(!dateOK(x.date)){issues.push(issue('general-expense-date','مصروف عام بلا تاريخ صالح','error',x.id));continue}
+      const amount=money(x.amount);if(amount<=0)continue;const account=String(x.accountId||ACCOUNT.adminExpense),paid=x.paymentStatus!=='unpaid'&&x.paymentStatus!=='accrued',credit=paid?cashAccount(x,settings,map):String(x.payableAccountId||ACCOUNT.supplierPayable);
+      out.push(entry('GENERAL-EXPENSE:'+x.id,x.date,'مصروف إداري '+(x.category||''),{kind:'general-expense',id:x.id},[line(account,amount),line(credit,0,amount)],{cashFlowCategory:paid?'operating':''}));
+    }
+    return out;
+  }
+
+  function laborEntries(data,settings,map,issues){
+    const out=[];
+    const rows=[...(data.laborEntries||[]),...(data.projectExpenses||[]).filter(x=>x.expenseType==='work-hours'||(x.category==='ساعات عمل'&&x.workHours!=null))];
+    for(const x of rows){
+      const hours=x.hours??x.workHours;
+      if(!x.id||!dateOK(x.date)||!Number.isFinite(Number(hours))||Number(hours)<0||!Number.isFinite(Number(x.hourlyRate))||Number(x.hourlyRate)<0){issues.push(issue('labor-invalid','سجل ساعات غير صالح','error',x.id||''));continue}
+      const calculated=rounded(Number(hours)*Number(x.hourlyRate)),amount=x.amount==null?calculated:money(x.amount);
+      if(cents(amount)!==cents(calculated)){issues.push(issue('labor-total','تكلفة الساعات لا تساوي الساعات × سعر الساعة','error',x.id));continue}
+      if(!amount)continue;const paid=x.cashEffect===true||x.paymentStatus==='paid',credit=paid?cashAccount(x,settings,map):String(x.payableAccountId||ACCOUNT.wagesPayable),dims={code:x.code||'',employee:x.employee||x.worker||x.payee||''};
+      out.push(entry('LABOR:'+x.id,x.date,'ساعات عمل مشروع '+(x.code||''),{kind:'labor',id:x.id},[line(ACCOUNT.laborCost,amount,0,dims),line(credit,0,amount,dims)],{cashFlowCategory:paid?'operating':''}));
+    }
+    return out;
+  }
+
+  function readiness(data,settings,map,entries,issues,to=ISO_MAX){
+    if(!data.accountingSettings)issues.push(issue('settings-missing','لم يكتمل إعداد المحاسبة والعملة الوظيفية','error'));
+    if(String(settings.baseCurrency||'EGP')!=='EGP')issues.push(issue('base-currency','القوائم الحالية تتطلب أن تكون العملة الوظيفية EGP','error'));
+    const hasOpening=(data.manualJournals||data.journalEntries||[]).some(x=>(x.kind||x.type)==='opening'&&x.status!=='draft'&&x.status!=='reversed');
+    if(!hasOpening&&settings.openingComplete!==true)issues.push(issue('opening-missing','لم تُعتمد الأرصدة الافتتاحية أو الإقرار بأنها صفر','error'));
+    const defaultCash=String(settings.defaultCashAccountId||'');if(!defaultCash||map.get(defaultCash)?.group!=='cash')issues.push(issue('cash-account-missing','لم يُحدد حساب الصندوق أو البنك الافتراضي','error'));
+    const projects=new Map((data.projects||[]).map(p=>[p.code,p]));
+    for(const r of data.clientReceipts||[]){const p=projects.get(r.code);if(!p||R.projectCurrency(p)==='EGP'||(dateOK(r.date)&&r.date>to))continue;if(r.projectSettlementRate==null||r.projectAmount==null||r.cashAmount==null)issues.push(issue('foreign-receipt-unconfirmed','تحصيل مشروع أجنبي يحتاج تأكيد مبلغ العملة الأصلية والنقد وسعر التسوية: '+r.id,'error',r.id))}
+    for(const c of data.claims||[]){const date=recognitionDate(c);if(dateOK(date)&&date>to)continue;for(const row of R.claimRows(c)){const p=projects.get(row.code);if(!p||R.projectCurrency(p)==='EGP')continue;if(row.originalAmount==null||row.claimRate==null||row.rateSource==='legacy'||row.rateConfirmed===false||row.legacyCurrencyUnconfirmed)issues.push(issue('foreign-claim-unconfirmed','مطالبة مشروع أجنبي تحتاج تأكيد العملة الأصلية وسعر الإصدار: '+c.id,'error',c.id))}}
+    const ids=new Set();for(const e of entries.filter(x=>x.date<=to)){if(ids.has(e.id))issues.push(issue('entry-duplicate','معرف قيد مكرر: '+e.id,'error',e.id));ids.add(e.id);const debit=sum(e.lines,'debit'),credit=sum(e.lines,'credit');if(cents(debit)!==cents(credit))issues.push(issue('entry-unbalanced','قيد غير متوازن: '+e.id,'error',e.id));for(const x of e.lines)if(!map.has(x.account))issues.push(issue('entry-account','حساب غير معروف في القيد '+e.id,'error',e.id))}
+    return issues;
+  }
+
+  function build(data,options={}){
+    data=data||{};const settings=data.accountingSettings||{},map=accountMap(data),issues=[],to=options.to||ISO_MAX;
+    const entries=[
+      ...manualEntries(data,map,issues),...claimEntries(data,issues),...receiptEntries(data,settings,map,issues),
+      ...settlementEntries(data,issues),...designerEntries(data,settings,map,issues),...expenseEntries(data,settings,map,issues,to),
+      ...laborEntries(data,settings,map,issues)
+    ].sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.id).localeCompare(String(b.id)));
+    readiness(data,settings,map,entries,issues,to);
+    return {accounts:[...map.values()],entries,issues,ready:!issues.some(x=>x.severity==='error')};
+  }
+
+  function closingRateRecord(data,currency,to,beforeExclusive=''){
+    const value=data.closingRates;
+    if(Array.isArray(value)){
+      const rows=value.filter(x=>x&&x.currency===currency&&dateOK(x.date)&&x.date<=to&&(!beforeExclusive||x.date<beforeExclusive)).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+      return rows[0]?{rate:Number(rows[0].rate),date:rows[0].date}:null;
+    }
+    const row=value&&value[currency];if(row==null||beforeExclusive)return null;
+    if(typeof row==='object'){
+      const date=dateOK(row.date)?row.date:to;if(date>to)return null;
+      return {rate:Number(row.rate),date};
+    }
+    return {rate:Number(row),date:to};
+  }
+  function foreignBalanceAt(data,c,row,asOf){
+    if(recognitionDate(c)>asOf)return {native:0,carrying:0};
+    const settlements=(data.claimSettlements||[]).filter(s=>s.claimId===c.id&&s.code===row.code).filter(s=>{const receipt=(data.clientReceipts||[]).find(r=>r.id===s.receiptId);return String(s.date||receipt?.date||'')<=asOf});
+    let settledNative=0,settledBook=0;
+    for(const s of settlements){const receipt=(data.clientReceipts||[]).find(r=>r.id===s.receiptId),native=settlementNative(data,c,row,s,receipt);settledNative=add(settledNative,native);settledBook=add(settledBook,s.reportingAmount!=null?money(s.reportingAmount):R.fx(native,rowRate(c,row)))}
+    return {native:Math.max(0,subtract(rowOriginal(c,row),settledNative)),carrying:Math.max(0,subtract(claimRowBook(c,row),settledBook))};
+  }
+  function revaluationLines(difference,dims){return difference>0?[line(ACCOUNT.receivable,difference,0,dims),line(ACCOUNT.fxGain,0,difference,dims)]:[line(ACCOUNT.fxLoss,-difference,0,dims),line(ACCOUNT.receivable,0,-difference,dims)]}
+  function previousDate(date){const d=new Date(date+'T00:00:00Z');d.setUTCDate(d.getUTCDate()-1);return d.toISOString().slice(0,10)}
+  function revaluationEntries(data,from,to,issues){
+    const out=[];
+    for(const c of data.claims||[]){
+      if(!activeClaim(c)||recognitionDate(c)>to)continue;
+      for(const [index,row] of R.claimRows(c).entries()){
+        const currency=rowCurrency(c,row);if(currency==='EGP')continue;
+        const priorRate=closingRateRecord(data,currency,to,from),currentRate=closingRateRecord(data,currency,to);
+        const priorAsOf=previousDate(from);let priorBalance,currentBalance;
+        try{priorBalance=priorRate?foreignBalanceAt(data,c,row,priorAsOf):{native:0,carrying:0};currentBalance=foreignBalanceAt(data,c,row,to)}
+        catch(e){issues.push(issue('revaluation-settlement','تعذر حساب الرصيد الأجنبي للمطالبة '+c.id,'error',c.id));continue}
+        let priorAdjustment=0;
+        if(priorRate&&(cents(priorBalance.native)||cents(priorBalance.carrying))){
+          if(!Number.isFinite(priorRate.rate)||priorRate.rate<=0){issues.push(issue('closing-rate-missing','سعر إقفال '+currency+' غير صالح في '+priorRate.date,'error',c.id));continue}
+          priorAdjustment=subtract(R.fx(priorBalance.native,priorRate.rate),priorBalance.carrying);
+          if(cents(priorAdjustment)){
+            const dims={code:row.code||'',client:R.claimClient(data,c),currency,foreignAmount:priorBalance.native,rate:priorRate.rate};
+            out.push(entry(`REVALUE-OPEN:${c.id}:${index}:${from}:${priorRate.date}`,priorAsOf,'رصيد إعادة تقييم سابق لمطالبة '+c.id,{kind:'revaluation-opening',id:c.id},revaluationLines(priorAdjustment,dims)));
+          }
+        }
+        let currentAdjustment=0;
+        if(cents(currentBalance.native)||cents(currentBalance.carrying)){
+          if(!currentRate||!Number.isFinite(currentRate.rate)||currentRate.rate<=0){issues.push(issue('closing-rate-missing','سعر إقفال '+currency+' غير مسجل حتى '+to,'error',c.id));continue}
+          currentAdjustment=subtract(R.fx(currentBalance.native,currentRate.rate),currentBalance.carrying);
+        }
+        // The opening revaluation is already part of the opening balance.  The
+        // period receives only the movement to the current cumulative amount.
+        const movement=subtract(currentAdjustment,priorAdjustment);if(!cents(movement))continue;
+        const rate=currentRate?.rate||priorRate?.rate||rowRate(c,row),dims={code:row.code||'',client:R.claimClient(data,c),currency,foreignAmount:currentBalance.native,rate};
+        out.push(entry(`REVALUE:${c.id}:${index}:${to}`,to,'حركة إعادة تقييم رصيد مطالبة '+c.id,{kind:'revaluation',id:c.id},revaluationLines(movement,dims)));
+      }
+    }
+    return out;
+  }
+
+  function signature(entries,from,to,context={}){
+    const accountDefinitions=(context.accounts||[]).map(x=>[String(x.id),String(x.code||''),String(x.name||''),String(x.type||''),String(x.group||''),!!x.contra]).sort((a,b)=>a[0].localeCompare(b[0])),settings=context.settings||{};
+    const signedEntries=entries.filter(e=>e.date<=to).map(e=>[e.id,e.date,e.kind||'',e.cashFlowCategory||'',e.lines.map(x=>[x.account,x.debit,x.credit])]);
+    const text=JSON.stringify(signedEntries)+'|'+from+'|'+to+'|'+JSON.stringify({accounts:accountDefinitions,baseCurrency:settings.baseCurrency||'EGP',defaultCashAccountId:settings.defaultCashAccountId||''});
+    let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619)}
+    return 'R24-'+(hash>>>0).toString(16).padStart(8,'0');
+  }
+
+  const normalBalance=(a,debit,credit)=>a.type==='asset'||a.type==='expense'?subtract(debit,credit):subtract(credit,debit);
+  function accountRows(accounts,entries,from,to){
+    return accounts.map(a=>{const prior=entries.filter(e=>before(e.date,from)).flatMap(e=>e.lines).filter(x=>x.account===a.id),period=entries.filter(e=>inRange(e.date,from,to)).flatMap(e=>e.lines).filter(x=>x.account===a.id),all=[...prior,...period],debit=sum(all,'debit'),credit=sum(all,'credit'),periodDebit=sum(period,'debit'),periodCredit=sum(period,'credit');return {...a,opening:normalBalance(a,sum(prior,'debit'),sum(prior,'credit')),debit,credit,periodDebit,periodCredit,balance:normalBalance(a,debit,credit)}}).filter(x=>cents(x.debit)||cents(x.credit));
+  }
+  function trialBalance(rows){
+    const debit=sum(rows,'debit'),credit=sum(rows,'credit'),periodDebit=sum(rows,'periodDebit'),periodCredit=sum(rows,'periodCredit');
+    return {rows:rows.map(x=>({...x,balanceDebit:x.type==='asset'||x.type==='expense'?Math.max(0,x.balance):Math.max(0,-x.balance),balanceCredit:x.type==='asset'||x.type==='expense'?Math.max(0,-x.balance):Math.max(0,x.balance)})),debit,credit,periodDebit,periodCredit,difference:subtract(debit,credit),balanced:cents(debit)===cents(credit)};
+  }
+  function incomeStatement(rows){
+    const revenueRows=rows.filter(x=>x.type==='revenue'),expenseRows=rows.filter(x=>x.type==='expense'),costRows=expenseRows.filter(x=>x.group==='project-cost'),fxGainRows=revenueRows.filter(x=>x.group==='fx-gain'),projectRevenueRows=revenueRows.filter(x=>x.group!=='fx-gain'),fxLossRows=expenseRows.filter(x=>x.group==='fx-loss'),operatingRows=expenseRows.filter(x=>x.group!=='project-cost'&&x.group!=='fx-loss');
+    const movement=x=>x.type==='revenue'?subtract(x.periodCredit,x.periodDebit):subtract(x.periodDebit,x.periodCredit);
+    const total=list=>sum(list.map(x=>({amount:movement(x)})));
+    const projectRevenue=total(projectRevenueRows),projectCosts=total(costRows),grossProfit=subtract(projectRevenue,projectCosts),operatingExpenses=total(operatingRows),fxGain=total(fxGainRows),fxLoss=total(fxLossRows),netProfit=add(subtract(grossProfit,operatingExpenses),subtract(fxGain,fxLoss));
+    return {revenueRows:projectRevenueRows.map(x=>({...x,amount:movement(x)})),projectRevenue,expenseRows:expenseRows.map(x=>({...x,amount:movement(x)})),costRows:costRows.map(x=>({...x,amount:movement(x)})),projectCosts,grossProfit,operatingRows:operatingRows.map(x=>({...x,amount:movement(x)})),operatingExpenses,fxGain,fxLoss,netProfit};
+  }
+  function cumulativeProfit(rows){return sum(rows.filter(x=>x.type==='revenue').map(x=>({amount:x.balance}))) - sum(rows.filter(x=>x.type==='expense').map(x=>({amount:x.balance}))) }
+  function balanceSheet(rows){
+    const assets=rows.filter(x=>x.type==='asset').map(x=>({...x,amount:x.balance})),liabilities=rows.filter(x=>x.type==='liability').map(x=>({...x,amount:x.balance})),equity=rows.filter(x=>x.type==='equity').map(x=>({...x,amount:x.balance})),currentEarnings=rounded(cumulativeProfit(rows));
+    const totalAssets=sum(assets),totalLiabilities=sum(liabilities),bookEquity=sum(equity),totalEquity=add(bookEquity,currentEarnings),difference=subtract(totalAssets,add(totalLiabilities,totalEquity));
+    return {assets,totalAssets,liabilities,totalLiabilities,equity,currentEarnings,totalEquity,difference,balanced:cents(difference)===0};
+  }
+  function cashFlow(accounts,entries,from,to){
+    const cashIds=new Set(accounts.filter(x=>x.group==='cash').map(x=>x.id)),cashChange=e=>sum(e.lines.filter(x=>cashIds.has(x.account)).map(x=>({amount:subtract(x.debit,x.credit)}))),openingEntries=entries.filter(e=>before(e.date,from)||(e.kind==='opening'&&e.date===from)),periodEntries=entries.filter(e=>inRange(e.date,from,to)&&e.kind!=='opening'),openingCash=sum(openingEntries.map(e=>({amount:cashChange(e)}))),rows=periodEntries.map(e=>({...e,amount:cashChange(e),category:e.cashFlowCategory||'operating'})).filter(x=>cents(x.amount)),category=k=>sum(rows.filter(x=>x.category===k),'amount'),operating=category('operating'),investing=category('investing'),financing=category('financing'),netChange=sum([{amount:operating},{amount:investing},{amount:financing}]),closingCash=add(openingCash,netChange),ledgerClosingCash=sum(entries.filter(e=>e.date<=to).map(e=>({amount:cashChange(e)}))),difference=subtract(closingCash,ledgerClosingCash);
+    return {rows,openingCash,operating,investing,financing,netChange,closingCash,ledgerClosingCash,difference,reconciled:cents(difference)===0};
+  }
+  function report(data,{from=ISO_MIN,to=ISO_MAX}={}){
+    if(!dateOK(from)||!dateOK(to)||from>to)throw Error('فترة القوائم غير صالحة');
+    const built=build(data,{to}),issues=[...built.issues],entries=[...built.entries,...revaluationEntries(data,from,to,issues)].sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.id).localeCompare(String(b.id))),rows=accountRows(built.accounts,entries,from,to),trial=trialBalance(rows),income=incomeStatement(rows),position=balanceSheet(rows),flow=cashFlow(built.accounts,entries,from,to);
+    if(!trial.balanced)issues.push(issue('trial-unbalanced','ميزان المراجعة غير متوازن','error'));
+    if(!position.balanced)issues.push(issue('position-unbalanced','قائمة المركز المالي غير متوازنة','error'));
+    if(!flow.reconciled)issues.push(issue('cash-unreconciled','التدفق النقدي لا يطابق رصيد النقدية','error'));
+    const ready=!issues.some(x=>x.severity==='error'),reportSignature=signature(entries,from,to,{accounts:built.accounts,settings:data.accountingSettings||{}}),closed=(data.fiscalClosings||[]).find(x=>x.from===from&&x.to===to&&x.status==='closed');
+    return {from,to,ready,certified:ready&&closed?.signature===reportSignature,signature:reportSignature,issues,entries,trialBalance:trial,incomeStatement:income,balanceSheet:position,cashFlow:flow};
+  }
+
+  function weightedProjectRate(data,code){
+    const rows=(data.clientReceipts||[]).filter(r=>r.code===code&&!r.sourceAdvanceId),native=sum(rows,r=>r.projectAmount??R.unfx(r.amount,r.bookRate||1)),cash=sum(rows,r=>R.cashReceipt(r));
+    return {native,cash,rate:native?Number((cash/native).toFixed(6)):0};
+  }
+
+  return {DEFAULT_ACCOUNTS,ACCOUNT,accounts,build,report,weightedProjectRate,signature};
+})(typeof module!=='undefined'?require('./finance-core.js'):R14);
+if(typeof module!=='undefined')module.exports=R24Financial;
 
 // Bootstrap runs before the preserved V13 screens. No sample client data shipped.
 const r14Encode = value => encodeURIComponent(value).replace(/'/g,'%27');
@@ -1113,7 +1574,7 @@ clientNames=function(){return [...new Set([...data.projects.map(p=>p.client),...
 unallocated=function(n){return customerTotals(n).unallocated};
 verifiedClaims=function(n){return data.claims.filter(c=>R14.claimClient(data,c)===n&&R14.active(c))};
 dueClaims=function(n){return verifiedClaims(n).filter(c=>c.due&&c.due<r14Today()&&R14.remaining(data,c)>0)};
-ccAmounts=function(code){const p=getP(code);if(!p)return null;const contract=R14.cents(p.contract||0)/100,receipts=received(code),committed=fee(code),designerCash=paid(code),extra=R14.sum(data.projectExpenses.filter(x=>x.code===code)),projectCosts=R14.sum([{amount:committed},{amount:extra}]);return {contract,receipts,committed,designerCash,extra,verified:claimed(code),contractRemaining:R14.delta(contract,receipts),projectedProfit:R14.delta(contract,projectCosts),operatingCash:R14.delta(R14.delta(receipts,designerCash),extra),projectCosts}};
+ccAmounts=function(code){const p=getP(code);if(!p)return null;const contract=R14.cents(p.contract||0)/100,receipts=received(code),committed=fee(code),designerCash=paid(code),expenses=data.projectExpenses.filter(x=>x.code===code),extra=R14.sum(expenses),cashExpenses=R14.sum(expenses.filter(x=>x.cashEffect!==false)),projectCosts=R14.sum([{amount:committed},{amount:extra}]);return {contract,receipts,committed,designerCash,extra,cashExpenses,verified:claimed(code),contractRemaining:R14.delta(contract,receipts),projectedProfit:R14.delta(contract,projectCosts),operatingCash:R14.delta(R14.delta(receipts,designerCash),cashExpenses),projectCosts}};
 function r14InputMoney(id,{positive=false,signed=false}={}){
   const amount=R14.amount(val(id));if((!signed&&amount<0)||(positive&&amount<=0))throw Error('راجع قيمة المبلغ');return amount;
 }
@@ -1227,7 +1688,7 @@ displayClientLedger=function(){r14DisplayClient();const n=val('clientSelect');if
 const r14Advanced=advancedFinance;
 advancedFinance=function(){return r14Advanced().replaceAll('مطالبات تجاوزت تاريخ الاستحقاق','متبقي تجاوز الاستحقاق بحسب المطابقة').replaceAll('مقدم غير موزع','رصيد غير موزع')};
 const r14Dashboard=ccDashboard;
-ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated');return `<div class="panel"><div class="v5-header"><h2>RONIX V15 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:R14.sum(data.projectExpenses)}])),'قبض فعلي ناقص دفعات المصممين والمصروفات')}</div></div>`+r14Dashboard()};
+ccDashboard=function(){const totals=clientNames().map(customerTotals),cash=R14.sum(totals,'cash'),loose=R14.sum(totals,'unallocated'),cashExpenses=R14.sum(data.projectExpenses.filter(x=>x.cashEffect!==false));return `<div class="panel"><div class="v5-header"><h2>RONIX V15 · متابعة القبض</h2><button class="btn primary" onclick="openCustomerReceipt()">+ قبض من عميل</button></div><div class="v5-metrics">${v5Metric('إجمالي القبض الفعلي',cash,'المقدمات مرة واحدة','good')}${v5Metric('قبض مخصص للمشاريع',received(),'يشمل تخصيص المقدمات')}${v5Metric('رصيد العملاء غير الموزع',loose,'يُراجع ثم يوزع على المشاريع','warn')}${v5Metric('صافي النقد المسجل',R14.delta(cash,R14.sum([{amount:paid()},{amount:cashExpenses}])),'قبض فعلي ناقص دفعات المصممين والمصروفات النقدية فقط')}</div></div>`+r14Dashboard()};
 function r14ReceiptRows(n){return data.clientReceipts.filter(r=>R14.receiptClient(data,r)===n).sort((a,b)=>a.date.localeCompare(b.date))}
 clientStatementTabs=function(n){const ps=customerProjects(n),t=customerTotals(n);return [
   ['ملخص العميل',[['العميل','العقود','القبض الفعلي','المخصص للمشاريع','غير موزع','متبقي العقود بعد التخصيص'],[n,t.contracts,t.cash,t.receipts,t.unallocated,R14.delta(t.contracts,t.receipts)]]],
@@ -1445,16 +1906,33 @@ function r22ContractItemsTotal(){if(!$('pContractItems'))return;try{const rows=r
 function r22ContractItemAdd(){r22ContractItemsRender([...r22ContractItemsRead(true),{id:r14Id('CI'),description:'',unit:'عدد',quantity:1,unitPrice:''}])}
 function r22ContractItemRemove(id){r22ContractItemsRender(r22ContractItemsRead(true).filter(x=>x.id!==id))}
 function r22ContractSection(){return `<section class="r15-terms"><div class="panel-title"><div><h3>بنود العقد والكميات</h3><p class="hint">اكتب الوحدة بحرية: م²، متر طولي، عدد، طن أو أي وحدة أخرى. الكمية × سعر الوحدة = إجمالي البند، ومجموع البنود يصبح قيمة العقد الأساسية.</p></div><button class="btn" type="button" onclick="r22ContractItemAdd()">+ بند عقد</button></div><div id="pContractItems"></div></section>`}
+function r24ProjectMovementCounts(d,code){
+ const claim=(d.claims||[]).filter(c=>R14.claimRows(c).some(r=>r.code===code)).length;
+ const receipt=(d.clientReceipts||[]).filter(r=>r.code===code).length;
+ const advance=(d.advances||[]).filter(a=>(a.allocations||[]).some(r=>r.code===code)).length;
+ const designer=(d.assignments||[]).filter(a=>a.code===code).length+(d.payments||[]).filter(p=>p.code===code).length;
+ const expense=(d.projectExpenses||[]).filter(x=>x.code===code).length;
+ const archived=(d.deletedPayments||[]).filter(x=>x.payment?.code===code).length;
+ return {claim,receipt,advance,designer,expense,archived,total:claim+receipt+advance+designer+expense+archived};
+}
+function r24ProjectHasFinancialMovement(d,code){return r24ProjectMovementCounts(d,code).total>0}
+function r24RateNumber(value){return Number(value||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:6})}
+function r24ProjectRateOverview(p){
+ const s=R14.projectRateSummary(data,p),currency=R14.projectCurrency(p);
+ if(currency==='EGP')return `<div class="notice"><b>عملة المشروع:</b> جنيه مصري · <b>سعر التعاقد التاريخي:</b> 1.00 ج.م</div>`;
+ const weighted=s.weightedRate?r24RateNumber(s.weightedRate):'لم يُحسب بعد',latest=s.latestRate?`${r24RateNumber(s.latestRate)} ج.م${s.latestDate?` بتاريخ <bdi>${esc(s.latestDate)}</bdi>`:''}`:'لا يوجد سعر موثّق';
+ return `<div class="notice r24-rate-overview"><b>أسعار ${esc(currency)}</b> · سعر التعاقد التاريخي: <strong>${r24RateNumber(s.contractRate)} ج.م</strong> · المتوسط الفعلي المرجّح من الدفعات: <strong>${esc(weighted)}${s.weightedRate?' ج.م':''}</strong> · آخر سعر تنفيذ: <strong>${latest}</strong>${s.unconfirmedCount?`<br><span class="r14-due">توجد ${s.unconfirmedCount} حركة قديمة بسعر غير موثّق؛ بقيت محفوظة كما هي ولا تدخل في المتوسط حتى استكمال سعرها.</span>`:''}</div>`;
+}
 function r15PreviewTotals(){
- try{if($('pContractExtras')){$('pRate').disabled=val('pCurrency')==='EGP';if($('pRate').disabled)$('pRate').value='1';const draft={originalContract:val('pcontract')||0,contractExtras:r15RowsRead('pContractExtras',true).map(r=>({...r,amount:r.amount||0})),taxItems:$('pTaxItems')?r20TaxRead(true).map(t=>({...t,value:t.value||0})):[]},subtotal=R14.projectSubtotal(draft),tax=R14.projectTaxTotal(draft),original=R14.projectOriginalTotal(draft);$('pContractTotal').textContent=`قبل الضريبة: ${fmt(subtotal)} ${val('pCurrency')} · الضريبة/الخصم: ${fmt(tax)} · إجمالي التعاقد: ${fmt(original)} · ما يعادله: ${money(R14.fx(original,val('pRate')))}`}
+ try{if($('pContractExtras')){const historicalLocked=$('pRate').dataset.historicalLocked==='true',egp=val('pCurrency')==='EGP';$('pRate').disabled=egp||historicalLocked;if(egp&&!historicalLocked)$('pRate').value='1';const draft={originalContract:val('pcontract')||0,contractExtras:r15RowsRead('pContractExtras',true).map(r=>({...r,amount:r.amount||0})),taxItems:$('pTaxItems')?r20TaxRead(true).map(t=>({...t,value:t.value||0})):[]},subtotal=R14.projectSubtotal(draft),tax=R14.projectTaxTotal(draft),original=R14.projectOriginalTotal(draft);$('pContractTotal').textContent=`قبل الضريبة: ${fmt(subtotal)} ${val('pCurrency')} · الضريبة/الخصم: ${fmt(tax)} · إجمالي التعاقد: ${fmt(original)} · ما يعادله: ${money(R14.fx(original,val('pRate')))}`}
  if($('aExtraWorks')){const total=R14.assignmentTotal({baseFee:val('afee')||0,extraWorks:r15RowsRead('aExtraWorks',true).map(r=>({...r,amount:r.amount||0})),feeAdjustments:r15RowsRead('aFeeAdjustments',true).map(r=>({...r,amount:r.amount||0}))});$('aFeeTotal').textContent='إجمالي المستحق بعد الإضافات والخصومات: '+money(total)}}catch(e){if($('pContractTotal'))$('pContractTotal').textContent=e.message;if($('aFeeTotal'))$('aFeeTotal').textContent=e.message}
 }
 const r15OldEditProject=editProject;
-editProject=function(enc){r15OldEditProject(enc);const p=enc?getP(decodeURIComponent(enc)):null,form=$('modalBody').querySelector('form');$('pcontract').value=R14.originalContract(p);$('pcontract').parentNode.firstChild.textContent='قيمة العقد الأصلي بعملة التعاقد';$('pcontract').oninput=r15PreviewTotals;form.querySelector('.formgrid').insertAdjacentHTML('beforeend',`${field('pDate','تاريخ المشروع',p?.projectDate||'','date')}<label>عملة التعاقد<select id="pCurrency" class="field" onchange="r15PreviewTotals()">${r15CurrencyOptions(R14.projectCurrency(p))}</select></label>${field('pRate','سعر الصرف: 1 من عملة العقد = كم جنيه؟',R14.projectRate(p),'number','min="0.000001" step="0.000001" required oninput="r15PreviewTotals()"')}`);form.querySelector('.modalfoot').insertAdjacentHTML('beforebegin',r22ContractSection()+r15TermSection('pContractExtras','تعاقدات إضافية — بعملة المشروع',p?.contractExtras||[])+r21StatementSection()+r20TaxSection()+`<p class="notice" id="pContractTotal"></p><p class="hint">سعر التعاقد محفوظ. بعد وجود مطالبات أو تحصيلات يبقى ثابتًا، وتُسجل فروق الصرف عند القبض. التاريخ القديم غير المعروف يمكن تركه فارغًا.</p>`);r22ContractItemsRender(p?.contractItems||[]);r15RowsRender('pContractExtras',p?.contractExtras||[]);r21StatementItemsRender(p?.statementItems||[]);r20TaxRender(p?.taxItems||[])};
+editProject=function(enc){r15OldEditProject(enc);const p=enc?getP(decodeURIComponent(enc)):null,form=$('modalBody').querySelector('form'),historicalLocked=!!(p&&r24ProjectHasFinancialMovement(data,p.code));$('pcontract').value=R14.originalContract(p);$('pcontract').parentNode.firstChild.textContent='قيمة العقد الأصلي بعملة التعاقد';$('pcontract').oninput=r15PreviewTotals;form.querySelector('.formgrid').insertAdjacentHTML('beforeend',`${field('pDate','تاريخ المشروع',p?.projectDate||'','date')}<label>عملة التعاقد<select id="pCurrency" class="field" onchange="r15PreviewTotals()">${r15CurrencyOptions(R14.projectCurrency(p))}</select></label>${field('pRate','سعر الصرف التاريخي: 1 من عملة العقد = كم جنيه؟',R14.projectRate(p),'number','min="0.000001" step="0.000001" required oninput="r15PreviewTotals()"')}`);$('pRate').dataset.historicalLocked=String(historicalLocked);if(historicalLocked){$('pCurrency').disabled=true;$('pRate').disabled=true;$('pRate').readOnly=true}form.querySelector('.modalfoot').insertAdjacentHTML('beforebegin',r22ContractSection()+r15TermSection('pContractExtras','تعاقدات إضافية — بعملة المشروع',p?.contractExtras||[])+r21StatementSection()+r20TaxSection()+`<p class="notice" id="pContractTotal"></p><p class="hint">${historicalLocked?'عملة العقد وسعر التعاقد التاريخي مقفولان لأن المشروع لديه حركات مالية. أدخل سعر التنفيذ داخل كل سند قبض جديد.':'سعر التعاقد يحفظ كأساس تاريخي ويُقفل بعد أول حركة مالية. التاريخ القديم غير المعروف يمكن تركه فارغًا.'}</p>`);r22ContractItemsRender(p?.contractItems||[]);r15RowsRender('pContractExtras',p?.contractExtras||[]);r21StatementItemsRender(p?.statementItems||[]);r20TaxRender(p?.taxItems||[])};
 saveProject=function(e,original){e.preventDefault();try{
  const prior=original?decodeURIComponent(original):null,old=prior?getP(prior):null,code=val('pcode'),client=val('pclient');if(!code||!val('pname'))throw Error('الكود واسم المشروع مطلوبان');if(data.projects.some(p=>p!==old&&p.code===code))throw Error('الكود مستخدم');
  const currency=val('pCurrency'),rate=R14.rate(val('pRate')),base=old&&val('pcontract')===String(R14.originalContract(old))?R14.originalContract(old):r14InputMoney('pcontract');
- const linked=old&&(claimsFor(prior).length||receiptFor(prior).length);if(linked&&(R14.normName(old.client)!==client||currency!==R14.projectCurrency(old)||rate!==R14.projectRate(old)))throw Error('هذا المشروع له مطالبات أو تحصيلات؛ لا تغيّر العميل أو عملة العقد أو سعره التاريخي.');
+ const linked=old&&r24ProjectHasFinancialMovement(data,prior);if(linked&&(R14.normName(old.client)!==client||currency!==R14.projectCurrency(old)||rate!==R14.projectRate(old)))throw Error('هذا المشروع له حركات مالية؛ لا تغيّر العميل أو عملة العقد أو سعر التعاقد التاريخي. أدخل سعر كل تنفيذ داخل سند القبض.');
  const contractItems=r22ContractItemsRead();if(contractItems.some(x=>!x.description||!x.unit||x.quantity<=0))throw Error('راجع اسم ووحدة وكمية كل بند في العقد');
  const obj={...old,code,name:val('pname'),client,kind:val('pkind'),site:val('psite'),state:val('pstate'),note:val('pnote'),projectDate:r14RequireDate('pDate',true),originalContract:base,contractCurrency:currency,contractRate:rate,rateQuote:r19ReadRateMeta('pRate',currency,rate),contractItems,contractExtras:r15RowsRead('pContractExtras'),statementItems:r21StatementItemsRead(),taxItems:r20TaxRead()};
  obj.contract=R14.projectBookTotal(obj);if(old&&currency==='EGP'&&rate===1&&!obj.contractExtras.length&&!obj.taxItems.length&&base===old.contract)obj.contract=old.contract;
@@ -1464,7 +1942,7 @@ saveProject=function(e,original){e.preventDefault();try{
 const r15OldEditAssignment=editAssignment;
 editAssignment=function(code,designer){r15OldEditAssignment(code,designer);const old=designer?getA(decodeURIComponent(code),decodeURIComponent(designer)):null,form=$('modalBody').querySelector('form');$('afee').value=old?.baseFee??old?.fee??0;$('afee').parentNode.firstChild.textContent='الأتعاب الأصلية بالجنيه';$('afee').oninput=r15PreviewTotals;form.querySelector('.modalfoot').insertAdjacentHTML('beforebegin',r15TermSection('aExtraWorks','أعمال إضافية للمصمم',[])+r15TermSection('aFeeAdjustments','زيادات وخصومات على الأتعاب',[],true)+'<p id="aFeeTotal" class="notice"></p>');r15RowsRender('aExtraWorks',old?.extraWorks||[]);r15RowsRender('aFeeAdjustments',old?.feeAdjustments||[],true)};
 saveAssignment=function(e,c,d){e.preventDefault();try{const code=val('acode'),name=val('adesigner').replace(/\s+/g,' ').trim(),old=d?getA(decodeURIComponent(c),decodeURIComponent(d)):null;if(!getP(code)||!name)throw Error('راجع المشروع والمصمم');if(data.assignments.some(a=>a!==old&&a.code===code&&a.designer.trim().replace(/\s+/g,' ')===name))throw Error('المصمم مكلف بالفعل');const obj={...old,id:old?.id||r14Id('D'),code,designer:old?.designer||name,baseFee:r14InputMoney('afee'),extraWorks:r15RowsRead('aExtraWorks'),feeAdjustments:r15RowsRead('aFeeAdjustments'),kind:val('akind')};obj.fee=R14.assignmentTotal(obj);if(obj.fee<0)throw Error('الخصومات تتجاوز الأتعاب والإضافات');if(obj.fee<paid(code,obj.designer)&&!confirm('المستحق أقل من المدفوع وسيظهر رصيد دائن. متابعة؟'))return;if(r14Change('حفظ أتعاب المصمم وتفاصيلها',next=>{const i=old?data.assignments.indexOf(old):-1;if(i<0)next.assignments.push(obj);else next.assignments[i]=obj},{code,designer:obj.designer,previousFee:old?.fee,fee:obj.fee}))r14Done('تم حفظ الأتعاب والأعمال الإضافية والخصومات')}catch(e){alert(e.message)}};
-function r15ContractPanel(p){return `<div class="panel r15-contract-panel"><h3>بيانات التعاقد</h3><p>تاريخ المشروع: ${esc(p.projectDate||'غير مسجل')} · العملة: ${esc(R14.projectCurrency(p))} · سعر التعاقد: ${esc(R14.projectRate(p))} ج.م</p><p>العقد قبل الضريبة: ${fmt(R14.projectSubtotal(p))} ${esc(R14.projectCurrency(p))} · الضرائب والخصومات: ${fmt(R14.projectTaxTotal(p))} · إجمالي التعاقد: <b>${fmt(R14.projectOriginalTotal(p))} ${esc(R14.projectCurrency(p))}</b> · المقابل: ${money(p.contract)}</p><p>المسدد بعملة العقد: ${r14Paid(R14.receivedOriginal(data,p))} ${esc(R14.projectCurrency(p))} · المتبقي: ${r14Due(R14.delta(R14.projectOriginalTotal(p),R14.receivedOriginal(data,p)))} ${esc(R14.projectCurrency(p))}</p>${(p.contractExtras||[]).length?`<div class="tablewrap"><table><tr><th>التعاقد الإضافي</th><th>التاريخ</th><th>القيمة (${esc(R14.projectCurrency(p))})</th></tr>${p.contractExtras.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.date)}</td><td>${fmt(x.amount)}</td></tr>`).join('')}</table></div>`:''}${(p.taxItems||[]).length?`<div class="tablewrap"><table><tr><th>الضريبة / الخصم</th><th>الطريقة</th><th>القيمة</th><th>الأثر (${esc(R14.projectCurrency(p))})</th></tr>${p.taxItems.map(t=>`<tr><td>${esc(t.name)}</td><td>${t.type==='add'?'إضافة':'خصم'} · ${t.mode==='percent'?'نسبة':'ثابت'}</td><td>${fmt(t.value)}${t.mode==='percent'?'%':''}</td><td>${fmt(R14.projectTaxAmount(p,t))}</td></tr>`).join('')}</table></div>`:''}</div>`}
+function r15ContractPanel(p){return `<div class="panel r15-contract-panel"><h3>بيانات التعاقد</h3><p>تاريخ المشروع: ${esc(p.projectDate||'غير مسجل')} · العملة: ${esc(R14.projectCurrency(p))}</p>${r24ProjectRateOverview(p)}<p>العقد قبل الضريبة: ${fmt(R14.projectSubtotal(p))} ${esc(R14.projectCurrency(p))} · الضرائب والخصومات: ${fmt(R14.projectTaxTotal(p))} · إجمالي التعاقد: <b>${fmt(R14.projectOriginalTotal(p))} ${esc(R14.projectCurrency(p))}</b> · المقابل: ${money(p.contract)}</p><p>المسدد بعملة العقد: ${r14Paid(R14.receivedOriginal(data,p))} ${esc(R14.projectCurrency(p))} · المتبقي: ${r14Due(R14.delta(R14.projectOriginalTotal(p),R14.receivedOriginal(data,p)))} ${esc(R14.projectCurrency(p))}</p>${(p.contractExtras||[]).length?`<div class="tablewrap"><table><tr><th>التعاقد الإضافي</th><th>التاريخ</th><th>القيمة (${esc(R14.projectCurrency(p))})</th></tr>${p.contractExtras.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.date)}</td><td>${fmt(x.amount)}</td></tr>`).join('')}</table></div>`:''}${(p.taxItems||[]).length?`<div class="tablewrap"><table><tr><th>الضريبة / الخصم</th><th>الطريقة</th><th>القيمة</th><th>الأثر (${esc(R14.projectCurrency(p))})</th></tr>${p.taxItems.map(t=>`<tr><td>${esc(t.name)}</td><td>${t.type==='add'?'إضافة':'خصم'} · ${t.mode==='percent'?'نسبة':'ثابت'}</td><td>${fmt(t.value)}${t.mode==='percent'?'%':''}</td><td>${fmt(R14.projectTaxAmount(p,t))}</td></tr>`).join('')}</table></div>`:''}</div>`}
 function r15FeeDetailRows(assignments){return assignments.flatMap(a=>[['الأتعاب الأصلية',a.code,a.designer,'',a.baseFee??a.fee],...(a.extraWorks||[]).map(x=>[x.name,a.code,a.designer,x.date,x.amount]),...(a.feeAdjustments||[]).map(x=>[(x.type==='discount'?'خصم: ':'زيادة: ')+x.name,a.code,a.designer,x.date,x.type==='discount'?-x.amount:x.amount])])}
 function r15FeePanel(assignments){return `<div class="panel"><h3>تفاصيل أتعاب المصممين</h3><div class="tablewrap"><table><tr><th>البند</th><th>المشروع</th><th>المصمم</th><th>التاريخ</th><th>المبلغ (ج.م)</th></tr>${r15FeeDetailRows(assignments).map(row=>`<tr>${row.map((x,i)=>`<td>${i===4?fmt(x):esc(x)}</td>`).join('')}</tr>`).join('')}</table></div></div>`}
 const r15OldRenderProject=renderProject;
@@ -1490,11 +1968,14 @@ openReceipt=function(codeEnc,idEnc){
  const p=codeEnc?getP(decodeURIComponent(codeEnc)):null;openCustomerReceipt(p?r14Encode(p.client||''):'');
  if(p){const input=[...document.querySelectorAll('.receipt-allocation')].find(i=>i.dataset.code===p.code);if(input){input.closest('tr').classList.add('r15-selected-project');input.focus()}const note=document.createElement('p');note.className='notice';note.textContent='تسجيل تحصيل للمشروع '+p.code+' — '+p.name;$('crAllocations').before(note)}
 };
-function r15RepriceReceipt(){document.querySelectorAll('.r15-receipt-cash').forEach(r17ReceiptCashChanged);checkAllocationTotal()}
+function r15RepriceReceipt(){
+ const currency=val('crCurrency'),receiptRate=R14.rate(val('crRate'));
+ document.querySelectorAll('.r15-receipt-cash').forEach(input=>{const row=input.closest('tr'),p=getP(input.dataset.code),rateInput=row.querySelector('.r24-project-rate');if(rateInput&&(R14.projectCurrency(p)==='EGP'||R14.projectCurrency(p)===currency)){rateInput.value=R14.projectCurrency(p)==='EGP'?1:receiptRate;rateInput.dataset.source=R14.projectCurrency(p)==='EGP'?'base':'receipt';}r17ReceiptCashChanged(input)});checkAllocationTotal()
+}
 function r15ReceiptCurrencyChanged(){if(val('crCurrency')==='EGP')$('crRate').value=1;refreshReceiptAllocations([])}
 refreshReceiptAllocations=function(existing=[]){
  const name=val('crClient'),currency=$('crCurrency')?val('crCurrency'):'EGP',rate=$('crRate')?Number(val('crRate')):1,ps=customerProjects(name);
- $('crAllocations').innerHTML=`<p class="notice">اكتب فقط الجزء المخصص من السند بعملة القبض. يحسب البرنامج تلقائيًا ما يقابله بعملة عقد المشروع، ويعرض فرق الصرف منفصلًا.</p><div class="tablewrap"><table><tr><th>المشروع</th><th>متبقي العقد</th><th>المبلغ من السند (${esc(currency)}) — اكتب هنا</th><th>المسدد من العقد — محسوب تلقائيًا</th></tr>${ps.map(p=>{const old=existing.find(r=>r.code===p.code),native=old?.projectAmount??(old?R14.unfx(old.amount,R14.projectRate(p)):0),same=R14.projectCurrency(p)===currency,cash=old?.incomingCurrency===currency?old.receiptOriginal:(same?native:R14.unfx(R14.fx(native,R14.projectRate(p)),rate||1)),remaining=R14.sum([{amount:R14.projectOriginalTotal(p)},{amount:-R14.receivedOriginal(data,p)},{amount:native}]);return `<tr><td>${esc(p.code)} — ${esc(p.name)}</td><td>${r14Due(remaining)} ${esc(R14.projectCurrency(p))}</td><td><div class="r20-cash-allocation"><input aria-label="المبلغ المخصص من السند" class="field r15-receipt-cash" data-code="${esc(p.code)}" type="number" min="0" step="0.01" value="${cash||''}" data-manual="true" oninput="r17ReceiptCashChanged(this)"><button type="button" class="btn" onclick="r17AllocateReceiptRemainder(this)">استخدام باقي السند</button></div></td><td><label>${esc(R14.projectCurrency(p))}<input aria-label="المسدد من العقد" class="field receipt-allocation" data-code="${esc(p.code)}" type="number" min="0" step="0.01" value="${native||''}" readonly></label></td></tr>`}).join('')}</table></div>`;checkAllocationTotal();
+ $('crAllocations').innerHTML=`<p class="notice">اكتب الجزء المخصص من السند، ثم راجع سعر تسوية عملة المشروع في تاريخ الدفعة. سعر التعاقد التاريخي لا يتغير، ويحسب البرنامج فرق الصرف والمتوسط المرجّح تلقائيًا.</p><div class="tablewrap"><table><tr><th>المشروع</th><th>متبقي العقد</th><th>المبلغ من السند (${esc(currency)})</th><th>سعر عملة المشروع يوم الدفعة</th><th>المسدد من العقد</th></tr>${ps.map(p=>{const old=existing.find(r=>r.code===p.code),projectCurrency=R14.projectCurrency(p),same=projectCurrency===currency,summary=R14.projectRateSummary?R14.projectRateSummary(data,p):null,settlementRate=projectCurrency==='EGP'?1:(old?(R14.projectSettlementRate?R14.projectSettlementRate(old,p):(old.projectSettlementRate||R14.projectRate(p))):(same?(rate||R14.projectRate(p)):(summary?.effectiveRate||R14.projectRate(p)))),source=old?.settlementRateSource||(projectCurrency==='EGP'?'base':same?'receipt':summary?.weightedRate?'weighted':'contract'),native=old?.projectAmount??0,cash=old?.incomingCurrency===currency?old.receiptOriginal:(native?(same?native:R14.unfx(R14.fx(native,settlementRate),rate||1)):0),remaining=R14.sum([{amount:R14.projectOriginalTotal(p)},{amount:-R14.receivedOriginal(data,p)},{amount:native}]),locked=projectCurrency==='EGP'||same;return `<tr><td><b>${esc(p.code)}</b> — ${esc(p.name)}<br><small>سعر التعاقد: ${fmt(R14.projectRate(p))} ج.م/${esc(projectCurrency)}</small></td><td>${r14Due(remaining)} ${esc(projectCurrency)}</td><td><div class="r20-cash-allocation"><input aria-label="المبلغ المخصص من السند" class="field r15-receipt-cash" data-code="${esc(p.code)}" type="number" min="0" step="0.01" value="${cash||''}" data-manual="true" oninput="r17ReceiptCashChanged(this)"><button type="button" class="btn" onclick="r17AllocateReceiptRemainder(this)">استخدام الباقي</button></div></td><td><label>1 ${esc(projectCurrency)} = <input aria-label="سعر تسوية عملة المشروع" class="field r24-project-rate" type="number" min="0.000001" step="0.000001" value="${settlementRate}" data-source="${esc(source)}" ${locked?'readonly':''} oninput="this.dataset.source='manual';r24SettlementRateChanged(this)"> ج.م</label>${locked?`<small>${projectCurrency==='EGP'?'عملة الأساس':'مطابق لسعر عملة السند'}</small>`:'<small>يمكن تعديله حسب سعر يوم الدفعة</small>'}</td><td><label>${esc(projectCurrency)}<input aria-label="المسدد من العقد" class="field receipt-allocation" data-code="${esc(p.code)}" type="number" min="0" step="0.01" value="${native||''}" readonly></label></td></tr>`}).join('')}</table></div>`;document.querySelectorAll('.r15-receipt-cash').forEach(input=>{if(input.value)r17ReceiptCashChanged(input)});checkAllocationTotal();
 };
 function r15AllocationChanged(input){
  const p=getP(input.dataset.code),row=input.closest('tr'),cash=row.querySelector('.r15-receipt-cash'),currency=$('crCurrency')?val('crCurrency'):'EGP',rate=$('crRate')?Number(val('crRate')):1;
@@ -1511,20 +1992,21 @@ function r15AllocationChanged(input){
  }catch{}checkAllocationTotal()
 }
 function r17ReceiptCashChanged(input){
- try{const p=getP(input.dataset.code),native=input.closest('tr').querySelector('.receipt-allocation'),currency=val('crCurrency'),rate=R14.rate(val('crRate'));
-  input.dataset.manual='true';native.value=R14.projectCurrency(p)===currency?input.value:R14.unfx(R14.fx(input.value||0,rate),R14.projectRate(p));
+ try{const p=getP(input.dataset.code),row=input.closest('tr'),native=row.querySelector('.receipt-allocation'),settlement=R14.rate(row.querySelector('.r24-project-rate').value),currency=val('crCurrency'),receiptRate=R14.rate(val('crRate')),actualCash=R14.fx(input.value||0,receiptRate);
+  input.dataset.manual='true';native.value=R14.projectCurrency(p)===currency?input.value:R14.unfx(actualCash,settlement);
  }catch{}checkAllocationTotal()
 }
+function r24SettlementRateChanged(input){const cash=input.closest('tr').querySelector('.r15-receipt-cash');r17ReceiptCashChanged(cash)}
 function r17AllocateReceiptRemainder(button){
  try{const input=button.closest('tr').querySelector('.r15-receipt-cash'),other=R14.sum([...document.querySelectorAll('.r15-receipt-cash')].filter(x=>x!==input),x=>x.value||0),rest=R14.delta(val('crAmount')||0,other);if(rest<=0)throw Error('أدخل إجمالي السند وتأكد أن لديه مبلغًا متاحًا للتوزيع');input.value=rest;r17ReceiptCashChanged(input)}catch(e){alert(e.message)}
 }
-function r15AllocationRead(raw=false){return [...document.querySelectorAll('.receipt-allocation')].map(x=>({code:x.dataset.code,projectAmount:raw?x.value:R14.amount(x.value||'0'),receiptOriginal:raw?x.closest('tr').querySelector('.r15-receipt-cash').value:R14.amount(x.closest('tr').querySelector('.r15-receipt-cash').value||'0')}))}
-checkAllocationTotal=function(){const el=$('crCheck');if(!el)return;try{if($('crCurrency')){$('crRate').disabled=val('crCurrency')==='EGP';if($('crRate').disabled)$('crRate').value=1}const currency=$('crCurrency')?val('crCurrency'):'EGP',rate=$('crRate')?R14.rate(val('crRate')):1,rows=r15AllocationRead(),total=R14.amount(val('crAmount')||'0'),allocated=R14.sum(rows,'receiptOriginal'),book=R14.sum(rows,r=>R14.fx(r.projectAmount,R14.projectRate(getP(r.code)))),cash=R14.fx(allocated,rate);el.textContent=`السند: ${fmt(total)} ${currency} | المخصص: ${fmt(allocated)} | غير موزع: ${fmt(R14.delta(total,allocated))} ${currency} | المقابل الفعلي: ${money(R14.fx(total,rate))} | فرق صرف / تقريب المخصص: ${money(R14.delta(cash,book))}`;el.style.color=allocated>total?'#c62828':'#087f46'}catch(e){el.textContent=e.message;el.style.color='#c62828'}};
+function r15AllocationRead(raw=false){return [...document.querySelectorAll('.receipt-allocation')].map(x=>{const row=x.closest('tr'),rateInput=row.querySelector('.r24-project-rate');return{code:x.dataset.code,projectAmount:raw?x.value:R14.amount(x.value||'0'),receiptOriginal:raw?row.querySelector('.r15-receipt-cash').value:R14.amount(row.querySelector('.r15-receipt-cash').value||'0'),settlementRate:raw?rateInput.value:R14.rate(rateInput.value),settlementRateSource:rateInput.dataset.source||'manual'}})}
+checkAllocationTotal=function(){const el=$('crCheck');if(!el)return;try{if($('crCurrency')){$('crRate').disabled=val('crCurrency')==='EGP';if($('crRate').disabled)$('crRate').value=1}const currency=$('crCurrency')?val('crCurrency'):'EGP',rate=$('crRate')?R14.rate(val('crRate')):1,rows=r15AllocationRead(),total=R14.amount(val('crAmount')||'0'),allocated=R14.sum(rows,'receiptOriginal'),book=R14.sum(rows,r=>R14.fx(r.projectAmount,R14.projectRate(getP(r.code)))),cash=R14.fx(allocated,rate);el.textContent=`السند: ${fmt(total)} ${currency} | المخصص: ${fmt(allocated)} | غير موزع: ${fmt(R14.delta(total,allocated))} ${currency} | النقد الفعلي: ${money(R14.fx(total,rate))} | التسوية الدفترية: ${money(book)} | فرق الصرف المحقق: ${money(R14.delta(cash,book))}`;el.style.color=allocated>total?'#c62828':'#087f46'}catch(e){el.textContent=e.message;el.style.color='#c62828'}};
 saveCustomerReceipt=function(e){e.preventDefault();try{
  r14ProofReady(e.target);const client=val('crClient'),batchId=activeReceiptEdit||r14Id('RC'),total=r14InputMoney('crAmount',{positive:true}),currency=val('crCurrency'),exchangeRate=R14.rate(val('crRate')),allocations=r15AllocationRead(),old=data.clientReceipts.filter(r=>(r.batchId||r.id)===batchId);
  if(!clientNames().includes(client))throw Error('اختر العميل');
  if(allocations.some(a=>{const p=getP(a.code);return a.projectAmount>R14.sum([{amount:R14.projectOriginalTotal(p)},{amount:-R14.receivedOriginal(data,p)},...old.filter(r=>r.code===p.code).map(r=>({amount:r.projectAmount??R14.unfx(r.amount,R14.projectRate(p))}))])})&&!confirm('السداد يتجاوز رصيد عقد وسيظهر رصيد دائن. متابعة؟'))return;
- const next=R14.foreignReceiptEdit(data,{batchId,client,date:r14RequireDate('crDate'),total,currency,exchangeRate,allocations,method:val('crMethod'),ref:val('crRef'),note:val('crNote'),id:()=>r14Id('R')});for(const row of next.clientReceipts.filter(r=>(r.batchId||r.id)===batchId))row.rateQuote=r19ReadRateMeta('crRate',currency,exchangeRate);r14AttachTo(next,e.target,'receipt',batchId);
+ const receiptDate=r14RequireDate('crDate'),next=R14.foreignReceiptEdit(data,{batchId,client,date:receiptDate,total,currency,exchangeRate,allocations,method:val('crMethod'),ref:val('crRef'),note:val('crNote'),id:()=>r14Id('R')});for(const row of next.clientReceipts.filter(r=>(r.batchId||r.id)===batchId)){row.rateQuote=r19ReadRateMeta('crRate',currency,exchangeRate);if(row.code){const allocation=allocations.find(a=>a.code===row.code);row.settlementRateAsOf=receiptDate;row.settlementRateSource=allocation?.settlementRateSource||'manual';}}r14AttachTo(next,e.target,'receipt',batchId);
  if(r14Persist(next,old.length?'تعديل سند قبض':'إضافة سند قبض',{batchId,total,currency,exchangeRate})){activeReceiptEdit=null;r14Done('حُفظ القبض وسداد العقود وفرق الصرف')}
  }catch(e){alert(e.message)}};
 // Deleting a designer payment preserves its proof and reversal record.
@@ -1942,7 +2424,7 @@ openCustomerReceipt=function(client='',batch=''){
   r19BindRate('crRate','crCurrency',r15RepriceReceipt,row?.rateQuote);
 };
 const r19ProjectForm=editProject;
-editProject=function(enc){r19ProjectForm(enc);const p=enc?getP(decodeURIComponent(enc)):null,locked=!!(p&&(claimsFor(p.code).length||receiptFor(p.code).length));r19BindRate('pRate','pCurrency',r15PreviewTotals,p?.rateQuote,locked)};
+editProject=function(enc){r19ProjectForm(enc);const p=enc?getP(decodeURIComponent(enc)):null,locked=!!(p&&(typeof r24ProjectHasFinancialMovement==='function'?r24ProjectHasFinancialMovement(data,p.code):(claimsFor(p.code).length||receiptFor(p.code).length)));r19BindRate('pRate','pCurrency',r15PreviewTotals,p?.rateQuote,locked)};
 r15Changes=function(){modal('تحديث الأسعار وأرقام السندات · V19',`<ol><li>رابط أسعار بنك مصر الرسمي بجانب سعر الصرف، مع إدخال يدوي وتاريخ حفظ.</li><li>زر السعر الآلي يعطي مرجعًا عامًا للمقارنة ولا يُعرض على أنه سعر بنك مصر.</li><li>أرقام قصيرة ثابتة للمطالبات والسندات، والمبالغ معروضة دون قروش مع حفظ دقة الحساب.</li></ol><p>عند استلام عملة أجنبية راجع عادةً سعر شراء البنك، وعند شراء العملة راجع سعر البيع. اعتمد دائمًا سعر التنفيذ الفعلي الظاهر في مستند التحويل.</p>`)};
 r15Help.textContent='✓ ما الجديد · V19';r15Help.onclick=r15Changes;
 document.title='RONIX V19 | الحسابات وسعر الصرف';document.querySelector('.sublogo').textContent='PROJECT FINANCE · V19';document.querySelector('.sidebar-footer').innerHTML='RONIX V19 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';document.querySelector('.footer').textContent='RONIX V19 · المبالغ معروضة لأقرب وحدة دون تغيير دقة الحساب · احتفظ بنسخة احتياطية';
@@ -2152,5 +2634,459 @@ r17Trash=function(){go('trash')};
 const r23Render=render;
 render=function(){if(page==='trash'&&!projectFocus&&!designerFocus){$('content').innerHTML=r23TrashPage();return}r23Render()};
 render();
+
+/* Cash-flow timeline: actual cash only. Claims and contract values are excluded. */
+const R24Cashflow = ((R) => {
+  const dateOK = value => /^\d{4}-\d{2}-\d{2}$/.test(String(value || ''));
+  const cash = value => R.cents(value ?? 0) / 100;
+  const rows = value => Array.isArray(value) ? value : [];
+  const keyFor = (date, mode) => mode === 'year' ? String(date).slice(0, 4) : String(date).slice(0, 7);
+
+  function entries(d, code = '') {
+    const out = [];
+    const push = (kind, date, amount, source, rowCode = '') => {
+      if (!dateOK(date) || (code && rowCode !== code)) return;
+      const value = cash(amount);
+      if (!value) return;
+      out.push({kind, date, amount: value, source, code: rowCode});
+    };
+
+    // A split receipt has one row per project. cashAmount belongs to that row,
+    // so summing the rows records the bank receipt once. Advance allocations are
+    // excluded because their cash was already recorded when the advance arrived.
+    for (const r of rows(d.clientReceipts)) {
+      if (r.sourceAdvanceId) continue;
+      push('inflow', r.date, R.cashReceipt(r), 'receipt', r.code || '');
+    }
+    // Customer advances are independent cash receipts. Current legacy advances
+    // are EGP; future records may persist cashAmount after currency conversion.
+    if (!code) for (const a of rows(d.advances)) push('inflow', a.date, a.cashAmount ?? a.total, 'advance');
+    for (const p of rows(d.payments)) push('designer', p.date, p.amount, 'designer-payment', p.code || '');
+    // Internal time allocation affects project cost and margin, but it is not a
+    // bank/cash movement. A later payroll/payment record is the cash event.
+    for (const x of rows(d.projectExpenses)) if (x.cashEffect !== false) push('expense', x.date, x.amount, 'project-expense', x.code || '');
+    return out.sort((a, b) => a.date.localeCompare(b.date) || a.kind.localeCompare(b.kind));
+  }
+
+  function nextKey(key, mode) {
+    if (mode === 'year') return String(Number(key) + 1).padStart(4, '0');
+    const [year, month] = key.split('-').map(Number), date = new Date(Date.UTC(year, month, 1));
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+  }
+
+  function periods(d, mode = 'month', code = '') {
+    if (!['month', 'year'].includes(mode)) throw Error('فترة التدفق غير صالحة');
+    const source = entries(d, code), grouped = new Map();
+    for (const entry of source) {
+      const key = keyFor(entry.date, mode);
+      if (!grouped.has(key)) grouped.set(key, {key, inflow: 0, designer: 0, expenses: 0});
+      const row = grouped.get(key);
+      if (entry.kind === 'inflow') row.inflow = R.sum([{amount: row.inflow}, {amount: entry.amount}]);
+      if (entry.kind === 'designer') row.designer = R.sum([{amount: row.designer}, {amount: entry.amount}]);
+      if (entry.kind === 'expense') row.expenses = R.sum([{amount: row.expenses}, {amount: entry.amount}]);
+    }
+    const keys = [...grouped.keys()].sort();
+    if (!keys.length) return [];
+    // Fill empty calendar periods so the timeline does not hide a month/year
+    // with no movement.
+    for (let key = keys[0]; key <= keys.at(-1); key = nextKey(key, mode)) {
+      if (!grouped.has(key)) grouped.set(key, {key, inflow: 0, designer: 0, expenses: 0});
+    }
+    let running = 0;
+    return [...grouped.values()].sort((a, b) => a.key.localeCompare(b.key)).map(row => {
+      const outflow = R.sum([{amount: row.designer}, {amount: row.expenses}]);
+      const net = R.delta(row.inflow, outflow);
+      running = R.sum([{amount: running}, {amount: net}]);
+      return {...row, outflow, net, running};
+    });
+  }
+
+  function model(d, mode = 'month', code = '') {
+    const all = periods(d, mode, code), visible = all.slice(mode === 'month' ? -12 : -8);
+    return {
+      mode,
+      code,
+      all,
+      visible,
+      totals: {
+        inflow: R.sum(visible, 'inflow'),
+        designer: R.sum(visible, 'designer'),
+        expenses: R.sum(visible, 'expenses'),
+        outflow: R.sum(visible, 'outflow'),
+        net: R.sum(visible, 'net')
+      }
+    };
+  }
+
+  return {entries, periods, model};
+})(typeof module !== 'undefined' ? require('./finance-core.js') : R14);
+
+if (typeof module !== 'undefined') module.exports = R24Cashflow;
+
+if (typeof window !== 'undefined') {
+  let r24CashflowMode = 'month';
+
+  function r24CashflowLabel(key, mode) {
+    if (mode === 'year') return key;
+    const [year, month] = key.split('-').map(Number);
+    return new Intl.DateTimeFormat('ar-EG', {month: 'short', year: 'numeric', timeZone: 'UTC'}).format(new Date(Date.UTC(year, month - 1, 1)));
+  }
+
+  function r24CashflowPanel() {
+    const m = R24Cashflow.model(data, r24CashflowMode), max = Math.max(1, ...m.visible.flatMap(x => [x.inflow, x.outflow]));
+    const periods = m.visible.map(x => `<article class="r24-flow-period">
+      <strong>${esc(r24CashflowLabel(x.key, m.mode))}</strong>
+      <div class="r24-flow-bars" aria-label="قبض ${fmt(x.inflow)}، مدفوع ${fmt(x.outflow)}">
+        <span class="r24-flow-bar in" style="--value:${Math.max(2, x.inflow / max * 100)}%"><small>${fmt(x.inflow)}</small></span>
+        <span class="r24-flow-bar out" style="--value:${Math.max(2, x.outflow / max * 100)}%"><small>${fmt(x.outflow)}</small></span>
+      </div>
+      <span class="${x.net < 0 ? 'r14-due' : 'r14-paid'}">الصافي: ${fmt(x.net)} ج.م</span>
+    </article>`).join('');
+    return `<section class="panel r24-cashflow" id="r24Cashflow" aria-label="التدفق النقدي الفعلي">
+      <div class="panel-title"><div><h2>التدفق النقدي الفعلي</h2><p class="hint">القبض الفعلي ناقص دفعات المصممين ومصروفات المشاريع. المطالبات والعقود غير المحصلة لا تدخل هنا.</p></div><div class="actions" role="group" aria-label="فترة التدفق"><button type="button" class="btn ${m.mode === 'month' ? 'primary' : ''}" aria-pressed="${m.mode === 'month'}" onclick="r24CashflowSetMode('month')">شهري</button><button type="button" class="btn ${m.mode === 'year' ? 'primary' : ''}" aria-pressed="${m.mode === 'year'}" onclick="r24CashflowSetMode('year')">سنوي</button></div></div>
+      <div class="r24-flow-summary"><div><small>القبض الفعلي</small><strong class="r14-paid">${money(m.totals.inflow)}</strong></div><div><small>دفعات المصممين</small><strong>${money(m.totals.designer)}</strong></div><div><small>مصروفات المشاريع</small><strong>${money(m.totals.expenses)}</strong></div><div><small>صافي الفترة</small><strong class="${m.totals.net < 0 ? 'r14-due' : 'r14-paid'}">${money(m.totals.net)}</strong></div></div>
+      <div class="r24-flow-legend"><span class="in">القبض</span><span class="out">المدفوع</span></div>
+      <div class="r24-flow-timeline">${periods || '<p class="empty">لا توجد حركات نقدية مؤرخة بعد.</p>'}</div>
+    </section>`;
+  }
+
+  function r24CashflowSetMode(mode) {
+    if (!['month', 'year'].includes(mode)) return;
+    r24CashflowMode = mode;
+    const current = document.getElementById('r24Cashflow');
+    if (current) current.outerHTML = r24CashflowPanel();
+  }
+
+  const r24CashflowDashboard = ccDashboard;
+  ccDashboard = function () { return r24CashflowDashboard() + r24CashflowPanel(); };
+}
+
+/* Project operations: owner-only close/reopen, work-hour costs, and visual project cards. */
+function r24CurrentEmail(){try{return typeof R20Cloud!=='undefined'?String(R20Cloud.state?.user?.email||''):''}catch{return''}}
+function r24CanManageProject(){return R24ProjectOps.canClose(r24CurrentEmail())}
+function r24Status(p){return R24ProjectOps.isClosed(p)?{key:'closed',label:'مغلق'}:{key:'active',label:'نشط'}}
+function r24WorkRows(code){return R24ProjectOps.workRows(data.projectExpenses,code).sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.id).localeCompare(String(a.id)))}
+function r24WorkPanel(p){
+ const rows=r24WorkRows(p.code),total=R24ProjectOps.totals(rows),enc=r14Encode(p.code);
+ return `<section class="panel r24-work-panel"><div class="panel-title"><div><p class="eyebrow">تكلفة وقت العمل</p><h2>ساعات المشروع</h2><p class="hint">كل حركة ساعات تُسجل كتكلفة مستحقة على مركز تكلفة المشروع: الساعات × تكلفة الساعة، ولا تخصم من النقدية حتى تسجيل دفع فعلي.</p></div><button class="btn primary" type="button" onclick="r24OpenWorkHours('${enc}')">+ تسجيل ساعات</button></div><div class="r24-work-summary"><div><small>عدد الحركات</small><strong>${fmt(total.count)}</strong></div><div><small>إجمالي الساعات</small><strong>${fmt(total.hours)}</strong></div><div><small>إجمالي تكلفة الساعات</small><strong>${money(total.amount)}</strong></div></div><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>الموظف / المنفذ</th><th>البيان</th><th>الساعات</th><th>تكلفة الساعة</th><th>الإجمالي</th><th>إجراء</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.payee||'—')}</td><td>${esc(x.workDescription||x.notes||'ساعات عمل')}</td><td>${fmt(x.workHours)}</td><td>${fmt(x.hourlyRate)}</td><td>${fmt(x.amount)}</td><td><div class="r23-row-actions"><button class="link" type="button" onclick="r24OpenWorkHours('${enc}','${r14Encode(x.id)}')">تعديل</button><button class="link danger-link" type="button" onclick="r23Delete('expense','${r14Encode(x.id)}')">حذف</button></div></td></tr>`).join('')||'<tr><td colspan="7" class="empty">لم تُسجل ساعات عمل لهذا المشروع بعد.</td></tr>'}</tbody></table></div></section>`
+}
+function r24OpenWorkHours(projectEnc='',expenseEnc=''){
+ const code=projectEnc?decodeURIComponent(projectEnc):'',id=expenseEnc?decodeURIComponent(expenseEnc):'',old=id?data.projectExpenses.find(x=>x.id===id):null,p=getP(old?.code||code);
+ if(!p)return alert('اختر مشروعًا صحيحًا');
+ modal(old?'تعديل ساعات المشروع':'تسجيل ساعات عمل',`<form onsubmit="r24SaveWorkHours(event,'${old?r14Encode(old.id):''}')"><input id="r24WorkProject" type="hidden" value="${esc(p.code)}"><div class="formgrid">${field('r24WorkDate','التاريخ',old?.date||r14Today(),'date','required')}${field('r24WorkPayee','الموظف / المنفذ',old?.payee||'')}${field('r24WorkDescription','بيان العمل',old?.workDescription||old?.notes||'')}${field('r24WorkHours','عدد الساعات',old?.workHours||'','number','min="0.001" step="0.001" required oninput="r24PreviewWorkCost()"')}${field('r24HourlyRate','تكلفة الساعة (ج.م)',old?.hourlyRate||'','number','min="0.01" step="0.01" required oninput="r24PreviewWorkCost()"')}${field('r24WorkRef','مرجع / أمر عمل',old?.ref||'')}</div><div class="notice r24-work-preview">المشروع: <b>${esc(p.code)} — ${esc(p.name)}</b><br>إجمالي التكلفة: <strong id="r24WorkCost">${old?money(old.amount):'—'}</strong></div><p class="hint">تكلفة الساعات تدخل في تكلفة المشروع والربحية، ولا تُعامل كدفع نقدي حتى تُسجل حركة دفع مستقلة.</p><div class="modalfoot"><button class="btn primary" type="submit">حفظ الساعات والمصروف</button><button class="btn" type="button" onclick="closeModal()">إلغاء</button></div></form>`);
+ // The shared modal defaults every numeric field to 0.01; hours need 0.001.
+ $('r24WorkHours').step='0.001';
+}
+function r24PreviewWorkCost(){const out=$('r24WorkCost');if(!out)return;try{out.textContent=money(R24ProjectOps.workAmount(val('r24WorkHours'),val('r24HourlyRate')))}catch{out.textContent='أكمل الساعات وتكلفة الساعة'}}
+function r24SaveWorkHours(event,expenseEnc=''){
+ event.preventDefault();try{
+  const id=expenseEnc?decodeURIComponent(expenseEnc):'',old=id?data.projectExpenses.find(x=>x.id===id):null,code=val('r24WorkProject'),date=val('r24WorkDate'),hours=Number(val('r24WorkHours')),hourlyRate=R14.amount(val('r24HourlyRate')),amount=R24ProjectOps.workAmount(val('r24WorkHours'),val('r24HourlyRate'));
+  if(!getP(code)||!R14.dateOK(date))throw Error('راجع المشروع والتاريخ');
+  const record={...old,id:old?.id||r14Id('EXP'),code,date,category:'ساعات عمل',expenseType:'work-hours',payee:val('r24WorkPayee').trim(),workDescription:val('r24WorkDescription').trim(),workHours:hours,hourlyRate,amount,ref:val('r24WorkRef').trim(),notes:val('r24WorkDescription').trim(),cashEffect:false,paymentStatus:'accrued',accountingReviewed:true,accountId:'5300',payableAccountId:'2250'};
+  if(r14Change(old?'تعديل تكلفة ساعات مشروع':'إضافة تكلفة ساعات مشروع',next=>{const index=next.projectExpenses.findIndex(x=>x.id===record.id);if(index<0)next.projectExpenses.push(record);else next.projectExpenses[index]=record;next.costAudit.push({at:new Date().toISOString(),action:old?'edit work hours':'add work hours',before:old?R14.copy(old):undefined,after:R14.copy(record)})},{expenseId:record.id,code,hours,hourlyRate,amount,cashEffect:false}))r14Done('تم حفظ الساعات وإضافتها إلى تكلفة المشروع دون حركة نقدية')
+ }catch(error){alert(error.message)}
+}
+function r24ChangeProjectState(projectEnc,close){
+ const code=decodeURIComponent(projectEnc),p=getP(code);if(!p)return;
+ if(!r24CanManageProject())return alert('إغلاق المشروع أو إعادة فتحه متاح لحساب م. عامر فقط: '+R24ProjectOps.OWNER_EMAIL);
+ const verb=close?'إغلاق':'إعادة فتح';if(!confirm(`${verb} المشروع ${p.code} — ${p.name}؟`))return;
+ const email=r24CurrentEmail();if(r14Change(verb+' مشروع',next=>{const target=next.projects.find(x=>x.code===code);if(!target)throw Error('المشروع غير موجود');if(close){target.state='مغلق';target.closedAt=r14Today();target.closedBy=email}else{target.state='نشط';delete target.closedAt;delete target.closedBy}},{code,closed:close,by:email}))r14Done(close?'تم إغلاق المشروع وتثبيت تاريخ الإغلاق':'أُعيد فتح المشروع وأصبح نشطًا')
+}
+function r24ProjectCards(rows){return `<div class="r24-project-cards">${rows.map(p=>{const status=r24Status(p),img=cover(p),a=ccAmounts(p.code);return `<article class="r24-project-card ${status.key}"><div class="r24-project-image">${img?`<img src="${esc(img.src)}" alt="صورة مشروع ${esc(p.code)}">`:'<span>لا توجد صورة</span>'}</div><div class="r24-project-card-body"><div class="r24-project-card-title"><div><bdi>${esc(p.code)}</bdi><h3>${esc(p.name)}</h3></div><span class="r24-status ${status.key}">${status.label}</span></div><p>${esc(p.client||'بدون عميل')}</p><dl><div><dt>قيمة العقد</dt><dd>${money(a?.contract||0)}</dd></div><div><dt>المحصّل</dt><dd class="r14-paid">${money(a?.receipts||0)}</dd></div><div><dt>المتبقي</dt><dd class="r14-due">${money(a?.contractRemaining||0)}</dd></div></dl><button class="btn" type="button" onclick="openProject('${r14Encode(p.code)}')">فتح بطاقة المشروع</button></div></article>`}).join('')||'<p class="empty">لا توجد مشاريع نشطة.</p>'}</div>`}
+
+const r24EditProject=editProject;
+editProject=function(enc){r24EditProject(enc);const p=enc?getP(decodeURIComponent(enc)):null,state=$('pstate');if(state){state.value=p?.state||'نشط';state.readOnly=true;state.insertAdjacentHTML('afterend','<small>تتغير الحالة من زر إغلاق / إعادة فتح المشروع، وتُحفظ في سجل التدقيق.</small>')}};
+const r24SaveProject=saveProject;
+saveProject=function(event,original){const p=original?getP(decodeURIComponent(original)):null;if($('pstate'))$('pstate').value=p?.state||'نشط';return r24SaveProject(event,original)};
+const r24RenderProject=renderProject;
+renderProject=function(){r24RenderProject();const p=getP(projectFocus);if(!p)return;const status=r24Status(p),head=$('content').querySelector('.projecthead'),actions=head?.querySelector('.actions');head?.querySelector('h1')?.insertAdjacentHTML('afterend',`<span class="r24-status ${status.key}">${status.label}</span>`);if(actions){actions.insertAdjacentHTML('beforeend',`<button class="btn" type="button" onclick="r24OpenWorkHours('${r14Encode(p.code)}')">+ ساعات عمل</button><button class="btn ${status.key==='active'?'danger':''}" type="button" ${r24CanManageProject()?'':`disabled title="متاح لحساب ${R24ProjectOps.OWNER_EMAIL} فقط"`} onclick="r24ChangeProjectState('${r14Encode(p.code)}',${status.key==='active'})">${status.key==='active'?'إغلاق المشروع':'إعادة فتح المشروع'}</button>`)}const anchor=$('content').querySelector('.panel');anchor?.insertAdjacentHTML('afterend',r24WorkPanel(p))};
+const r24ShowCostCenter=showCostCenter;
+showCostCenter=function(enc){r24ShowCostCenter(enc);const p=getP(decodeURIComponent(enc));if(!p||!$('ccDetail'))return;const actions=$('ccDetail').querySelector('.cc-head .actions');actions?.insertAdjacentHTML('afterbegin',`<button class="btn" type="button" onclick="r24OpenWorkHours('${r14Encode(p.code)}')">+ ساعات عمل</button>`);$('ccDetail').insertAdjacentHTML('beforeend',r24WorkPanel(p))};
+const r24EditProjectExpense=editProjectExpense;
+editProjectExpense=function(enc){const id=decodeURIComponent(enc),row=data.projectExpenses.find(x=>x.id===id);if(row&&(row.expenseType==='work-hours'||(row.category==='ساعات عمل'&&row.workHours!=null)))return r24OpenWorkHours(r14Encode(row.code),enc);return r24EditProjectExpense(enc)};
+const r24Dashboard=ccDashboard;
+ccDashboard=function(){const projects=data.projects.filter(p=>!p.archivedAt&&!R24ProjectOps.isClosed(p)).slice(0,12);return r24Dashboard()+`<section class="panel r24-dashboard-projects"><div class="panel-title"><div><p class="eyebrow">المشاريع النشطة</p><h2>بطاقات المشاريع</h2></div><button class="btn" type="button" onclick="go('projects')">كل المشاريع</button></div>${r24ProjectCards(projects)}</section>`};
+
+if(!$('r24ProjectOpsStyle')){const style=document.createElement('style');style.id='r24ProjectOpsStyle';style.textContent=`.r24-status{display:inline-flex;width:max-content;align-items:center;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800}.r24-status.active{background:#e5f7ed;color:#087745;border:1px solid #a9dfbf}.r24-status.closed{background:#eef1f5;color:#667085;border:1px solid #d3d9e2}.r24-project-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px}.r24-project-card{overflow:hidden;border:1px solid #dbe2eb;border-radius:16px;background:#fff}.r24-project-card.active{border-top:4px solid #159455}.r24-project-card.closed{filter:saturate(.35);background:#f6f7f9}.r24-project-image{height:145px;display:grid;place-items:center;background:#f5f7fa;color:#7d8998}.r24-project-image img{width:100%;height:100%;object-fit:contain}.r24-project-card-body{padding:14px}.r24-project-card-title{display:flex;justify-content:space-between;gap:9px;align-items:start}.r24-project-card h3{margin:5px 0;font-size:17px}.r24-project-card p{color:#667085}.r24-project-card dl{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.r24-project-card dl div{background:#f7f9fb;border-radius:10px;padding:8px}.r24-project-card dt{font-size:10px;color:#667085}.r24-project-card dd{font-weight:800;margin:5px 0 0;font-size:12px}.r24-work-summary{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:10px;margin:12px 0}.r24-work-summary>div{border:1px solid #e0e5ed;border-radius:12px;padding:13px}.r24-work-summary small{display:block;color:#667085}.r24-work-summary strong{display:block;margin-top:7px;font-size:18px}.r24-work-preview strong{font-size:20px;color:#172337}@media(max-width:600px){.r24-project-cards{grid-template-columns:1fr}.r24-project-card dl,.r24-work-summary{grid-template-columns:1fr}.r24-project-image{height:125px}}`;document.head.append(style)}
+
+/* RONIX V24: claim documents retain their contract currency and a frozen issue rate. */
+const R24Claims=(()=>{
+ const displays=new Set(['contract','EGP','both']);
+ const currency=p=>R14.projectCurrency(p);
+ const display=v=>displays.has(v)?v:'EGP';
+ const rateValue=v=>{const n=Number(v?.rate??v);return Number.isFinite(n)&&n>0?n:0};
+ function weightedRate(d,p){
+  if(!p||currency(p)==='EGP')return 1;
+  try{const n=rateValue(typeof R14.projectRateSummary==='function'?R14.projectRateSummary(d,p)?.effectiveRate:0);if(n)return n}catch{}
+  try{const n=rateValue(typeof R14.projectWeightedRate==='function'?R14.projectWeightedRate(d,p):0);if(n)return n}catch{}
+  return R14.projectRate(p);
+ }
+ function rateInfo(d,p,row={}){
+  const weighted=weightedRate(d,p),contract=R14.projectRate(p),source=row.rateSource||((weighted&&weighted!==contract)?'weighted':'contract');
+  const selected=source==='contract'?contract:source==='weighted'?weighted:rateValue(row.claimRate);
+  return {rate:selected||contract||1,source:source==='manual'?'manual':source,weighted,contract};
+ }
+ function rowOriginal(row,p){
+  if(row?.originalAmount!=null)return R14.amount(row.originalAmount);
+  if(!row)return 0;
+  const rowCurrency=row.currency||'EGP';
+  if(rowCurrency===currency(p))return rowCurrency==='EGP'?R14.amount(row.amount||0):R14.unfx(row.amount||0,R14.projectRate(p));
+  return currency(p)==='EGP'?R14.amount(row.amount||0):R14.unfx(row.amount||0,R14.projectRate(p));
+ }
+ function itemOriginal(item,row,p){
+  if(item?.originalAmount!=null)return R14.amount(item.originalAmount);
+  return currency(p)!=='EGP'?R14.unfx(item.amount||0,R14.projectRate(p)):R14.amount(item.amount||0);
+ }
+ function hydrateItem(item,row,p){
+  const originalAmount=itemOriginal(item,row,p),quantity=Number(item.quantity??1)||1,originalUnitPrice=item.originalUnitPrice!=null?R14.amount(item.originalUnitPrice):R14.amount((originalAmount/quantity).toFixed(2));
+  return {...item,description:String(item.description||item.desc||p?.name||row.code||''),unit:String(item.unit||'عدد'),quantity,originalUnitPrice,originalAmount,unitPrice:R14.fx(originalUnitPrice,R14.projectRate(p)),amount:R14.fx(originalAmount,R14.projectRate(p)),accountingUnitPrice:R14.fx(originalUnitPrice,row.claimRate),accountingAmount:R14.fx(originalAmount,row.claimRate)};
+ }
+ function hydrateRow(d,claim,row){
+  const p=d.projects.find(x=>x.code===row.code),legacy=row.originalAmount==null,baseCurrency=row.currency||currency(p),fallbackRate=legacy?R14.projectRate(p):rateInfo(d,p,row).rate,claimRate=rateValue(row.claimRate)||fallbackRate;
+  const legacyForeign=legacy&&baseCurrency!=='EGP',hydrated={...row,currency:baseCurrency,claimRate,rateDate:row.rateDate||claim.rateDate||claim.date||r14Today(),rateSource:row.rateSource||(legacyForeign?'legacy':'contract'),rateConfirmed:row.rateConfirmed??!legacyForeign};
+  hydrated.originalAmount=legacy?(baseCurrency==='EGP'?R14.amount(row.amount||0):R14.unfx(row.amount||0,R14.projectRate(p))):R14.amount(row.originalAmount);
+  hydrated.items=(row.items||[]).map(item=>hydrateItem(item,hydrated,p));
+  if(hydrated.items.length){hydrated.originalAmount=R14.sum(hydrated.items,'originalAmount');hydrated.amount=R14.sum(hydrated.items);hydrated.accountingAmount=R14.sum(hydrated.items,'accountingAmount')}
+  else hydrated.accountingAmount=R14.fx(hydrated.originalAmount,claimRate);
+  return hydrated;
+ }
+ function priorOriginal(d,code,exceptId=''){
+  const p=d.projects.find(x=>x.code===code);return R14.sum(d.claims.filter(c=>c.id!==exceptId&&R14.active(c)).flatMap(c=>R14.claimRows(c).filter(r=>r.code===code).map(r=>({amount:rowOriginal(r,p)}))));
+ }
+ function suggestedOriginal(d,p,exceptId=''){
+  return Math.max(0,R14.delta(R14.delta(R14.projectOriginalTotal(p),R14.receivedOriginal(d,p)),priorOriginal(d,p.code,exceptId)));
+ }
+ function receiptOriginalShare(d,claim,code){
+  return d.claimSettlements.filter(s=>s.claimId===claim.id&&s.code===code).reduce((total,s)=>{
+   if(s.originalAmount!=null)return total+Number(s.originalAmount);
+   const receipt=d.clientReceipts.find(r=>r.id===s.receiptId),row=R14.claimRows(claim).find(r=>r.code===code),p=d.projects.find(p=>p.code===code);
+   if(receipt?.projectAmount&&receipt.amount)return total+Number(receipt.projectAmount)*Number(s.amount)/Number(receipt.amount);
+   return total+R14.unfx(s.amount,R14.projectRate(p));
+  },0);
+ }
+ function groupedOriginal(rows,key='originalAmount'){
+  const out={};for(const row of rows){const code=row.currency||'EGP';out[code]=(out[code]||0)+Number(row[key]||0)}return out;
+ }
+ return {display,currency,weightedRate,rateInfo,rowOriginal,itemOriginal,hydrateRow,priorOriginal,suggestedOriginal,receiptOriginalShare,groupedOriginal};
+})();
+
+function r24ClaimRateInfo(p,row={}){return R24Claims.rateInfo(data,p,row)}
+function r24ClaimNativeLabel(value,currency){return `${fmt(value||0)} ${esc(currency||'EGP')}`}
+function r24ClaimDisplayLine(native,currency,book,mode){
+ mode=R24Claims.display(mode);const original=`${fmt(native||0)} ${esc(currency||'EGP')}`,egp=`${fmt(book||0)} ج.م`;
+ return mode==='contract'?original:mode==='EGP'?egp:`${original}<br><small>${egp}</small>`;
+}
+function r24ClaimEditorLine(native,currency,book,mode){
+ return R24Claims.display(mode)==='EGP'&&currency==='EGP'?fmt(native||0):r24ClaimDisplayLine(native,currency,book,mode);
+}
+function r24PriorItemQuantity(code,itemId){return data.claims.filter(c=>c.id!==window.claimEditingId&&R14.active(c)).reduce((n,c)=>n+R14.claimRows(c).filter(r=>r.code===code).flatMap(r=>r.items||[]).filter(x=>x.contractItemId===itemId).reduce((a,x)=>a+Number(x.quantity||0),0),0)}
+function r24ClaimItems(code,row={}){
+ const p=getP(code);if(!p)return[];const info=r24ClaimRateInfo(p,row),currency=R14.projectCurrency(p),contract=p.contractItems||[];
+ const bookRate=R14.projectRate(p);
+ if(!contract.length){const original=R24Claims.suggestedOriginal(data,p,window.claimEditingId);return original?[{id:r14Id('CLI'),description:p.name||code,unit:'عدد',quantity:1,originalUnitPrice:original,originalAmount:original,unitPrice:R14.fx(original,bookRate),amount:R14.fx(original,bookRate),accountingUnitPrice:R14.fx(original,info.rate),accountingAmount:R14.fx(original,info.rate)}]:[]}
+ return contract.map(x=>{const quantity=Math.max(0,Number(x.quantity)-r24PriorItemQuantity(code,x.id)),originalUnitPrice=R14.amount(x.unitPrice),originalAmount=R14.amount((quantity*originalUnitPrice).toFixed(2));return{id:r14Id('CLI'),contractItemId:x.id,description:x.description,unit:x.unit||'عدد',quantity,originalUnitPrice,originalAmount,unitPrice:R14.fx(originalUnitPrice,bookRate),amount:R14.fx(originalAmount,bookRate),accountingUnitPrice:R14.fx(originalUnitPrice,info.rate),accountingAmount:R14.fx(originalAmount,info.rate),currency}}).filter(x=>x.quantity>0);
+}
+function r24RecalculateRow(row){
+ const p=getP(row.code);if(!p)return row;row.currency=row.currency||R14.projectCurrency(p);row.claimRate=R14.rate(row.claimRate||r24ClaimRateInfo(p,row).rate);row.rateDate=row.rateDate||r14Today();
+ const bookRate=R14.projectRate(p);for(const x of row.items||[]){x.quantity=Number(x.quantity||0);x.originalUnitPrice=R14.amount(x.originalUnitPrice??0);x.originalAmount=R14.amount((x.quantity*x.originalUnitPrice).toFixed(2));x.unitPrice=R14.fx(x.originalUnitPrice,bookRate);x.amount=R14.fx(x.originalAmount,bookRate);x.accountingUnitPrice=R14.fx(x.originalUnitPrice,row.claimRate);x.accountingAmount=R14.fx(x.originalAmount,row.claimRate)}
+ if(row.items?.length){row.originalAmount=R14.sum(row.items,'originalAmount');row.amount=R14.sum(row.items);row.accountingAmount=R14.sum(row.items,'accountingAmount')}else{row.originalAmount=R14.amount(row.originalAmount||0);row.amount=R14.fx(row.originalAmount,bookRate);row.accountingAmount=R14.fx(row.originalAmount,row.claimRate)}return row;
+}
+function r24NewClaimRow(code){
+ const p=getP(code);if(!p)return{code:'',currency:'EGP',claimRate:1,rateDate:r14Today(),rateSource:'contract',originalAmount:0,amount:0,items:[]};
+ const info=r24ClaimRateInfo(p),row={code,currency:R14.projectCurrency(p),claimRate:info.rate,rateDate:r14Today(),rateSource:info.weighted&&info.weighted!==info.contract?'weighted':'contract',rateConfirmed:true,originalAmount:0,amount:0,items:[]};row.items=r24ClaimItems(code,row);return r24RecalculateRow(row);
+}
+function r24ClaimRowsFromRecord(c){return R14.claimRows(c).map(r=>R24Claims.hydrateRow(data,c,r))}
+function r24ClaimDisplayChanged(){r24ClaimSummaryUpdate();claimRenderRows()}
+function r24ClaimRateSource(i,source){
+ const row=claimDraftRows[i],p=getP(row?.code);if(!row||!p||source==='legacy')return;row.rateSource=source;row.rateConfirmed=true;const info=r24ClaimRateInfo(p,row);if(source!=='manual')row.claimRate=source==='weighted'?info.weighted:info.contract;row.rateDate=r14Today();r24RecalculateRow(row);claimRenderRows();
+}
+function r24ClaimRateInput(i,value){const row=claimDraftRows[i];if(!row)return;try{row.claimRate=R14.rate(value);row.rateSource='manual';row.rateConfirmed=true;r24RecalculateRow(row);const root=$('claimRows')?.querySelector(`[data-claim-row="${i}"]`),mode=$('claimDisplayCurrency')?.value||'both';if(root){root.querySelectorAll('[data-claim-line-total]').forEach((el,j)=>{const item=row.items[j];if(item)el.innerHTML=r24ClaimEditorLine(item.originalAmount,row.currency,item.accountingAmount,mode)});const total=root.querySelector('[data-claim-project-total]');if(total)total.innerHTML=r24ClaimDisplayLine(row.originalAmount,row.currency,row.accountingAmount,mode)}r24ClaimSummaryUpdate()}catch(e){const el=$('claimSummary');if(el)el.textContent=e.message}}
+function r24ClaimRateDate(i,value){if(claimDraftRows[i])claimDraftRows[i].rateDate=value}
+function r24ClaimItemInput(rowIndex,itemIndex,key,value){
+ const row=claimDraftRows[rowIndex],x=row?.items?.[itemIndex];if(!x)return;x[key]=key==='description'||key==='unit'?value:Number(value||0);r24RecalculateRow(row);
+ const root=$('claimRows')?.querySelector(`[data-claim-row="${rowIndex}"]`);if(root){const line=root.querySelector(`[data-claim-line-total="${itemIndex}"]`),project=root.querySelector('[data-claim-project-total]'),mode=$('claimDisplayCurrency')?.value||'both';if(line)line.innerHTML=r24ClaimEditorLine(x.originalAmount,row.currency,x.accountingAmount,mode);if(project)project.innerHTML=r24ClaimDisplayLine(row.originalAmount,row.currency,row.accountingAmount,mode)}r24ClaimSummaryUpdate();
+}
+r22ClaimItemInput=r24ClaimItemInput;
+r22ClaimItemChange=function(i,j,k,v){r24ClaimItemInput(i,j,k,v);claimRenderRows()};
+r22ClaimItemAdd=function(i){const row=claimDraftRows[i];if(!row)return;row.items=[...(row.items||[]),{id:r14Id('CLI'),description:'',unit:'عدد',quantity:1,originalUnitPrice:0,originalAmount:0,unitPrice:0,amount:0}];r24RecalculateRow(row);claimRenderRows()};
+r22ClaimItemRemove=function(i,j){const row=claimDraftRows[i];if(!row)return;row.items.splice(j,1);r24RecalculateRow(row);claimRenderRows()};
+r21ClaimAuto=function(i){const row=claimDraftRows[i],p=getP(row?.code);if(!p)return;const info=r24ClaimRateInfo(p,row);Object.assign(row,{currency:R14.projectCurrency(p),claimRate:info.rate,rateSource:info.weighted&&info.weighted!==info.contract?'weighted':'contract',rateDate:r14Today()});row.items=r24ClaimItems(row.code,row);if(!row.items.length)row.originalAmount=R24Claims.suggestedOriginal(data,p,window.claimEditingId);r24RecalculateRow(row);claimRenderRows()};
+claimChangeRow=function(i,key,value){
+ if(key==='code'&&value&&claimDraftRows.some((r,j)=>i!==j&&r.code===value)){alert('المشروع مكرر في المطالبة');queueMicrotask(claimRenderRows);return}
+ if(key==='code')claimDraftRows[i]=r24NewClaimRow(value);else if(key==='originalAmount'){const row=claimDraftRows[i];row.originalAmount=R14.amount(value||0);row.items=[];r24RecalculateRow(row)}queueMicrotask(claimRenderRows);
+};
+claimAddRow=function(code=''){claimDraftRows.push(r24NewClaimRow(code));claimRenderRows()};
+claimRemoveRow=function(i){claimDraftRows.splice(i,1);if(!claimDraftRows.length)claimDraftRows.push(r24NewClaimRow(''));claimRenderRows()};
+function r24ClaimSummaryUpdate(){
+ const mode=$('claimDisplayCurrency')?.value||'both',book=R14.sum(claimDraftRows.map(r=>({amount:r.accountingAmount||r.amount||0}))),groups=R24Claims.groupedOriginal(claimDraftRows),native=Object.entries(groups).map(([c,v])=>`${fmt(v)} ${esc(c)}`).join(' + ')||'0';
+ let contract=0,paid=0,prior=0;for(const row of claimDraftRows){const p=getP(row.code);if(!p)continue;contract+=Number(p.contract||0);paid+=received(p.code);prior+=R14.sum(data.claims.filter(c=>c.id!==window.claimEditingId&&R14.active(c)),c=>R14.claimAmount(c,p.code))}
+ const el=$('claimSummary');if(el)el.innerHTML=`العقود بالجنيه: <b>${fmt(contract)}</b> | المحصل: <b>${r14Paid(paid)}</b> | مطالبات سابقة: <b>${fmt(prior)}</b><br><span class="r14-due">إجمالي المطالبة: <b>${mode==='EGP'?fmt(book)+' ج.م':native}${mode==='both'?` · ${fmt(book)} ج.م`:''}</b></span>`;r24ClaimReceiptsUpdate();
+}
+function r24ClaimReceiptsUpdate(){
+ const root=$('claimReceipts');if(!root)return;const codes=new Set(claimDraftRows.map(row=>row.code).filter(Boolean)),receipts=data.clientReceipts.filter(receipt=>codes.has(receipt.code)).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ root.innerHTML=`<h3>الدفعات المسجلة على المشاريع</h3><div class="tablewrap"><table><thead><tr><th>التاريخ</th><th>المشروع</th><th>السداد بعملة العقد</th><th>النقد الفعلي ج.م</th></tr></thead><tbody>${receipts.map(receipt=>`<tr><td>${esc(receipt.date||'—')}</td><td>${esc(receipt.code||'—')}</td><td class="r14-paid">${fmt(receipt.projectAmount??receipt.amount)} ${esc(receipt.projectCurrency||'EGP')}</td><td class="r14-paid">${fmt(R14.cashReceipt(receipt))} ج.م</td></tr>`).join('')||'<tr><td colspan="4">لا توجد دفعات مسجلة على المشاريع المختارة</td></tr>'}</tbody></table></div><p class="hint">هذه الدفعات معروضة بصورة منفصلة. لا يُخصم من المطالبة إلا السداد الذي تمت مطابقته معها.</p>`;
+}
+function r24ClaimRatePanel(row,i,p){
+ if(!p)return'';const info=r24ClaimRateInfo(p,row),foreign=row.currency!=='EGP',choices=[...(row.rateSource==='legacy'?[['legacy','قديم — يحتاج تأكيد']]:[]),['contract','سعر التعاقد'],['weighted','متوسط الدفعات المرجّح'],['manual','إدخال يدوي']];return `<div class="r24-claim-rate ${foreign?'foreign':''}">${row.rateSource==='legacy'?'<p class="notice r24-rate-warning">هذه مطالبة قديمة بعملة أجنبية ولم يكن سعر إصدارها محفوظًا. اختر سعر التعاقد أو المتوسط أو أدخل السعر يدويًا قبل الحفظ.</p>':''}<label>عملة العقد<input class="field" value="${esc(row.currency)}" readonly></label><label>مصدر سعر المطالبة<select class="field" onchange="r24ClaimRateSource(${i},this.value)" ${foreign?'':'disabled'}>${choices.map(([v,t])=>`<option value="${v}" ${row.rateSource===v?'selected':''} ${v==='legacy'?'disabled':''}>${t}</option>`).join('')}</select></label><label>1 ${esc(row.currency)} = كم جنيه؟<input class="field" type="number" min="0.000001" step="0.000001" value="${esc(row.claimRate)}" oninput="r24ClaimRateInput(${i},this.value)" ${foreign?'':'readonly'}></label><label>تاريخ السعر<input class="field" type="date" value="${esc(row.rateDate||r14Today())}" onchange="r24ClaimRateDate(${i},this.value)" required></label>${foreign?`<p class="hint">سعر التعاقد: ${fmt(info.contract)} · متوسط الدفعات: ${fmt(info.weighted)} ج.م لكل ${esc(row.currency)}</p>`:'<p class="hint">الجنيه المصري لا يحتاج تحويلًا.</p>'}</div>`}
+claimRenderRows=function(){
+ const ps=claimClientProjects(),mode=$('claimDisplayCurrency')?.value||'both';for(const row of claimDraftRows)if(row.code)r24RecalculateRow(row);
+ $('claimRows').innerHTML=claimDraftRows.map((row,i)=>{const p=ps.find(x=>x.code===row.code),img=p&&cover(p),details=(row.items||[]).map((x,j)=>`<tr data-claim-item="${j}"><td><div class="r22-claim-description"><input aria-label="بيان بند المطالبة" class="field" value="${esc(x.description||'')}" oninput="r24ClaimItemInput(${i},${j},'description',this.value)" required><span class="r22-line-origin ${x.contractItemId?'contract':'extra'}">${x.contractItemId?'من أصل العقد':'بند إضافي'}</span></div></td><td><input aria-label="وحدة بند المطالبة" class="field" value="${esc(x.unit||'')}" oninput="r24ClaimItemInput(${i},${j},'unit',this.value)" required></td><td><input aria-label="كمية المطالبة" class="field" type="number" min="0.001" step="0.001" value="${esc(x.quantity??0)}" oninput="r24ClaimItemInput(${i},${j},'quantity',this.value)" required></td><td><input aria-label="سعر وحدة المطالبة" class="field" type="number" min="0" step="0.01" value="${esc(x.originalUnitPrice??0)}" oninput="r24ClaimItemInput(${i},${j},'originalUnitPrice',this.value)" required></td><td><output class="r22-claim-line-total" data-claim-line-total="${j}">${r24ClaimEditorLine(x.originalAmount,row.currency,x.accountingAmount,mode)}</output></td><td><button type="button" class="btn danger" onclick="r22ClaimItemRemove(${i},${j})" aria-label="حذف البند">×</button></td></tr>`).join('');return `<article class="r14-claim-row r24-claim-row" data-claim-row="${i}"><div class="r14-claim-photo">${img?`<img src="${esc(img.src)}" alt="صورة ${esc(row.code)}">`:'<span>لا توجد صورة للمشروع</span>'}</div><select aria-label="مشروع المطالبة" class="field" onchange="claimChangeRow(${i},'code',this.value)"><option value="">اختر المشروع</option>${ps.map(x=>`<option value="${esc(x.code)}" ${row.code===x.code?'selected':''}>${esc(x.code)} — ${esc(x.name)}</option>`).join('')}</select><div class="r24-project-values">${p?`العقد: <b>${fmt(R14.projectOriginalTotal(p))} ${esc(R14.projectCurrency(p))}</b><br>المقابل الدفتري: <b>${fmt(p.contract)} ج.م</b><br>المسدد: <b>${fmt(R14.receivedOriginal(data,p))} ${esc(R14.projectCurrency(p))}</b>`:'اختر مشروعًا'}</div><label class="r14-due">إجمالي المشروع<output class="r22-claim-project-total" aria-label="قيمة المطالبة للمشروع" data-claim-project-total>${r24ClaimDisplayLine(row.originalAmount,row.currency,row.accountingAmount,mode)}</output><small>محسوب من الكمية × السعر وبسعر الإصدار المحفوظ</small><button type="button" class="link" onclick="r21ClaimAuto(${i})">إعادة من أصل العقد</button></label><button type="button" class="btn danger" onclick="claimRemoveRow(${i})" aria-label="حذف المشروع من المطالبة">×</button>${row.code?r24ClaimRatePanel(row,i,p):''}${row.code?`<div class="tablewrap r22-claim-items"><table><thead><tr><th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة (${esc(row.currency)})</th><th>الإجمالي</th><th></th></tr></thead><tbody>${details}</tbody></table><div class="r22-claim-item-actions"><span class="hint">القيمة الأصلية محفوظة بعملة العقد، والمقابل بالجنيه مثبت بسعر المطالبة.</span><button type="button" class="btn" onclick="r22ClaimItemAdd(${i})">+ بند إضافي</button></div></div>`:''}</article>`}).join('');r24ClaimSummaryUpdate();
+};
+claimClientChanged=function(){claimDraftRows=[r24NewClaimRow('')];claimRenderRows()};
+openClaim=function(codeEnc,idEnc){
+ const old=idEnc?data.claims.find(x=>x.id===decodeURIComponent(idEnc)):null,p=codeEnc?getP(decodeURIComponent(codeEnc)):null,client=old?.client||getP(old?.code)?.client||p?.client||clientNames()[0]||'';window.claimEditingId=old?.id||null;claimDraftRows=old?r24ClaimRowsFromRecord(old):[r24NewClaimRow(p?.code||'')];const display=R24Claims.display(old?.displayCurrency||(p&&R14.projectCurrency(p)!=='EGP'?'both':'EGP'));
+ modal(old?'تعديل مطالبة مالية مجمعة':'مطالبة مالية مجمعة',`<form onsubmit="saveClaim(event,'${old?r14Encode(old.id):''}')"><div class="formgrid"><label>العميل<select class="field" id="claimClient" onchange="claimClientChanged()">${clientNames().map(n=>`<option ${n===client?'selected':''}>${esc(n)}</option>`).join('')}</select></label>${field('claimDate','التاريخ',old?.date||r14Today(),'date','required')}${field('claimDue','الاستحقاق',old?.due||'','date')}<label>الحالة<select class="field" id="claimStatus">${['مسودة','صادرة','معتمدة','ملغاة'].map(n=>`<option ${n===R14.status(old||{status:'مسودة'})?'selected':''}>${n}</option>`).join('')}</select></label><label>عرض مبالغ المطالبة<select class="field" id="claimDisplayCurrency" onchange="r24ClaimDisplayChanged()"><option value="contract" ${display==='contract'?'selected':''}>عملة العقد</option><option value="EGP" ${display==='EGP'?'selected':''}>الجنيه المصري</option><option value="both" ${display==='both'?'selected':''}>عملة العقد والجنيه معًا</option></select></label></div><p class="notice">لكل مشروع سعر مطالبة محفوظ وتاريخ مستقل. تغيير أسعار الدفعات لاحقًا لا يغيّر هذه المطالبة.</p><div class="r24-claim-title"><h3>مشاريع المطالبة</h3><button type="button" class="btn" onclick="claimAddRow()">+ مشروع</button></div><div id="claimRows"></div><div class="notice" id="claimSummary"></div><section id="claimReceipts"></section><label class="full">ملاحظات<textarea class="field" id="claimNote" rows="2">${esc(old?.note||'')}</textarea></label><div class="modalfoot"><button class="btn primary" type="submit">حفظ المطالبة</button>${old?`<button type="button" class="btn" onclick="printClaim('${r14Encode(old.id)}')">طباعة / PDF</button>`:''}<button type="button" class="btn" onclick="closeModal()">إغلاق</button></div></form>`);claimRenderRows();
+};
+saveClaim=function(e,id){
+ e.preventDefault();try{const old=id?data.claims.find(c=>c.id===decodeURIComponent(id)):null,client=val('claimClient'),date=r14RequireDate('claimDate'),due=r14RequireDate('claimDue',true),status=val('claimStatus'),displayCurrency=R24Claims.display(val('claimDisplayCurrency'));if(due&&due<date)throw Error('تاريخ الاستحقاق يسبق المطالبة');
+  const rows=claimDraftRows.map(row=>{const copy=R14.copy(row);r24RecalculateRow(copy);copy.rateDate=String(copy.rateDate||date);copy.items=(copy.items||[]).map(x=>({...x,description:String(x.description||'').trim(),unit:String(x.unit||'').trim()}));return copy});
+  if(!rows.length||rows.some(r=>!getP(r.code)||R14.normName(getP(r.code).client)!==client||r.originalAmount<=0||r.amount<=0))throw Error('اختر مشاريع العميل وأدخل قيمة موجبة');if(new Set(rows.map(r=>r.code)).size!==rows.length)throw Error('المشروع مكرر');
+  for(const row of rows){const p=getP(row.code);if(row.currency!==R14.projectCurrency(p))throw Error('عملة المطالبة لا تطابق عقد المشروع '+row.code);if(row.currency!=='EGP'&&(row.rateSource==='legacy'||row.rateConfirmed!==true))throw Error('أكد مصدر سعر المطالبة القديمة للمشروع '+row.code);R14.rate(row.claimRate);if(!R14.dateOK(row.rateDate))throw Error('تاريخ سعر المطالبة غير صالح: '+row.code);if(!row.items?.length||row.items.some(x=>!x.description||!x.unit||x.quantity<=0||x.originalUnitPrice<0))throw Error('راجع بنود ووحدات وكميات وأسعار المشروع '+row.code);const prior=R24Claims.priorOriginal(data,row.code,old?.id);if(R14.cents(prior)+R14.cents(row.originalAmount)>R14.cents(R14.projectOriginalTotal(p)))throw Error('مطالبات المشروع '+row.code+' تتجاوز العقد بعملته الأصلية')}
+  if(old&&R14.active(old)&&!confirm('سيتم تعديل مستند صادر أو معتمد مع تسجيل السعر والقيم السابقة. متابعة؟'))return;const total=R14.sum(rows),accountingTotal=R14.sum(rows,'accountingAmount'),currencyTotals=R24Claims.groupedOriginal(rows),obj={...old,id:old?.id||r14Id('CL'),client,code:rows[0].code,projectRows:rows,date,due,status,note:val('claimNote'),displayCurrency,currencyTotals,total,accountingTotal,items:rows.map(r=>({desc:getP(r.code)?.name||r.code,amount:r.amount})),history:old?[...(old.history||[]),{at:new Date().toISOString(),previous:{...old,history:undefined}}]:[]};if(r14Change('حفظ مطالبة متعددة العملة',d=>r14Upsert(d,'claims',obj),{id:obj.id,total:obj.total,accountingTotal,currencyTotals,displayCurrency,status}))r14Done('تم حفظ المطالبة بعملتها وسعر الإصدار')
+ }catch(error){alert(error.message)}
+};
+function r24ClaimOriginalText(c){const groups=R24Claims.groupedOriginal(r24ClaimRowsFromRecord(c));return Object.entries(groups).map(([currency,value])=>`${fmt(value)} ${currency}`).join(' + ')}
+claimTable=function(cs){return `<div class="tablewrap r14-claims-table"><table><thead><tr><th>المطالبة / العميل</th><th>المشاريع</th><th>التاريخ</th><th>الحالة</th><th>القيمة الأصلية</th><th>قيمة الإصدار ج.م</th><th class="r14-paid">المسدد بقيمة الإصدار</th><th class="r14-due">المطلوب بقيمة الإصدار</th><th>إجراءات</th></tr></thead><tbody>${cs.map(c=>{const enc=r14Encode(c.id),issuedTotal=c.accountingTotal??R14.sum(r24ClaimRowsFromRecord(c),'accountingAmount'),issuedPaid=r24ClaimIssuedPaid(c),issuedRemaining=R14.delta(issuedTotal,issuedPaid),active=R14.active(c);return `<tr><td>${esc(r19Doc('claim',c.id))}<br>${esc(R14.claimClient(data,c))}</td><td>${esc(claimCodes(c).join('، '))}</td><td>${esc(c.date)}<br><small>${esc(c.due||'غير محدد')}</small></td><td>${esc(R14.status(c))}</td><td>${esc(r24ClaimOriginalText(c))}</td><td>${fmt(issuedTotal)} ج.م</td><td>${r14Paid(issuedPaid)}</td><td>${active?r14Due(issuedRemaining):'—'}</td><td><div class="r23-row-actions"><button class="link" onclick="printClaim('${enc}')">المطالبة / PDF</button><button class="link" onclick="openClaim(null,'${enc}')">تعديل</button>${active?`<button class="link" onclick="r14Match('${enc}')">مطابقة</button>`:''}<button class="link danger-link" onclick="r23Delete('claim','${enc}')">حذف</button></div></td></tr>`}).join('')||'<tr><td colspan="9">لا توجد مطالبات</td></tr>'}</tbody></table></div>`};
+function r24ClaimOriginalSettled(c){const out={};for(const row of r24ClaimRowsFromRecord(c)){out[row.currency]=(out[row.currency]||0)+R24Claims.receiptOriginalShare(data,c,row.code)}return out}
+function r24ClaimIssuedPaid(c){return R14.sum(r24ClaimRowsFromRecord(c).map(row=>({amount:R14.fx(R24Claims.receiptOriginalShare(data,c,row.code),row.claimRate)})))}
+function r24ClaimPrintValues(c,valueBook,originalGroups){const mode=R24Claims.display(c.displayCurrency),native=Object.entries(originalGroups).map(([currency,value])=>`${R19.formatAmount(value)} ${esc(currency)}`).join(' + ')||'0';return mode==='EGP'?`${R19.formatAmount(valueBook)} ج.م`:mode==='contract'?native:`${native}<br><small>${R19.formatAmount(valueBook)} ج.م</small>`}
+r14ClaimDocument=function(c){
+ const rows=r24ClaimRowsFromRecord(c),mode=R24Claims.display(c.displayCurrency),issuedTotal=c.accountingTotal??R14.sum(rows,'accountingAmount'),issuedPaid=r24ClaimIssuedPaid(c),issuedRemaining=R14.delta(issuedTotal,issuedPaid),originalTotals=R24Claims.groupedOriginal(rows),originalPaid=r24ClaimOriginalSettled(c),originalDue={};
+ for(const [currency,total] of Object.entries(originalTotals))originalDue[currency]=Math.max(0,total-(originalPaid[currency]||0));
+ const codes=new Set(rows.map(r=>r.code)),receipts=data.clientReceipts.filter(r=>codes.has(r.code)).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))),share=`مطالبة ${r19Doc('claim',c.id)}\nالعميل: ${R14.claimClient(data,c)}\nالإجمالي: ${Object.entries(originalTotals).map(([k,v])=>fmt(v)+' '+k).join(' + ')}\nالمقابل: ${fmt(issuedTotal)} ج.م`;
+ const customDescriptions=(c.items||[]).filter(item=>!rows.some(row=>item.desc===(getP(row.code)?.name||row.code)||item.desc===row.code));
+ const groups=rows.map(row=>{const project=getP(row.code);let items=(row.items||[]).map(item=>({...item,unit:item.unit||'عدد'}));if(!items.length&&rows.length===1&&customDescriptions.length)items=customDescriptions.map(item=>({description:item.desc,unit:'عدد',quantity:1,originalUnitPrice:item.amount,originalAmount:item.amount,accountingUnitPrice:item.amount,accountingAmount:item.amount}));if(!items.length)items=[{description:project?.name||row.code,unit:'عدد',quantity:1,originalUnitPrice:row.originalAmount,originalAmount:row.originalAmount,accountingUnitPrice:row.accountingAmount,accountingAmount:row.accountingAmount}];return{row,project,items}});
+ const valueCell=(native,currency,book)=>{if(mode==='EGP'&&currency==='EGP')return R19.formatAmount(book);if(mode==='EGP')return `${R19.formatAmount(book)} <small>ج.م</small>`;if(mode==='contract')return `${R19.formatAmount(native)} <small>${esc(currency)}</small>`;return `${R19.formatAmount(native)} <small>${esc(currency)}</small><br><small>${R19.formatAmount(book)} ج.م</small>`};
+ const summaryValue=(book,nativeGroups)=>{const native=Object.entries(nativeGroups).map(([currency,value])=>`${R19.formatAmount(value)} ${esc(currency)}`).join(' + ')||'0';return mode==='EGP'?`<bdi>${R19.formatAmount(book)}</bdi> ج.م`:mode==='contract'?`<bdi>${native}</bdi>`:`<bdi>${native}</bdi><br><small>${R19.formatAmount(book)} ج.م</small>`};
+ return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(r19Doc('claim',c.id))}</title><style>
+ @page{size:A4 portrait;margin:13mm}*{box-sizing:border-box}html{background:#edf0f4}body{margin:24px auto;padding:13mm;width:210mm;background:#fff;color:#172b45;font:12px/1.55 Tahoma,Arial,sans-serif;box-shadow:0 2px 14px #172b451a}.claim-header{display:flex;justify-content:space-between;align-items:center;gap:24px;border-bottom:2px solid #b58a48;padding-bottom:10px;margin-bottom:12px;break-inside:avoid}.brand-logo{display:block;width:82px;height:82px;object-fit:contain}.document-title{text-align:left}.document-title h1{font-size:23px;margin:0 0 7px}.document-meta{font-size:11px;direction:ltr}.client{font-weight:700;margin:0 0 5px;font-size:14px}.claim-intro{font-size:12px;line-height:1.8;margin:8px 0 12px}.claim-meta{font-size:11px;color:#526277;margin:0 0 14px}h2{font-size:14px;margin:15px 0 8px;break-after:avoid}table{border-collapse:collapse;table-layout:fixed;width:100%;margin:0;font-size:11px}thead{display:table-header-group}th,td{border:1px solid #d5dde7;padding:6px;text-align:right;vertical-align:middle;overflow-wrap:anywhere}th{color:#526277;background:#f8f9fb;font-size:10px}tr{break-inside:avoid}.amount{white-space:normal;font-variant-numeric:tabular-nums}.paid{color:#087f46!important;font-weight:700}.due{color:#c62828!important;font-weight:700}.paid,.due,.claim-header,.claim-total{print-color-adjust:exact;-webkit-print-color-adjust:exact}.photo{text-align:center;padding:5px}.photo img,.photo-placeholder{display:block;width:100%;height:104px;object-fit:contain;margin:auto;background:#fff}.photo-placeholder{display:flex;align-items:center;justify-content:center;border:1px dashed #cbd3df;color:#7d8998}.project-code{display:block;font-weight:700}.project-name{display:block}.project-contract,.project-rate{display:block;font-size:9px;color:#526277;margin-top:4px}.item-origin{display:block;color:#7b5a24;font-size:9px;font-weight:700}.claim-summary{margin:14px 0 0;break-inside:avoid}.summary-line{display:flex;justify-content:space-between;gap:16px;padding:3px 0}.claim-total{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:8px;padding:11px 13px;border:1.5px solid #c62828;border-radius:5px;background:#fff7f7;font-size:16px;font-weight:700}.claim-total bdi{font-size:23px}.details,.note{font-size:11px;margin:10px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}.receipt-note{font-size:10px;color:#526277}.signatures{display:flex;justify-content:space-between;gap:30px;margin-top:24px;font-size:11px;break-inside:avoid}.claim-actions{position:sticky;top:0;z-index:10;display:flex;gap:8px;padding:10px;margin:-13mm -13mm 12px;background:#172b45;direction:rtl}.claim-actions button{flex:1;border:1px solid #d5dde7;border-radius:8px;background:#fff;color:#172b45;padding:10px 8px;font:700 12px Tahoma,Arial}.claim-actions .share{background:#087f46;color:#fff;border-color:#087f46}@media screen and (max-width:820px){body{width:100%;margin:0;padding:16px}.claim-actions{margin:-16px -16px 16px}.projects-table{font-size:10px}.photo img,.photo-placeholder{height:82px}}@media print{html{background:#fff}body{width:auto;margin:0;padding:0;box-shadow:none}.claim-actions{display:none!important}}
+ </style></head><body><nav class="actions claim-actions" aria-label="إجراءات المطالبة"><button type="button" onclick="if(window.opener&&!window.opener.closed)window.close();else history.back()">رجوع</button><button type="button" class="share" onclick="shareClaim()">مشاركة / واتساب</button><button type="button" onclick="window.print()">طباعة / PDF</button></nav>
+ <header class="head claim-header"><img class="brand-logo" src="${R14_LOGO}" alt="RONIX"><div class="document-title"><h1>مطالبة مالية</h1><div class="meta document-meta"><bdi>${esc(r19Doc('claim',c.id))}</bdi> · <bdi>${esc(c.date)}</bdi></div></div></header><p class="client">السادة / ${esc(R14.claimClient(data,c)||'—')}</p><p class="claim-meta">الاستحقاق: ${esc(c.due||'غير محدد')} · الحالة: ${esc(R14.status(c))} · عرض المستند: ${mode==='both'?'عملة العقد والجنيه':mode==='contract'?'عملة العقد':'الجنيه المصري'}</p><p class="intro claim-intro">نشكر لكم ثقتكم وتعاونكم، ويسعدنا مواصلة العمل معكم. نرفق بيان المشاريع والدفعات المسجلة، مع تثبيت عملة العقد وسعر الإصدار.</p>
+ <table class="projects-table"><colgroup><col style="width:22%"><col style="width:18%"><col style="width:17%"><col style="width:8%"><col style="width:8%"><col style="width:13%"><col style="width:14%"></colgroup><thead><tr><th>صورة المشروع</th><th>المشروع</th><th>البند</th><th>الوحدة</th><th>الكمية</th><th>سعر الوحدة</th><th>الإجمالي</th></tr></thead><tbody>${groups.map(group=>group.items.map((item,index)=>{const photo=group.project&&cover(group.project),span=` rowspan="${group.items.length}"`;return `<tr>${index===0?`<td class="photo"${span}>${photo?`<img src="${esc(new URL(photo.src,location.href).href)}" alt="${esc(group.row.code)}">`:'<div class="photo-placeholder">صورة المشروع</div>'}</td><td${span}><bdi class="project-code">${esc(group.row.code)}</bdi><span class="project-name">${esc(group.project?.name||'—')}</span><span class="project-contract">العقد: ${R19.formatAmount(R14.projectOriginalTotal(group.project))} ${esc(group.row.currency)}</span><span class="project-rate">سعر الإصدار: 1 ${esc(group.row.currency)} = ${R19.formatAmount(group.row.claimRate)} ج.م<br><bdi>${esc(group.row.rateDate)}</bdi></span></td>`:''}<td>${esc(item.description||group.project?.name||group.row.code)}${item.contractItemId?'<span class="item-origin">من أصل العقد</span>':''}</td><td>${esc(item.unit||'عدد')}</td><td class="amount"><bdi>${esc(item.quantity??1)}</bdi></td><td class="amount">${valueCell(item.originalUnitPrice,group.row.currency,item.accountingUnitPrice)}</td><td class="amount"><strong>${valueCell(item.originalAmount,group.row.currency,item.accountingAmount)}</strong></td></tr>`}).join('')).join('')}</tbody></table>
+ ${rows.length>1&&customDescriptions.length?`<div class="details"><p><b>بيان إضافي:</b> ${customDescriptions.map(item=>esc(item.desc)).join('، ')}</p></div>`:''}<h2>الدفعات المسجلة على المشاريع</h2><table class="receipts-table"><colgroup><col style="width:28%"><col style="width:28%"><col style="width:44%"></colgroup><thead><tr><th>التاريخ</th><th>المشروع</th><th class="paid">السداد المخصص</th></tr></thead><tbody>${receipts.map(receipt=>`<tr><td><bdi>${esc(receipt.date)}</bdi></td><td><bdi>${esc(receipt.code)}</bdi></td><td class="amount paid"><bdi>${R19.formatAmount(receipt.projectAmount??receipt.amount)}</bdi> ${esc(receipt.projectCurrency||'EGP')}${receipt.incomingCurrency&&receipt.incomingCurrency!==(receipt.projectCurrency||'EGP')?`<br><small>المحصل: ${R19.formatAmount(receipt.receiptOriginal??receipt.amount)} ${esc(receipt.incomingCurrency)}</small>`:''}${R14.cashReceipt(receipt)!==Number(receipt.projectAmount??receipt.amount)?`<br><small>النقد الفعلي: ${R19.formatAmount(R14.cashReceipt(receipt))} ج.م</small>`:''}</td></tr>`).join('')||'<tr><td colspan="3">لا توجد دفعات مسجلة</td></tr>'}</tbody></table>${receipts.length?'<p class="receipt-note">يُخصم من المطلوب فقط السداد المرتبط بهذه المطالبة؛ وقد تخص دفعات المشاريع أعلاه مطالبات أخرى.</p>':''}${c.note?`<p class="note">${esc(c.note)}</p>`:''}<section class="summary claim-summary"><div class="summary-line"><span>إجمالي قيمة المطالبة</span><span>${summaryValue(issuedTotal,originalTotals)}</span></div><div class="summary-line paid"><span>إجمالي المسدد من هذه المطالبة</span><span>${summaryValue(issuedPaid,originalPaid)}</span></div><div class="total claim-total due"><span>${R14.active(c)?'إجمالي المطلوب سداده':'الرصيد الحسابي — '+esc(R14.status(c))}</span><span>${summaryValue(issuedRemaining,originalDue)}</span></div></section><footer class="sign signatures"><span>إعداد الحسابات: ______________</span><span>اعتماد RONIX: ______________</span></footer><script>async function shareClaim(){const text=${JSON.stringify(share)};try{if(navigator.share){await navigator.share({title:${JSON.stringify('مطالبة '+r19Doc('claim',c.id))},text});return}}catch(error){if(error&&error.name==='AbortError')return}window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank','noopener')}<\/script></body></html>`;
+};
+
+/* RONIX V24: audited financial-statements workspace and fiscal close controls. */
+let r24FinancialFrom=`${new Date().getFullYear()}-01-01`,r24FinancialTo=r14Today(),r24JournalDraft=[];
+const r24FinancialAccounts=()=>R24Financial.accounts(data);
+const r24FinancialAmount=value=>`${fmt(Number(value||0))} ج.م`;
+const r24FinancialSigned=value=>`<span class="${Number(value)<0?'r14-due':Number(value)>0?'r14-paid':''}">${r24FinancialAmount(value)}</span>`;
+function r24FinancialSignature(report){
+ const text=JSON.stringify((report.entries||[]).filter(e=>e.date<=report.to).map(e=>[e.id,e.date,e.lines.map(x=>[x.account,x.debit,x.credit])]))+'|'+report.from+'|'+report.to;
+ let hash=2166136261;for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619)}return 'R24-'+(hash>>>0).toString(16).padStart(8,'0')
+}
+function r24FinancialReport(){return R24Financial.report(data,{from:r24FinancialFrom,to:r24FinancialTo})}
+function r24FinancialClosing(report){
+ const rows=(data.fiscalClosings||[]).filter(x=>x.from===report.from&&x.to===report.to&&x.status==='closed').sort((a,b)=>String(b.closedAt).localeCompare(String(a.closedAt))),row=rows[0];
+ if(!row)return null;const signature=report.signature||r24FinancialSignature(report);return {...row,currentSignature:signature,unchanged:row.signature===signature}
+}
+function r24FinancialPeriodChanged(){
+ const from=val('r24FinFrom'),to=val('r24FinTo');if(!R14.dateOK(from)||!R14.dateOK(to)||from>to)return alert('راجع تاريخ بداية ونهاية الفترة');r24FinancialFrom=from;r24FinancialTo=to;render()
+}
+function r24FinancialStatus(report){
+ const closing=r24FinancialClosing(report),certified=report.certified===true&&closing?.unchanged;
+ if(certified)return `<div class="r24-fin-status certified"><strong>✓ قوائم ختامية مقفلة</strong><span>تم الإقفال في ${esc(String(closing.closedAt||'').slice(0,10))} · بصمة ${esc(closing.signature||closing.currentSignature)}</span></div>`;
+ if(closing&&!closing.unchanged)return `<div class="r24-fin-status blocked"><strong>! تغيرت القيود بعد الإقفال</strong><span>أعد فتح الفترة وراجع الحركات ثم أغلقها من جديد.</span></div>`;
+ if(report.ready)return `<div class="r24-fin-status ready"><strong>✓ القوائم متوازنة وجاهزة للإقفال</strong><span>ميزان المراجعة والمركز المالي والتدفق النقدي متطابقة.</span></div>`;
+ return `<div class="r24-fin-status blocked"><strong>مسودة محاسبية — غير جاهزة للاعتماد</strong><span>أكمل عناصر المراجعة الظاهرة أدناه قبل تسمية القوائم ختامية.</span></div>`
+}
+function r24FinancialIssues(report){
+ if(!report.issues.length)return '<div class="r24-fin-check ok">✓ لا توجد موانع محاسبية في هذه الفترة.</div>';
+ return `<div class="r24-fin-issues"><div class="r24-fin-issues-head"><h3>مراجعات مطلوبة (${report.issues.length})</h3><button class="btn" type="button" onclick="r24OpenAccountingReview()">مراجعة البيانات القديمة</button></div><ul>${report.issues.map(x=>`<li class="${x.severity==='error'?'error':'warning'}"><b>${x.severity==='error'?'يلزم':'تنبيه'}:</b> ${esc(x.message)}${x.source?` <small>${esc(x.source)}</small>`:''}</li>`).join('')}</ul></div>`
+}
+function r24FinancialTrial(report){
+ const t=report.trialBalance;return `<section class="panel r24-fin-section"><div class="panel-title"><div><p class="eyebrow">القيد المزدوج</p><h2>ميزان المراجعة</h2></div><span class="r24-fin-badge ${t.balanced?'ok':'bad'}">${t.balanced?'متوازن':'غير متوازن'}</span></div><div class="tablewrap"><table><thead><tr><th>الحساب</th><th>افتتاحي</th><th>حركة مدين</th><th>حركة دائن</th><th>رصيد مدين</th><th>رصيد دائن</th></tr></thead><tbody>${t.rows.map(x=>`<tr><td><bdi>${esc(x.code)}</bdi> — ${esc(x.name)}</td><td>${r24FinancialAmount(x.opening)}</td><td>${r24FinancialAmount(x.periodDebit)}</td><td>${r24FinancialAmount(x.periodCredit)}</td><td>${r24FinancialAmount(x.balanceDebit)}</td><td>${r24FinancialAmount(x.balanceCredit)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">لا توجد حركات في الفترة.</td></tr>'}</tbody><tfoot><tr><th>الإجمالي</th><th></th><th>${r24FinancialAmount(t.periodDebit)}</th><th>${r24FinancialAmount(t.periodCredit)}</th><th></th><th>الفرق: ${r24FinancialAmount(t.difference)}</th></tr></tfoot></table></div></section>`
+}
+function r24FinancialIncome(report){
+ const x=report.incomeStatement,row=(name,value,cls='')=>`<div class="r24-fin-line ${cls}"><span>${name}</span><b>${r24FinancialSigned(value)}</b></div>`;
+ return `<section class="panel r24-fin-section"><div class="panel-title"><div><p class="eyebrow">عن الفترة</p><h2>قائمة الدخل</h2></div></div><div class="r24-fin-statement">${row('إيرادات المشاريع',x.projectRevenue)}${row('تكاليف المشاريع',-x.projectCosts)}${row('مجمل الربح',x.grossProfit,'subtotal')}${row('مصروفات تشغيلية وإدارية',-x.operatingExpenses)}${row('أرباح فروق العملة',x.fxGain)}${row('خسائر فروق العملة',-x.fxLoss)}${row('صافي ربح / خسارة الفترة',x.netProfit,'grand')}</div></section>`
+}
+function r24FinancialPosition(report){
+ const x=report.balanceSheet,list=rows=>rows.map(a=>`<div class="r24-fin-line"><span><bdi>${esc(a.code)}</bdi> — ${esc(a.name)}</span><b>${r24FinancialSigned(a.amount)}</b></div>`).join('')||'<p class="empty">لا يوجد رصيد.</p>';
+ return `<section class="panel r24-fin-section"><div class="panel-title"><div><p class="eyebrow">في ${esc(report.to)}</p><h2>قائمة المركز المالي</h2></div><span class="r24-fin-badge ${x.balanced?'ok':'bad'}">${x.balanced?'الأصول = الالتزامات + الحقوق':'يوجد فرق'}</span></div><div class="r24-fin-columns"><div><h3>الأصول</h3>${list(x.assets)}<div class="r24-fin-line grand"><span>إجمالي الأصول</span><b>${r24FinancialAmount(x.totalAssets)}</b></div></div><div><h3>الالتزامات</h3>${list(x.liabilities)}<div class="r24-fin-line subtotal"><span>إجمالي الالتزامات</span><b>${r24FinancialAmount(x.totalLiabilities)}</b></div><h3>حقوق الملكية</h3>${list(x.equity)}<div class="r24-fin-line"><span>نتيجة الأعمال المتراكمة</span><b>${r24FinancialSigned(x.currentEarnings)}</b></div><div class="r24-fin-line grand"><span>إجمالي حقوق الملكية</span><b>${r24FinancialAmount(x.totalEquity)}</b></div></div></div><p class="r24-fin-reconcile ${x.balanced?'ok':'bad'}">فرق المعادلة: ${r24FinancialAmount(x.difference)}</p></section>`
+}
+function r24FinancialCash(report){
+ const x=report.cashFlow,row=(name,value,cls='')=>`<div class="r24-fin-line ${cls}"><span>${name}</span><b>${r24FinancialSigned(value)}</b></div>`;
+ return `<section class="panel r24-fin-section"><div class="panel-title"><div><p class="eyebrow">نقد فعلي فقط</p><h2>قائمة التدفقات النقدية</h2></div><span class="r24-fin-badge ${x.reconciled?'ok':'bad'}">${x.reconciled?'متطابقة مع الأستاذ':'غير متطابقة'}</span></div><div class="r24-fin-statement">${row('رصيد النقدية أول الفترة',x.openingCash)}${row('صافي التدفق التشغيلي',x.operating)}${row('صافي التدفق الاستثماري',x.investing)}${row('صافي التدفق التمويلي',x.financing)}${row('صافي التغير في النقدية',x.netChange,'subtotal')}${row('رصيد النقدية آخر الفترة',x.closingCash,'grand')}</div><p class="r24-fin-reconcile ${x.reconciled?'ok':'bad'}">الفرق مع رصيد الأستاذ: ${r24FinancialAmount(x.difference)}</p></section>`
+}
+function r24FinancialJournalRows(){
+ const account=new Map(r24FinancialAccounts().map(x=>[x.id,x]));return (data.manualJournals||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(j=>{const debit=R14.sum(j.lines||[],'debit'),credit=R14.sum(j.lines||[],'credit');return `<tr><td><bdi>${esc(j.id)}</bdi></td><td><bdi>${esc(j.date)}</bdi></td><td>${esc(j.description||'')}</td><td>${esc(j.kind==='opening'?'افتتاحي':j.kind==='reversal'?'عكس قيد':'تسوية')}</td><td>${r24FinancialAmount(debit)}</td><td>${r24FinancialAmount(credit)}</td><td>${j.voidedBy?`<span class="pill warn">تم عكسه</span>`:j.status==='reversed'?`<span class="pill warn">ملغي</span>`:`<span class="pill">مرحّل</span>`}</td><td>${!j.voidedBy&&j.status!=='reversed'&&j.kind!=='reversal'?`<button class="link danger-link" type="button" onclick="r24ReverseJournal('${r14Encode(j.id)}')">عكس القيد</button>`:'—'}</td></tr>`}).join('')||'<tr><td colspan="8" class="empty">لا توجد قيود يدوية.</td></tr>'
+}
+function r24FinancialPage(){
+ let report;try{report=r24FinancialReport()}catch(error){return `<section class="panel"><h2>تعذر إعداد القوائم</h2><p class="notice">${esc(error.message)}</p></section>`}
+ const closing=r24FinancialClosing(report),certified=report.certified===true&&closing?.unchanged;
+ return `<section class="r24-fin-head"><div><p class="eyebrow">RONIX / ACCOUNTING CLOSE</p><h2>القوائم المالية والإقفال</h2><p class="hint">قوائم مشتقة من قيود مزدوجة. لا تحصل على صفة «ختامية» إلا بعد اكتمال الإعداد، توازن الحسابات، وإقفال الفترة.</p></div><div class="actions"><button class="btn" type="button" onclick="r24OpenAccountingReview()">مراجعة البيانات القديمة</button><button class="btn" type="button" onclick="r24OpenAccountingSettings()">إعداد المحاسبة</button><button class="btn" type="button" onclick="r24OpenJournal('opening')">+ قيد افتتاحي</button><button class="btn primary" type="button" onclick="r24OpenJournal('adjustment')">+ قيد تسوية</button></div></section><section class="panel r24-fin-toolbar"><label>من تاريخ<input id="r24FinFrom" class="field" type="date" value="${esc(report.from)}"></label><label>إلى تاريخ<input id="r24FinTo" class="field" type="date" value="${esc(report.to)}"></label><button class="btn" type="button" onclick="r24FinancialPeriodChanged()">تحديث الفترة</button><button class="btn" type="button" onclick="r24ExportFinancial()">Excel</button><button class="btn" type="button" onclick="r24PrintFinancial()">طباعة / PDF</button>${closing?`<button class="btn danger" type="button" onclick="r24ReopenPeriod()">إعادة فتح الفترة</button>`:`<button class="btn gold" type="button" ${report.ready?'':'disabled'} onclick="r24ClosePeriod()">إقفال واعتماد الفترة</button>`}</section>${r24FinancialStatus(report)}${r24FinancialIssues(report)}<section class="r24-fin-kpis"><div><small>إيرادات الفترة</small><strong>${r24FinancialAmount(report.incomeStatement.projectRevenue)}</strong></div><div><small>صافي النتيجة</small><strong>${r24FinancialSigned(report.incomeStatement.netProfit)}</strong></div><div><small>إجمالي الأصول</small><strong>${r24FinancialAmount(report.balanceSheet.totalAssets)}</strong></div><div><small>النقدية آخر الفترة</small><strong>${r24FinancialAmount(report.cashFlow.closingCash)}</strong></div></section><div class="r24-fin-grid">${r24FinancialIncome(report)}${r24FinancialCash(report)}</div>${r24FinancialPosition(report)}${r24FinancialTrial(report)}<section class="panel r24-fin-section"><div class="panel-title"><div><p class="eyebrow">سجل لا يُحذف بصمت</p><h2>القيود اليدوية والافتتاحية</h2></div><button class="btn" type="button" onclick="r24OpenJournal('adjustment')">+ قيد</button></div><div class="tablewrap"><table><thead><tr><th>المعرف</th><th>التاريخ</th><th>البيان</th><th>النوع</th><th>مدين</th><th>دائن</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>${r24FinancialJournalRows()}</tbody></table></div></section>`
+}
+
+function r24AccountingReviewData(){
+ const projects=new Map((data.projects||[]).map(p=>[p.code,p]));
+ const assignments=(data.assignments||[]).map((row,index)=>({row,index,date:row.recognizedDate||row.accruedDate||row.approvedDate||'',project:projects.get(row.code)})).filter(x=>Number(x.row.fee||0)>0&&x.row.accountingStatus!=='commitment'&&!R14.dateOK(x.date));
+ const receiptMap=new Map();for(const row of data.clientReceipts||[]){const project=projects.get(row.code);if(!project||R14.projectCurrency(project)==='EGP')continue;if(row.projectSettlementRate!=null&&row.projectAmount!=null&&row.cashAmount!=null)continue;const id=row.batchId||row.id;if(!receiptMap.has(id))receiptMap.set(id,{id,client:row.client||project.client||'',date:row.date||'',codes:new Set()});receiptMap.get(id).codes.add(row.code)}
+ const claims=[];for(const claim of data.claims||[]){const problem=(R14.claimRows(claim)||[]).filter(row=>{const project=projects.get(row.code);return project&&R14.projectCurrency(project)!=='EGP'&&(row.originalAmount==null||row.claimRate==null||row.rateSource==='legacy'||row.rateConfirmed===false||row.legacyCurrencyUnconfirmed)});if(problem.length)claims.push({claim,codes:[...new Set(problem.map(x=>x.code))]})}
+ return {assignments,receipts:[...receiptMap.values()].map(x=>({...x,codes:[...x.codes]})),claims}
+}
+function r24OpenAccountingReview(){
+ const review=r24AccountingReviewData(),projectDate=x=>R14.dateOK(x.date)?x.date:R14.dateOK(x.project?.projectDate)?x.project.projectDate:'';
+ const assignments=review.assignments.length?`<form onsubmit="r24SaveAccountingReview(event)"><div class="r24-review-bulk"><label>تاريخ موحد اختياري<input id="r24ReviewBulkDate" class="field" type="date"></label><button class="btn" type="button" onclick="r24ApplyReviewDate()">تطبيق على كل صفوف المصروف</button></div><div class="tablewrap"><table class="r24-review-table"><thead><tr><th>المشروع</th><th>المصمم</th><th>الأتعاب</th><th>المعالجة المحاسبية</th><th>تاريخ الاعتماد</th></tr></thead><tbody>${review.assignments.map(x=>`<tr data-r24-assignment-index="${x.index}"><td><bdi>${esc(x.row.code)}</bdi> — ${esc(x.project?.name||'')}${x.row.archivedAt?' <span class="pill warn">مؤرشف</span>':''}</td><td>${esc(x.row.designer)}</td><td>${r24FinancialAmount(x.row.fee)}</td><td><select class="field r24-review-mode" onchange="r24ReviewModeChanged(this)"><option value="expense">اعتماد كمصروف ومستحق</option><option value="commitment">التزام إداري فقط — لا يدخل القوائم</option></select></td><td><input class="field r24-review-date" type="date" value="${esc(projectDate(x))}"></td></tr>`).join('')}</tbody></table></div><p class="hint">تاريخ المشروع يظهر كاقتراح عند توفره، ولن يُعتمد إلا بعد حفظك للمراجعة.</p><div class="modalfoot"><button class="btn primary" type="submit">حفظ مراجعة الأتعاب</button></div></form>`:'<div class="r24-review-complete">✓ تمت مراجعة تواريخ أتعاب المصممين.</div>';
+ const receipts=review.receipts.map(x=>`<tr><td>${esc(x.id)}</td><td>${esc(x.date||'—')}</td><td>${esc(x.client||'—')}</td><td>${esc(x.codes.join('، '))}</td><td><button class="btn" type="button" onclick="r24ReviewEditReceipt('${r14Encode(x.id)}')">فتح وتأكيد سعر التسوية</button></td></tr>`).join('');
+ const claims=review.claims.map(x=>`<tr><td>${esc(typeof r19Doc==='function'?r19Doc('claim',x.claim.id):x.claim.id)}</td><td>${esc(x.claim.date||'—')}</td><td>${esc(x.codes.join('، '))}</td><td><button class="btn" type="button" onclick="r24ReviewEditClaim('${r14Encode(x.claim.id)}')">فتح وتأكيد سعر الإصدار</button></td></tr>`).join('');
+ modal('مراجعة البيانات المحاسبية القديمة',`<p class="notice">لا يغيّر هذا الملف أي مبلغ تلقائيًا. أنت تحدد تاريخ الاعتراف أو تصنف التكليف كالتزام إداري، وتفتح مستندات العملات لتأكيد أرقامها.</p><section class="r24-review-section"><h3>أتعاب تحتاج تاريخ اعتراف (${review.assignments.length})</h3>${assignments}</section><section class="r24-review-section"><h3>تحصيلات عملات تحتاج تأكيد (${review.receipts.length})</h3><div class="tablewrap"><table><thead><tr><th>السند</th><th>التاريخ</th><th>العميل</th><th>المشاريع</th><th></th></tr></thead><tbody>${receipts||'<tr><td colspan="5" class="empty">لا توجد تحصيلات عملات غير مؤكدة.</td></tr>'}</tbody></table></div></section><section class="r24-review-section"><h3>مطالبات عملات تحتاج تأكيد (${review.claims.length})</h3><div class="tablewrap"><table><thead><tr><th>المطالبة</th><th>التاريخ</th><th>المشاريع</th><th></th></tr></thead><tbody>${claims||'<tr><td colspan="4" class="empty">لا توجد مطالبات عملات غير مؤكدة.</td></tr>'}</tbody></table></div></section><div class="modalfoot"><button class="btn" type="button" onclick="closeModal()">إغلاق</button></div>`)
+}
+function r24ReviewModeChanged(select){const date=select.closest('tr')?.querySelector('.r24-review-date'),commitment=select.value==='commitment';if(date){date.disabled=commitment;date.required=!commitment}}
+function r24ApplyReviewDate(){const date=val('r24ReviewBulkDate');if(!R14.dateOK(date))return alert('اختر تاريخًا موحدًا صالحًا');document.querySelectorAll('[data-r24-assignment-index]').forEach(root=>{if(root.querySelector('.r24-review-mode').value==='expense')root.querySelector('.r24-review-date').value=date})}
+function r24SaveAccountingReview(event){
+ event.preventDefault();try{const rows=[...document.querySelectorAll('[data-r24-assignment-index]')].map(root=>({index:Number(root.dataset.r24AssignmentIndex),mode:root.querySelector('.r24-review-mode').value,date:root.querySelector('.r24-review-date').value}));for(const row of rows)if(row.mode==='expense'&&!R14.dateOK(row.date))throw Error('حدد تاريخ اعتماد صالحًا لكل مصروف، أو صنفه كالتزام إداري');const reviewedAt=new Date().toISOString(),reviewedBy=typeof r24CurrentEmail==='function'?r24CurrentEmail():'';if(r14Change('مراجعة محاسبية لأتعاب قديمة',next=>{for(const row of rows){const assignment=next.assignments[row.index];if(!assignment)throw Error('تغير سجل التكليفات؛ أغلق النافذة وأعد المراجعة');assignment.accountingReviewed=true;assignment.accountingReviewedAt=reviewedAt;assignment.accountingReviewedBy=reviewedBy;if(row.mode==='commitment'){assignment.accountingStatus='commitment';delete assignment.recognizedDate;delete assignment.accruedDate;delete assignment.approvedDate}else{assignment.accountingStatus='recognized';assignment.recognizedDate=row.date}}},{count:rows.length,recognized:rows.filter(x=>x.mode==='expense').length,commitments:rows.filter(x=>x.mode==='commitment').length}))r14Done('تم حفظ مراجعة الأتعاب وتحديث جاهزية القوائم')}catch(error){alert(error.message)}
+}
+function r24ReviewEditReceipt(enc){closeModal();setTimeout(()=>editCustomerReceipt(enc),0)}
+function r24ReviewEditClaim(enc){closeModal();setTimeout(()=>openClaim('',enc),0)}
+function r24OpenAccountingSettings(){
+ const s=data.accountingSettings||{},accounts=r24FinancialAccounts(),cash=accounts.filter(x=>x.group==='cash'),currencies=[...new Set(data.projects.map(p=>R14.projectCurrency(p)).filter(x=>x!=='EGP'))],rates=Array.isArray(data.closingRates)?data.closingRates:[];
+ modal('إعداد المحاسبة وأسعار الإقفال',`<form onsubmit="r24SaveAccountingSettings(event)"><div class="formgrid"><label>العملة الوظيفية<input class="field" value="EGP — جنيه مصري" readonly></label><label>حساب النقدية الافتراضي<select id="r24DefaultCash" class="field" required>${cash.map(x=>`<option value="${esc(x.id)}" ${String(s.defaultCashAccountId||'1100')===x.id?'selected':''}>${esc(x.code)} — ${esc(x.name)}</option>`).join('')}</select></label><label class="full r24-fin-confirm"><input id="r24OpeningComplete" type="checkbox" ${s.openingComplete?'checked':''}> أؤكد أن الأرصدة الافتتاحية أُدخلت بقيود متوازنة، أو أن جميعها صفر.</label></div><h3>أسعار إقفال العملات</h3><p class="hint">تستخدم فقط لإعادة تقييم الأرصدة الأجنبية المفتوحة في تاريخ القوائم؛ لا تغيّر سعر العقد ولا مستندات الماضي.</p><div class="r24-closing-rates">${currencies.map(currency=>{const old=rates.filter(x=>x.currency===currency).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];return `<div data-closing-currency="${esc(currency)}"><b>${esc(currency)}</b><label>1 ${esc(currency)} = جنيه<input class="field r24-close-rate" type="number" min="0.000001" step="0.000001" value="${esc(old?.rate||'')}" placeholder="سعر الإقفال"></label><label>تاريخ السعر<input class="field r24-close-date" type="date" value="${esc(old?.date||r24FinancialTo)}"></label></div>`}).join('')||'<p class="hint">لا توجد عقود بعملة أجنبية.</p>'}</div><div class="modalfoot"><button class="btn primary" type="submit">حفظ الإعداد</button><button class="btn" type="button" onclick="closeModal()">إلغاء</button></div></form>`)
+}
+function r24SaveAccountingSettings(event){
+ event.preventDefault();try{const defaultCashAccountId=val('r24DefaultCash'),openingComplete=$('r24OpeningComplete').checked,rates=[...document.querySelectorAll('[data-closing-currency]')].map(root=>({currency:root.dataset.closingCurrency,rate:root.querySelector('.r24-close-rate').value,date:root.querySelector('.r24-close-date').value})).filter(x=>String(x.rate).trim());for(const x of rates){x.rate=R14.rate(x.rate);if(!R14.dateOK(x.date))throw Error('راجع تاريخ سعر إقفال '+x.currency)}if(r14Change('تحديث إعداد المحاسبة وأسعار الإقفال',next=>{next.accountingSettings={...(next.accountingSettings||{}),baseCurrency:'EGP',defaultCashAccountId,openingComplete,updatedAt:new Date().toISOString()};next.closingRates=Array.isArray(next.closingRates)?next.closingRates:[];for(const x of rates){next.closingRates=next.closingRates.filter(r=>!(r.currency===x.currency&&r.date===x.date));next.closingRates.push({...x,source:'manual'})}},{defaultCashAccountId,openingComplete,rateCurrencies:rates.map(x=>x.currency)}))r14Done('تم حفظ إعداد المحاسبة وأسعار الإقفال')}catch(error){alert(error.message)}
+}
+function r24JournalLine(){return {account:'',debit:0,credit:0,code:'',client:''}}
+function r24OpenJournal(kind='adjustment'){
+ r24JournalDraft=[r24JournalLine(),r24JournalLine()];modal(kind==='opening'?'قيد افتتاحي متوازن':'قيد تسوية متوازن',`<form onsubmit="r24SaveJournal(event,'${kind}')"><div class="formgrid">${field('r24JournalDate','التاريخ',kind==='opening'?r24FinancialFrom:r14Today(),'date','required')}${field('r24JournalDescription','البيان','','text','required')}<label>تصنيف التدفق<select id="r24JournalCashflow" class="field"><option value="operating">تشغيلي</option><option value="investing">استثماري</option><option value="financing">تمويلي</option><option value="none">لا يوجد أثر نقدي</option></select></label></div><p class="notice">يجب أن يتساوى إجمالي المدين والدائن. الإلغاء لاحقًا ينشئ قيدًا عكسيًا ولا يمحو التاريخ.</p><div id="r24JournalLines"></div><button class="btn" type="button" onclick="r24AddJournalLine()">+ سطر قيد</button><div class="r24-journal-balance" id="r24JournalBalance"></div><div class="modalfoot"><button class="btn primary" type="submit">ترحيل القيد</button><button class="btn" type="button" onclick="closeModal()">إلغاء</button></div></form>`);r24RenderJournalLines()
+}
+function r24RenderJournalLines(){
+ const root=$('r24JournalLines');if(!root)return;const accounts=r24FinancialAccounts();root.innerHTML=`<div class="tablewrap"><table><thead><tr><th>الحساب</th><th>مدين</th><th>دائن</th><th>المشروع / البعد</th><th></th></tr></thead><tbody>${r24JournalDraft.map((x,i)=>`<tr><td><select class="field" onchange="r24JournalInput(${i},'account',this.value,this)"><option value="">اختر الحساب</option>${accounts.map(a=>`<option value="${esc(a.id)}" ${x.account===a.id?'selected':''}>${esc(a.code)} — ${esc(a.name)}</option>`).join('')}</select></td><td><input class="field" type="number" min="0" step="0.01" value="${x.debit||''}" oninput="r24JournalInput(${i},'debit',this.value,this)"></td><td><input class="field" type="number" min="0" step="0.01" value="${x.credit||''}" oninput="r24JournalInput(${i},'credit',this.value,this)"></td><td><input class="field" value="${esc(x.code||'')}" placeholder="اختياري" oninput="r24JournalInput(${i},'code',this.value,this)"></td><td><button class="btn danger" type="button" onclick="r24RemoveJournalLine(${i})" ${r24JournalDraft.length<=2?'disabled':''}>×</button></td></tr>`).join('')}</tbody></table></div>`;r24JournalBalance()
+}
+function r24JournalInput(index,key,value,input){const row=r24JournalDraft[index];if(!row)return;row[key]=key==='debit'||key==='credit'?Number(value||0):value;if(key==='debit'&&row.debit){row.credit=0;const other=input?.closest('tr')?.children[2]?.querySelector('input');if(other)other.value=''}if(key==='credit'&&row.credit){row.debit=0;const other=input?.closest('tr')?.children[1]?.querySelector('input');if(other)other.value=''}r24JournalBalance()}
+function r24AddJournalLine(){r24JournalDraft.push(r24JournalLine());r24RenderJournalLines()}
+function r24RemoveJournalLine(index){if(r24JournalDraft.length<=2)return;r24JournalDraft.splice(index,1);r24RenderJournalLines()}
+function r24JournalBalance(){const root=$('r24JournalBalance');if(!root)return;try{const debit=R14.sum(r24JournalDraft,'debit'),credit=R14.sum(r24JournalDraft,'credit'),difference=R14.delta(debit,credit);root.className='r24-journal-balance '+(R14.cents(difference)===0&&debit>0?'ok':'bad');root.innerHTML=`المدين: <b>${r24FinancialAmount(debit)}</b> · الدائن: <b>${r24FinancialAmount(credit)}</b> · الفرق: <b>${r24FinancialAmount(difference)}</b>`}catch(error){root.className='r24-journal-balance bad';root.textContent=error.message}}
+function r24DateInClosedPeriod(date){return (data.fiscalClosings||[]).some(x=>x.status==='closed'&&x.from<=date&&date<=x.to)}
+function r24SaveJournal(event,kind){
+ event.preventDefault();try{const date=val('r24JournalDate'),description=val('r24JournalDescription'),cashFlowCategory=val('r24JournalCashflow');if(!R14.dateOK(date)||!description)throw Error('راجع تاريخ القيد وبيانه');if(r24DateInClosedPeriod(date))throw Error('التاريخ داخل فترة مقفلة؛ أعد فتحها أولًا');const accounts=new Set(r24FinancialAccounts().map(x=>x.id)),lines=r24JournalDraft.map(x=>({account:String(x.account||''),debit:R14.amount(String(x.debit||0)),credit:R14.amount(String(x.credit||0)),code:String(x.code||'')})).filter(x=>x.debit||x.credit);if(lines.length<2||lines.some(x=>!accounts.has(x.account)||(x.debit&&x.credit)))throw Error('أدخل طرفين صحيحين على الأقل، واختر حسابًا لكل سطر');const debit=R14.sum(lines,'debit'),credit=R14.sum(lines,'credit');if(!debit||R14.cents(debit)!==R14.cents(credit))throw Error('إجمالي المدين يجب أن يساوي إجمالي الدائن');const record={id:r14Id('JRN'),kind,date,description,status:'posted',cashFlowCategory:cashFlowCategory==='none'?'':cashFlowCategory,lines,createdAt:new Date().toISOString()};if(r14Change('ترحيل قيد محاسبي يدوي',next=>{next.manualJournals=Array.isArray(next.manualJournals)?next.manualJournals:[];next.manualJournals.push(record)},{id:record.id,kind,date,debit}))r14Done('تم ترحيل القيد المتوازن')}catch(error){alert(error.message)}
+}
+function r24ReverseJournal(enc){
+ const id=decodeURIComponent(enc),row=(data.manualJournals||[]).find(x=>x.id===id);if(!row||row.voidedBy||row.kind==='reversal')return;const reason=prompt('اكتب سبب عكس القيد. سيبقى القيد الأصلي ويُنشأ قيد معاكس:');if(!String(reason||'').trim())return;const date=r14Today();if(r24DateInClosedPeriod(date))return alert('تاريخ اليوم داخل فترة مقفلة؛ أعد فتحها أولًا');const reversal={id:r14Id('JRN'),kind:'reversal',date,description:'عكس '+row.id+' — '+reason.trim(),status:'posted',cashFlowCategory:row.cashFlowCategory||'',reverses:row.id,lines:(row.lines||[]).map(x=>({...x,debit:x.credit||0,credit:x.debit||0})),createdAt:new Date().toISOString()};if(r14Change('عكس قيد محاسبي',next=>{next.manualJournals=Array.isArray(next.manualJournals)?next.manualJournals:[];const original=next.manualJournals.find(x=>x.id===id);if(!original||original.voidedBy)throw Error('القيد غير موجود أو عُكس سابقًا');original.voidedBy=reversal.id;original.voidReason=reason.trim();original.voidedAt=new Date().toISOString();next.manualJournals.push(reversal)},{id,reversalId:reversal.id,reason:reason.trim()}))r14Done('تم إنشاء قيد عكسي مع بقاء السجل الأصلي')
+}
+function r24ClosePeriod(){
+ const report=r24FinancialReport();if(!report.ready)return alert('لا يمكن الإقفال قبل إكمال المراجعات وتوازن القوائم');const existing=r24FinancialClosing(report);if(existing?.unchanged)return alert('الفترة مقفلة بالفعل');if(!confirm('سيتم تثبيت بصمة القيود واعتماد القوائم للفترة. متابعة؟'))return;const closing={id:r14Id('CLOSE'),from:report.from,to:report.to,status:'closed',signature:report.signature||r24FinancialSignature(report),closedAt:new Date().toISOString(),closedBy:typeof r24CurrentEmail==='function'?r24CurrentEmail():''};if(r14Change('إقفال فترة مالية',next=>{next.fiscalClosings=Array.isArray(next.fiscalClosings)?next.fiscalClosings:[];next.fiscalClosings.push(closing)},{from:closing.from,to:closing.to,signature:closing.signature}))r14Done('تم إقفال الفترة واعتماد بصمة القيود')
+}
+function r24ReopenPeriod(){
+ const report=r24FinancialReport(),closing=r24FinancialClosing(report);if(!closing)return;const reason=prompt('اكتب سبب إعادة فتح الفترة:');if(!String(reason||'').trim())return;if(r14Change('إعادة فتح فترة مالية',next=>{const row=(next.fiscalClosings||[]).find(x=>x.id===closing.id);if(!row||row.status!=='closed')throw Error('سجل الإقفال غير موجود');row.status='reopened';row.reopenedAt=new Date().toISOString();row.reopenReason=reason.trim();row.reopenedBy=typeof r24CurrentEmail==='function'?r24CurrentEmail():''},{id:closing.id,reason:reason.trim()}))r14Done('أعيد فتح الفترة وسُجل السبب')
+}
+function r24FinancialTabs(){
+ const r=r24FinancialReport(),t=r.trialBalance,i=r.incomeStatement,b=r.balanceSheet,c=r.cashFlow;return [
+  ['حالة القوائم',[['الفترة من','الفترة إلى','جاهزة','مقفلة','عدد المراجعات'],[r.from,r.to,r.ready?'نعم':'لا',r24FinancialClosing(r)?.unchanged?'نعم':'لا',r.issues.length],[],['المراجات'],...r.issues.map(x=>[x.severity,x.message,x.source||''])]],
+  ['ميزان المراجعة',[['الكود','الحساب','افتتاحي','حركة مدين','حركة دائن','رصيد مدين','رصيد دائن'],...t.rows.map(x=>[x.code,x.name,x.opening,x.periodDebit,x.periodCredit,x.balanceDebit,x.balanceCredit]),[],['إجمالي الحركة','','',t.periodDebit,t.periodCredit,'الفرق',t.difference]]],
+  ['قائمة الدخل',[['البند','القيمة'],['إيرادات المشاريع',i.projectRevenue],['تكاليف المشاريع',i.projectCosts],['مجمل الربح',i.grossProfit],['المصروفات التشغيلية',i.operatingExpenses],['أرباح فرق العملة',i.fxGain],['خسائر فرق العملة',i.fxLoss],['صافي النتيجة',i.netProfit]]],
+  ['المركز المالي',[['القسم','الكود','الحساب','القيمة'],...b.assets.map(x=>['أصل',x.code,x.name,x.amount]),...b.liabilities.map(x=>['التزام',x.code,x.name,x.amount]),...b.equity.map(x=>['حقوق ملكية',x.code,x.name,x.amount]),['إجمالي الأصول','','',b.totalAssets],['إجمالي الالتزامات','','',b.totalLiabilities],['نتيجة الأعمال','','',b.currentEarnings],['إجمالي حقوق الملكية','','',b.totalEquity],['فرق المعادلة','','',b.difference]]],
+  ['التدفقات النقدية',[['البند','القيمة'],['نقدية أول الفترة',c.openingCash],['تشغيلي',c.operating],['استثماري',c.investing],['تمويلي',c.financing],['صافي التغير',c.netChange],['نقدية آخر الفترة',c.closingCash],['فرق المطابقة',c.difference]]]
+ ]
+}
+function r24ExportFinancial(){try{exportTabs(r24FinancialTabs(),`RONIX_Financial_${r24FinancialFrom}_${r24FinancialTo}`)}catch(error){alert(error.message)}}
+function r24FinancialDocument(){
+ const r=r24FinancialReport(),tabs=r24FinancialTabs(),closing=r24FinancialClosing(r),status=r.ready&&closing?.unchanged?'قوائم ختامية مقفلة':r.ready?'قوائم متوازنة غير مقفلة':'مسودة غير معتمدة';return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>قوائم RONIX المالية</title><style>@page{size:A4 portrait;margin:11mm}*{box-sizing:border-box}body{max-width:210mm;margin:auto;color:#172b45;font:10px/1.55 Tahoma,Arial}.actions{display:flex;gap:8px;padding:8px;background:#172337;position:sticky;top:0}.actions button{flex:1;padding:8px}.head{display:flex;justify-content:space-between;border-bottom:2px solid #b58a48;padding:12px 0}.head img{width:65px;height:65px;object-fit:contain}.status{padding:9px;border:1px solid #d7dfe8;border-radius:7px;margin:10px 0;font-weight:bold}.status.ready{color:#087c69}h2{margin-top:20px}table{width:100%;border-collapse:collapse;table-layout:fixed;margin:7px 0 14px}th,td{border:1px solid #d7dfe8;padding:5px;overflow-wrap:anywhere;text-align:right}th{background:#edf1f6}tr{break-inside:avoid}@media print{.actions{display:none}body{max-width:none}}</style></head><body><nav class="actions"><button onclick="if(opener&&!opener.closed)close();else history.back()">رجوع</button><button onclick="print()">طباعة / PDF</button></nav><header class="head"><div><h1>القوائم المالية</h1><p>من ${esc(r.from)} إلى ${esc(r.to)}</p></div><img src="${R14_LOGO}" alt="RONIX"></header><div class="status ${r.ready?'ready':''}">${esc(status)}${closing?.signature?` · ${esc(closing.signature)}`:''}</div>${tabs.slice(1).map(tab=>`<section><h2>${esc(tab[0])}</h2><table>${tab[1].map((row,index)=>`<tr>${row.map(cell=>`<${index===0?'th':'td'}>${esc(typeof cell==='number'?fmt(cell):cell??'')}</${index===0?'th':'td'}>`).join('')}</tr>`).join('')}</table></section>`).join('')}<footer>إعداد الحسابات: ____________　 اعتماد: ____________</footer></body></html>`
+}
+function r24PrintFinancial(){const w=open('','_blank');if(!w)return alert('اسمح بالنوافذ المنبثقة للطباعة');w.document.open();w.document.write(r24FinancialDocument());w.document.close();Promise.all([...w.document.images].map(x=>x.decode().catch(()=>{}))).then(()=>{if(!w.closed){w.focus();w.print()}})}
+
+titles.financialStatements=['القوائم المالية والإقفال','ميزان مراجعة، دخل، مركز مالي، تدفقات نقدية وإقفال موثق'];
+const r24FinancialRender=render;render=function(){if(page==='financialStatements'&&!projectFocus&&!designerFocus){$('content').innerHTML=r24FinancialPage();return}return r24FinancialRender()};
+if(!document.querySelector('.nav[data-page="financialStatements"]')){const button=document.createElement('button');button.className='nav';button.dataset.page='financialStatements';button.innerHTML='<span>▥</span>القوائم المالية والإقفال';button.onclick=()=>go('financialStatements');(document.querySelector('.nav[data-page="reports"]')||document.querySelector('.sidebar-footer')).before(button)}
 
 </script>

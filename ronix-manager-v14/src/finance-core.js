@@ -1,6 +1,6 @@
 /* RONIX V14. Monetary arithmetic in integer piastres; no network or storage. */
 const R14 = (() => {
-  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers','documentNumbers'];
+  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers','documentNumbers','manualJournals','laborEntries','generalExpenses','accounts','closingRates','fiscalClosings'];
   const copy = v => JSON.parse(JSON.stringify(v));
   const normName = v => String(v || '').trim();
   function cents(v) {
@@ -48,6 +48,27 @@ const R14 = (() => {
   function unfx(v,r=1){const n=BigInt(cents(v))*1000000n,d=rateUnits(r),q=n<0n?-((-n+d/2n)/d):(n+d/2n)/d;return Number(q)/100}
   const projectCurrency=p=>p?.contractCurrency??'EGP';
   const projectRate=p=>p?.contractRate??1;
+  function projectSettlementRate(r,p){
+    if(!p)throw Error('المشروع غير موجود');
+    if(projectCurrency(p)==='EGP')return 1;
+    if(r?.projectSettlementRate!=null)return rate(r.projectSettlementRate);
+    const native=Number(r?.projectAmount||0),cash=Number(cashReceipt(r)||0);
+    if(native>0&&cash>0)return rate((cash/native).toFixed(6));
+    return projectRate(p);
+  }
+  function projectRateSummary(d,p){
+    if(!p)throw Error('المشروع غير موجود');
+    const rows=d.clientReceipts.filter(r=>r.code===p.code),usable=[],unconfirmed=[];
+    for(const r of rows){
+      const native=Number(r.projectAmount||0),cash=Number(r.cashAmount||0);
+      if(native>0&&cash>0)usable.push(r);else unconfirmed.push(r);
+    }
+    const originalPaid=sum(usable,r=>r.projectAmount),cashPaid=sum(usable,r=>r.cashAmount);
+    const weightedRate=originalPaid>0?rate((cashPaid/originalPaid).toFixed(6)):0;
+    const latest=usable.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.id).localeCompare(String(a.id)))[0];
+    return {currency:projectCurrency(p),contractRate:projectRate(p),weightedRate,effectiveRate:weightedRate||projectRate(p),originalPaid,cashPaid,confirmedCount:usable.length,unconfirmedCount:unconfirmed.length,latestRate:latest?projectSettlementRate(latest,p):0,latestDate:latest?.settlementRateAsOf||latest?.date||''};
+  }
+  const projectWeightedRate=(d,p)=>projectRateSummary(d,p).weightedRate;
   const originalContract=p=>p?.originalContract??p?.contract??0;
   const projectSubtotal=p=>sum([{amount:originalContract(p)},...(p.contractExtras||[])]);
   function projectTaxAmount(p,t){
@@ -76,7 +97,13 @@ const R14 = (() => {
       const native=amount(a.projectAmount),cash=amount(a.receiptOriginal);if(native<0||cash<0||(native===0)!==(cash===0))throw Error('راجع تخصيص العقد والمبلغ المخصص من السند');
       if(!native)continue;
       if(projectCurrency(p)===currency&&cents(native)!==cents(cash))throw Error('عند تطابق العملتين يجب أن يتساوى مبلغ العقد والجزء المخصص من السند');
-      entries.push({...base,id:old.find(r=>r.code===a.code)?.id||id(),code:a.code,projectAmount:native,projectCurrency:projectCurrency(p),bookRate:projectRate(p),receiptOriginal:cash,amount:fx(native,projectRate(p)),cashAmount:fx(cash,exchangeRate)});
+      const actualCash=fx(cash,exchangeRate),settlementRate=projectCurrency(p)==='EGP'?1:rate(a.settlementRate??(actualCash/native).toFixed(6));
+      // The project settlement rate describes one unit of the contract currency
+      // in EGP on this receipt date. Keep it separate from the incoming-currency
+      // rate and from the immutable historical contract rate.
+      const expectedCash=fx(native,settlementRate),tolerance=Math.max(1,Math.ceil(settlementRate/2));
+      if(Math.abs(cents(actualCash)-cents(expectedCash))>tolerance)throw Error('مبلغ سداد العقد لا يطابق النقد الفعلي وسعر تسوية المشروع: '+a.code);
+      entries.push({...base,id:old.find(r=>r.code===a.code)?.id||id(),code:a.code,projectAmount:native,projectCurrency:projectCurrency(p),bookRate:projectRate(p),projectSettlementRate:settlementRate,settlementRateAsOf:a.settlementRateAsOf||date,settlementRateSource:a.settlementRateSource||'manual',receiptOriginal:cash,amount:fx(native,projectRate(p)),cashAmount:actualCash});
     }
     const rest=delta(total,sum(entries,'receiptOriginal'));if(rest<0)throw Error('التوزيع أكبر من إجمالي السند');
     if(rest)entries.push({...base,id:old.find(r=>!r.code)?.id||id(),code:'',unallocated:true,receiptOriginal:rest,amount:fx(rest,exchangeRate),cashAmount:fx(rest,exchangeRate)});
@@ -117,6 +144,9 @@ const R14 = (() => {
     for(const p of d.projects)for(const x of p.contractItems||[])if(x.unit==null)x.unit='عدد';
     for(const c of d.claims){
       if(c.items==null)c.items=claimRows(c).map(r=>({desc:String(r.code||''),amount:r.amount}));
+      // Historical claims remain byte-for-byte compatible. Their currency is
+      // hydrated as legacy EGP only in the V24 claim editor/report layer, where
+      // foreign-project rows are visibly flagged for review.
       for(const r of claimRows(c))for(const x of r.items||[])if(x.unit==null)x.unit='عدد';
     }
     return d;
@@ -164,7 +194,18 @@ const R14 = (() => {
       else {for(const item of c.items)monetary(item.amount,'بند مطالبة',1);try{if(cents(sum(c.items))!==cents(c.total))add('بنود المطالبة لا تساوي إجماليها: '+c.id)}catch{}}
       unique(claimRows(c),r=>r.code,'مشاريع المطالبة');
       for(const r of claimRows(c)){linked(r.code,'مطالبة');monetary(r.amount,'بند مطالبة',1);if(projects.has(r.code)&&normName(projects.get(r.code).client)!==claimClient(d,c))add('مطالبة تجمع عملاء مختلفين: '+c.id);if(r.items!=null){if(!Array.isArray(r.items)||!r.items.length)add('تفاصيل كمية المطالبة غير صالحة: '+c.id);else{for(const x of r.items){if(!String(x.description||'').trim())add('بيان بند المطالبة مطلوب');if(!String(x.unit||'').trim())add('وحدة بند المطالبة مطلوبة');if(!Number.isFinite(Number(x.quantity))||Number(x.quantity)<=0)add('كمية المطالبة غير صالحة');monetary(x.unitPrice,'سعر وحدة المطالبة');monetary(x.amount,'إجمالي بند المطالبة');if(cents(x.amount)!==cents(amount((Number(x.quantity)*Number(x.unitPrice)).toFixed(2))))add('إجمالي بند المطالبة لا يطابق الكمية والسعر')}if(cents(sum(r.items))!==cents(r.amount))add('تفاصيل المطالبة لا تساوي إجمالي المشروع')}}}
+      for(const r of claimRows(c))if(r.originalAmount!=null){
+        if(!/^[A-Z]{3}$/.test(String(r.currency||'')))add('عملة مطالبة غير صالحة: '+c.id);else if(r.currency==='EGP'&&Number(r.claimRate)!==1)add('سعر مطالبة بالجنيه يجب أن يساوي 1: '+c.id);
+        try{rate(r.claimRate)}catch(e){add('سعر مطالبة غير صالح: '+c.id)}dated(r.rateDate||c.date,'تاريخ سعر مطالبة');monetary(r.originalAmount,'قيمة مطالبة أصلية',1);
+        const p=projects.get(r.code),bookRate=p?projectRate(p):1;
+        if(p&&r.currency!==projectCurrency(p))add('عملة المطالبة لا تطابق عملة عقد المشروع: '+c.id);
+        if(!r.legacyCurrencyUnconfirmed&&cents(r.amount)!==cents(fx(r.originalAmount,bookRate)))add('القيمة الدفترية للمطالبة لا تطابق سعر التعاقد: '+c.id);
+        if(r.accountingAmount!=null&&cents(r.accountingAmount)!==cents(fx(r.originalAmount,r.claimRate)))add('قيمة إصدار المطالبة لا تطابق سعر الإصدار: '+c.id);
+        for(const x of r.items||[]){monetary(x.originalAmount,'إجمالي بند أصلي');monetary(x.originalUnitPrice,'سعر وحدة أصلي');if(cents(x.originalAmount)!==cents(amount((Number(x.quantity)*Number(x.originalUnitPrice)).toFixed(2))))add('إجمالي البند الأصلي لا يطابق الكمية والسعر');if(x.accountingAmount!=null&&cents(x.accountingAmount)!==cents(fx(x.originalAmount,r.claimRate)))add('قيمة إصدار بند المطالبة غير مطابقة')}
+        if((r.items||[]).length&&r.accountingAmount!=null&&cents(sum(r.items,'accountingAmount'))!==cents(r.accountingAmount))add('بنود الإصدار لا تساوي إجمالي المشروع في المطالبة')
+      }
       try{if(cents(claimAmount(c))!==cents(c.total))add('إجمالي المطالبة لا يطابق توزيعها: '+c.id)}catch{}
+      if(c.accountingTotal!=null)try{if(claimRows(c).some(r=>r.accountingAmount==null)||cents(sum(claimRows(c),'accountingAmount'))!==cents(c.accountingTotal))add('قيمة إصدار المطالبة لا تطابق توزيع المشاريع: '+c.id)}catch{}
     }
     const batchClients=new Map();
     for(const r of d.clientReceipts){
@@ -213,7 +254,7 @@ const R14 = (() => {
       const batches=new Map();
       for(const r of d.clientReceipts)if(r.incomingCurrency){
         if(!/^[A-Z]{3}$/.test(r.incomingCurrency)||(r.incomingCurrency==='EGP'&&r.receiptRate!==1))add('عملة سند غير صالحة');rate(r.receiptRate);monetary(r.receiptOriginal,'قبض بعملة السند',1);monetary(r.cashAmount,'نقد فعلي',1);monetary(r.receiptTotal,'إجمالي السند',1);
-        if(r.code){const p=projects.get(r.code);if(!p||r.projectCurrency!==projectCurrency(p)||r.bookRate!==projectRate(p))add('عملة أو سعر العقد لا يطابق تخصيصه');monetary(r.projectAmount,'سداد بعملة العقد',1);if(cents(r.amount)!==cents(fx(r.projectAmount,r.bookRate)))add('قيمة تسوية العقد غير مطابقة');if(r.projectCurrency===r.incomingCurrency&&cents(r.projectAmount)!==cents(r.receiptOriginal))add('تخصيص بنفس العملة غير متساو')}
+        if(r.code){const p=projects.get(r.code);if(!p||r.projectCurrency!==projectCurrency(p)||r.bookRate!==projectRate(p))add('عملة أو سعر العقد لا يطابق تخصيصه');monetary(r.projectAmount,'سداد بعملة العقد',1);if(cents(r.amount)!==cents(fx(r.projectAmount,r.bookRate)))add('قيمة تسوية العقد غير مطابقة');if(r.projectCurrency===r.incomingCurrency&&cents(r.projectAmount)!==cents(r.receiptOriginal))add('تخصيص بنفس العملة غير متساو');if(r.projectSettlementRate!=null){try{rate(r.projectSettlementRate);dated(r.settlementRateAsOf||r.date,'تاريخ سعر تسوية المشروع');if(Math.abs(cents(r.cashAmount)-cents(fx(r.projectAmount,r.projectSettlementRate)))>Math.max(1,Math.ceil(Number(r.projectSettlementRate)/2)))add('النقد الفعلي لا يطابق سعر تسوية المشروع: '+r.id)}catch(e){add('سعر تسوية مشروع غير صالح: '+r.id)}}}
         else if(cents(r.amount)!==cents(r.cashAmount))add('الرصيد غير الموزع لا يساوي نقده');
         const key=r.batchId||r.id;if(!batches.has(key))batches.set(key,[]);batches.get(key).push(r);
       }
@@ -243,6 +284,6 @@ const R14 = (() => {
     const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);
     validate(next);return next;
   }
-  return {rate,fx,unfx,projectCurrency,projectRate,originalContract,projectSubtotal,projectTaxAmount,projectTaxTotal,projectOriginalTotal,projectBookTotal,assignmentTotal,cashReceipt,fxDifference,receivedOriginal,foreignReceiptEdit,arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
+  return {rate,fx,unfx,projectCurrency,projectRate,projectSettlementRate,projectRateSummary,projectWeightedRate,originalContract,projectSubtotal,projectTaxAmount,projectTaxTotal,projectOriginalTotal,projectBookTotal,assignmentTotal,cashReceipt,fxDifference,receivedOriginal,foreignReceiptEdit,arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
 })();
 if(typeof module!=='undefined')module.exports=R14;

@@ -1,0 +1,20 @@
+{
+  "passed": 14,
+  "checks": [
+    "financial workspace opens on the dedicated route",
+    "confirmed multi-currency records are ready without review blockers",
+    "trial balance, position, and cash flow reconcile",
+    "foreign settlement records the actual EGP cash and realized FX gain",
+    "all four closing statements render",
+    "financial statements fit an iPhone viewport without body overflow",
+    "claim editor keeps both projects in one customer claim",
+    "claim line items expose unit, quantity, price, and calculated total",
+    "contract and EGP display option remains selected",
+    "project image is visible beside its claim project",
+    "claim editor modal stays inside the 390px iPhone viewport",
+    "printed claim identifies both currencies and the frozen issue rate",
+    "printed claim includes unit quantity price and project image",
+    "finance and claim flows have no script exceptions"
+  ],
+  "errors": []
+}

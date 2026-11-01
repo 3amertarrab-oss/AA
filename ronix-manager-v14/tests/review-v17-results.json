@@ -6,7 +6,7 @@
     "latest source records preserved without resurrecting older data",
     "latest import passes accounting audit",
     "new claim amount is calculated automatically from contract receipts and prior claims",
-    "automatic claim amount remains manually editable",
+    "claim total remains editable through quantity and unit price",
     "claim PDF stays concise with project images paid green and due red",
     "EGP input calculates SAR repayment without changing actual cash",
     "cross-currency receipt saves exact cash and explicit rounding difference",

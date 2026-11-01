@@ -54,7 +54,7 @@ openCustomerReceipt=function(client='',batch=''){
   r19BindRate('crRate','crCurrency',r15RepriceReceipt,row?.rateQuote);
 };
 const r19ProjectForm=editProject;
-editProject=function(enc){r19ProjectForm(enc);const p=enc?getP(decodeURIComponent(enc)):null,locked=!!(p&&(claimsFor(p.code).length||receiptFor(p.code).length));r19BindRate('pRate','pCurrency',r15PreviewTotals,p?.rateQuote,locked)};
+editProject=function(enc){r19ProjectForm(enc);const p=enc?getP(decodeURIComponent(enc)):null,locked=!!(p&&(typeof r24ProjectHasFinancialMovement==='function'?r24ProjectHasFinancialMovement(data,p.code):(claimsFor(p.code).length||receiptFor(p.code).length)));r19BindRate('pRate','pCurrency',r15PreviewTotals,p?.rateQuote,locked)};
 r15Changes=function(){modal('تحديث الأسعار وأرقام السندات · V19',`<ol><li>رابط أسعار بنك مصر الرسمي بجانب سعر الصرف، مع إدخال يدوي وتاريخ حفظ.</li><li>زر السعر الآلي يعطي مرجعًا عامًا للمقارنة ولا يُعرض على أنه سعر بنك مصر.</li><li>أرقام قصيرة ثابتة للمطالبات والسندات، والمبالغ معروضة دون قروش مع حفظ دقة الحساب.</li></ol><p>عند استلام عملة أجنبية راجع عادةً سعر شراء البنك، وعند شراء العملة راجع سعر البيع. اعتمد دائمًا سعر التنفيذ الفعلي الظاهر في مستند التحويل.</p>`)};
 r15Help.textContent='✓ ما الجديد · V19';r15Help.onclick=r15Changes;
 document.title='RONIX V19 | الحسابات وسعر الصرف';document.querySelector('.sublogo').textContent='PROJECT FINANCE · V19';document.querySelector('.sidebar-footer').innerHTML='RONIX V19 · جنيه مصري<br>حفظ محلي على هذا الجهاز والمتصفح';document.querySelector('.footer').textContent='RONIX V19 · المبالغ معروضة لأقرب وحدة دون تغيير دقة الحساب · احتفظ بنسخة احتياطية';

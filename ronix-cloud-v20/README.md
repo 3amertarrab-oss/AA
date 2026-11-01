@@ -1,6 +1,6 @@
-# RONIX V20.1 cloud edition
+# RONIX V20.2 cloud edition
 
-Adds a shared, authenticated account to the project-finance application. V20.1 adds separate contract tax/discount rows, cash-first cross-currency receipt allocation, protected project/designer removal and restoration, fuller project Excel exports, and guarded modal closing. Laptop and iPhone use the same authenticated account through the responsive installable web app.
+Adds a shared, authenticated account to the project-finance application. V20.2 adds project contract currencies and historical rates, independently dated settlement rates for each payment, weighted exchange-rate reporting, multi-project claims in contract currency/EGP/both, project work-hour accruals, actual monthly and annual cash-flow timelines, and reviewable final financial statements. Laptop and iPhone use the same authenticated account through the responsive installable web app.
 
 **Deployment status:** packaged and locally tested. Supabase setup and the initial Cloudflare deployment were completed by the owner; this updated ZIP still needs to be uploaded as a new Cloudflare deployment. No real Safari/iPhone device test has been performed; browser tests use Chromium at 320, 390, and 430 px widths.
 
@@ -9,7 +9,7 @@ Adds a shared, authenticated account to the project-finance application. V20.1 a
 1. Export the latest JSON backup from the existing offline app. Do not seed a live account from an older uploaded backup.
 2. Open `RONIX_Setup.html` from `RONIX-Setup.zip`, or `dist/setup.html`. Enter the intended owner email locally, copy the generated SQL, and run it in the linked Supabase SQL editor. The email is appended locally and is not included in this repository.
 3. In Authentication → Users → Add user → Create new user, create the app user using that email and a password; auto-confirm the user. A Supabase dashboard login is not an app Auth user. Google OAuth is not configured in this release.
-4. Upload `RONIX-Cloud-V20.zip` with Cloudflare Pages Direct Upload. The ZIP has `index.html` at its root. Do not run the cloud app from `file://`.
+4. For a new installation, upload `RONIX-Cloud-V20.zip` with Cloudflare Pages Direct Upload. For the existing RONIX deployment, upload `RONIX-V20.2-Update.zip` as a new deployment. Both ZIP files have `index.html` at their root. Do not run the cloud app from `file://`.
 5. Open the resulting HTTPS site on the laptop, log in, import the latest backup once, and wait for synchronization to finish. Open the same site and account on iPhone in Safari; Share → Add to Home Screen.
 
 The setup page works as a local file and includes clipboard fallback. The application requires HTTPS or localhost. Only the project URL and **publishable** key are included in `config.js`. Never add a secret/service-role key, database password, owner email, or accounting backup to this public repository. Free plans are subject to the providers' limits and availability; this package does not activate billing or guarantee unlimited free hosting.
@@ -24,6 +24,9 @@ The setup page works as a local file and includes clipboard fallback. The applic
 - Photos and transfer evidence use content-hashed private PNG/JPEG/WebP/PDF objects, with a 5 MiB per-file limit and integrity checks on download. No public document URLs are generated. Existing objects cannot be overwritten or deleted through the app role; unused uploads may therefore need an administrator's later retention review.
 - Local working copies still contain embedded evidence and are subject to browser storage quotas. A quota error rejects the new operation before upload. This is appropriate for a small single-owner ledger, not an unlimited document archive or a multi-user ERP.
 - Backups hydrate all embedded cloud documents and keep data schema **19**, so V20 JSON can be imported by offline V19. App version and data schema version are intentionally different. Download a backup after each work session.
+- EGP remains the functional and reporting currency. Each foreign-currency project stores its historical contract rate; every payment allocation stores its own dated execution rate. Reports derive the weighted rate from actual EGP cash divided by settled contract currency and never rewrite the original contract value.
+- Claims preserve both contract-book value and issue-date accounting value. A claim may contain several projects for the same customer and can print in contract currency, EGP, or both. Legacy foreign claims and receipts remain marked for review until their rate source and date are confirmed.
+- Final statements are generated from balanced journals and include a trial balance, income statement, statement of financial position, and direct cash-flow statement. Closing remains draft until opening balances, account setup, legacy recognition dates, and foreign-currency rates are reviewed; a verified closing signature detects later changes.
 - Exchange-rate forms link to Banque Misr's official rates page. A manually entered rate is dated and recorded as `Banque Misr (manual)`. The automatic button remains a general public reference for comparison and is explicitly labelled as such; use the bank's actual buy/sell execution rate for accounting.
 - The service worker caches only the app shell, never Auth/REST/Storage responses. An already logged-in account can reopen its cached local copy offline. Login requires connectivity.
 

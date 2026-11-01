@@ -30,7 +30,7 @@ base=base.replace("exportTabs(tabs,name){download(name+'.xls'", "exportTabs(tabs
 # are only used to create it on the first build from the private upload.
 if SOURCE.exists():
     base=SOURCE.read_text()
-core='\n'.join((ROOT/'src'/n).read_text() for n in ['finance-core.js','accounting-links.js','media-core.js','lifecycle-core.js','customer-core.js','presentation-core.js'])
+core='\n'.join((ROOT/'src'/n).read_text() for n in ['finance-core.js','accounting-links.js','media-core.js','lifecycle-core.js','customer-core.js','presentation-core.js','project-ops-core.js','r24-financial-core.js'])
 storage=(ROOT/'src/storage.js').read_text()
 vendor=ROOT/'src/vendor'
 vendor.mkdir(exist_ok=True)
@@ -42,9 +42,10 @@ if not SOURCE.exists():
     SOURCE.write_text(base)
 logo='data:image/png;base64,'+base64.b64encode((ROOT/'src/assets/ronix-logo-transparent.png').read_bytes()).decode('ascii')
 ui=(ROOT/'src/finance-ui.js').read_text()
-base=base.replace('</head>', '<style>\n'+(ROOT/'src/finance-ui.css').read_text()+'\n</style></head>',1)
+css='\n'.join((ROOT/'src'/n).read_text() for n in ['finance-ui.css','r24-cashflow.css','r24-financial-ui.css'] if (ROOT/'src'/n).exists())
+base=base.replace('</head>', '<style>\n'+css+'\n</style></head>',1)
 base=base.replace('<script>', '<script>\n'+core+'\n'+storage+'\n'+ui+'\nconst R14_LOGO="'+logo+'";\n</script><script>',1)
-scripts='\n'.join((ROOT/'src'/n).read_text() for n in ['upgrade.js','attachments.js','r15-projects.js','r15-payments.js','xlsx-export.js','r15-integration.js','import.js','r16-integration.js','media-recovery.js','r17-review.js','r18-customers.js','r19-rates.js','r22-client-statement.js','r23-lifecycle.js'])
+scripts='\n'.join((ROOT/'src'/n).read_text() for n in ['upgrade.js','attachments.js','r15-projects.js','r15-payments.js','xlsx-export.js','r15-integration.js','import.js','r16-integration.js','media-recovery.js','r17-review.js','r18-customers.js','r19-rates.js','r22-client-statement.js','r23-lifecycle.js','r24-cashflow.js','r24-project-ops.js','r24-claims.js','r24-financial-ui.js'] if (ROOT/'src'/n).exists())
 extra='<style>.r14-welcome{border:2px solid #b58a48}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d4a454;outline-offset:2px}.tablewrap{max-width:100%}.modal{max-width:min(1100px,96vw)}.modal .formgrid label{min-width:0}</style>'
 base+='\n'+extra+'\n<script>\n'+fflate+'\n</script><script>\n'+scripts+'\n</script>\n'
 (ROOT/'dist/RONIX_Manager.html').write_text(base)
