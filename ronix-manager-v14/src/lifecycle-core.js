@@ -131,6 +131,14 @@ const R17Life=((R)=>{
   }
   d.trashRecords=d.trashRecords.filter(a=>a.id!==id);return R.validate(d);
  }
- return {payments,projectLocked,customerLinked,archiveBlockers,rebuildAdvance,remove,restore};
+ function purge(value,id,reason,at){
+  const d=R.normalize(value),index=d.trashRecords.findIndex(x=>x.id===id),text=String(reason||'').trim();
+  if(index<0)throw Error('السجل غير موجود في المحذوفات');
+  if(text.length<3)throw Error('اكتب سببًا واضحًا للحذف النهائي');
+  const item=d.trashRecords[index];d.trashRecords.splice(index,1);
+  d.costAudit.push({at:at||new Date().toISOString(),action:'permanent purge',trashId:id,kind:item.kind,reason:text});
+  return R.validate(d)
+ }
+ return {payments,projectLocked,customerLinked,archiveBlockers,rebuildAdvance,remove,restore,purge};
 })(typeof module!=='undefined'?require('./finance-core.js'):R14);
 if(typeof module!=='undefined')module.exports=R17Life;

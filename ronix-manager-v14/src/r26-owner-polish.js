@@ -1,0 +1,31 @@
+/* V20.4: clearer project output, final account state, and deliberate permanent deletion. */
+const r26ProjectDocumentBase=r25ProjectDocument;
+r25ProjectDocument=function(project){
+ const m=R25Project.model(data,project.code),tone=m.expectedMargin<0?'loss':'profit';
+ let html=r26ProjectDocumentBase(project);
+ html=html.replace('</header><section class="kpis">',`</header><section class="result-hero ${tone}"><small>${r25ProjectResultLabel(m.expectedMargin)} من العقد بعد التكاليف المسجلة</small><b>${r25ProjectMoney(Math.abs(m.expectedMargin))}</b></section><section class="kpis">`);
+ html=html.replace(new RegExp(`<div><small>${r25ProjectResultLabel(m.currentResult)}</small><b class="[^"]+">[^<]+</b></div>`),'');
+ html=html.replace('التحصيل هو النقد الداخل فعلًا. الربح الحالي = قيمة الأعمال المطالب بها والمعتمدة ناقص تكلفة المشروع المسجلة. الهامش المتوقع = قيمة العقد ناقص التكلفة المسجلة، وقد يتغير عند تسجيل تكاليف جديدة.','المكسب المتوقع = قيمة العقد ناقص كل التكاليف المسجلة. صافي الحركة النقدية = ما دخل فعليًا ناقص ما خرج فعليًا. وقد يتغير المكسب عند إضافة تكلفة أو تعديل العقد.');
+ return html
+};
+
+function r26PermanentDelete(enc){
+ const id=decodeURIComponent(enc),item=data.trashRecords.find(x=>x.id===id);if(!item)return alert('السجل غير موجود في المحذوفات');
+ const meta=r23TrashMeta(item);modal('حذف نهائي لا يمكن استعادته',`<form onsubmit="r26ConfirmPurge(event,'${r14Encode(id)}')"><div class="r23-impact"><h3>${esc(meta.label)}</h3><p>سيُحذف محتوى هذا السجل ومستنداته من النسخة الحالية نهائيًا. لن تتغير الحسابات لأن السجل مستبعد منها أصلًا، وسيبقى أثر تدقيق مختصر فقط.</p></div>${field('r26PurgeReason','سبب الحذف النهائي','','text','required minlength="3"')}<label class="r26-confirm"><input id="r26PurgeCheck" type="checkbox" required> أفهم أن هذا السجل لن يمكن استعادته</label><div class="modalfoot"><button class="btn" type="button" onclick="backup()">تنزيل نسخة أمان أولًا</button><button class="btn danger" type="submit">حذف نهائي</button><button class="btn" type="button" onclick="closeModal()">إلغاء</button></div></form>`)
+}
+function r26ConfirmPurge(event,enc){event.preventDefault();try{const id=decodeURIComponent(enc),reason=val('r26PurgeReason');if(!$('r26PurgeCheck').checked)throw Error('أكد فهمك أن الحذف نهائي');const next=R17Life.purge(data,id,reason,new Date().toISOString());if(r14Persist(next,'حذف نهائي من سلة المحذوفات',{trashId:id,reason}))r14Done('تم الحذف النهائي وبقي أثر التدقيق فقط')}catch(error){alert(error.message)}}
+const r26RecycleRowsBase=r23RecycleRows;
+r23RecycleRows=function(){return r26RecycleRowsBase().map(row=>{const item=data.trashRecords.find(x=>{const m=r23TrashMeta(x);return m.label===row.label&&x.kind===row.type&&x.at===row.at});if(item)row.action+=`<button class="btn danger" onclick="r26PermanentDelete('${r14Encode(item.id)}')">حذف نهائي</button>`;return row})};
+
+function r26CloseAccount(enc){
+ const code=decodeURIComponent(enc),p=getP(code);if(!p)return;const a=R16.project(data,code);
+ modal('قفل حساب المشروع نهائيًا',`<form onsubmit="r26SaveAccountClose(event,'${r14Encode(code)}')"><div class="r26-close-summary"><b>${esc(p.code)} — ${esc(p.name)}</b><span>متبقي العقد: ${money(a.contractBalance)}</span><span>متبقي المطالبات: ${money(a.claimDue)}</span></div><label>طريقة القفل<select id="r26CloseMode" class="field"><option value="retain">إغلاق إداري مع إبقاء الرصيد ظاهرًا</option><option value="waive">تنازل تجاري عن المتبقي — يبقى موثقًا ولا يُسجل كدفعة</option></select></label>${field('r26CloseReason','سبب القفل','','text','required minlength="3"')}<p class="hint">القفل يوقف متابعة الحساب تشغيليًا ولا يصنع إيصال قبض وهميًا. الرصيد وقت القفل يبقى محفوظًا للمراجعة.</p><div class="modalfoot"><button class="btn danger" type="submit">قفل الحساب</button><button class="btn" type="button" onclick="closeModal()">إلغاء</button></div></form>`)
+}
+function r26SaveAccountClose(event,enc){event.preventDefault();const code=decodeURIComponent(enc),reason=val('r26CloseReason').trim(),mode=val('r26CloseMode');if(reason.length<3)return alert('اكتب سببًا واضحًا');const a=R16.project(data,code);if(r14Change('قفل حساب مشروع نهائيًا',d=>{const p=d.projects.find(x=>x.code===code);if(!p)throw Error('المشروع غير موجود');p.accountClosedAt=new Date().toISOString();p.accountCloseMode=mode;p.accountCloseReason=reason;p.accountClosedContractBalance=a.contractBalance;p.accountClosedClaimDue=a.claimDue;p.state='مغلق'}, {code,mode,reason,contractBalance:a.contractBalance,claimDue:a.claimDue}))r14Done('تم قفل الحساب وحفظ الرصيد وقت القفل')}
+const r26RenderProjectBase=renderProject;
+renderProject=function(){r26RenderProjectBase();const p=getP(projectFocus),actions=$('content')?.querySelector('.projecthead .actions');if(p&&actions&&!actions.querySelector('.r26-close-account'))actions.insertAdjacentHTML('beforeend',p.accountClosedAt?`<span class="pill r26-closed">الحساب مقفول نهائيًا</span>`:`<button class="btn danger r26-close-account" onclick="r26CloseAccount('${r14Encode(p.code)}')">قفل الحساب نهائيًا</button>`)};
+
+const r26OpenReceiptBase=openCustomerReceipt;
+openCustomerReceipt=function(enc='',batchEnc=''){r26OpenReceiptBase(enc,batchEnc);$('modalBody')?.querySelector('form')?.classList.add('r26-receipt-form');const title=$('modalTitle');if(title)title.textContent=title.textContent.replace('وتوزيعه على المشاريع','')};
+const r26RefreshReceiptBase=refreshReceiptAllocations;
+refreshReceiptAllocations=function(existing=[]){r26RefreshReceiptBase(existing);for(const input of document.querySelectorAll('.receipt-allocation')){const p=getP(input.dataset.code);if(p?.accountClosedAt&&!existing.some(x=>x.code===p.code))input.closest('tr')?.remove()}checkAllocationTotal()};
