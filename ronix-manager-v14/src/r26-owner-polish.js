@@ -29,6 +29,6 @@ const r26RenderProjectBase=renderProject;
 renderProject=function(){r26RenderProjectBase();const p=getP(projectFocus),actions=$('content')?.querySelector('.projecthead .actions');if(p&&actions&&!actions.querySelector('.r26-close-account'))actions.insertAdjacentHTML('beforeend',p.accountClosedAt?`<span class="pill r26-closed">الحساب مقفول نهائيًا</span>`:`<button class="btn danger r26-close-account" onclick="r26CloseAccount('${r14Encode(p.code)}')">قفل الحساب نهائيًا</button>`)};
 
 const r26OpenReceiptBase=openCustomerReceipt;
-openCustomerReceipt=function(enc='',batchEnc=''){r26OpenReceiptBase(enc,batchEnc);$('modalBody')?.querySelector('form')?.classList.add('r26-receipt-form');const title=$('modalTitle');if(title)title.textContent=title.textContent.replace('وتوزيعه على المشاريع','')};
+openCustomerReceipt=function(enc='',batchEnc=''){r26OpenReceiptBase(enc,batchEnc);$('modalBody')?.querySelector('form')?.classList.add('r26-receipt-form','r28-receipt-form');const title=$('modalTitle');if(title)title.textContent=title.textContent.replace('وتوزيعه على المشاريع','')};
 const r26RefreshReceiptBase=refreshReceiptAllocations;
 refreshReceiptAllocations=function(existing=[]){r26RefreshReceiptBase(existing);for(const input of document.querySelectorAll('.receipt-allocation')){const p=getP(input.dataset.code);if(p?.accountClosedAt&&!existing.some(x=>x.code===p.code))input.closest('tr')?.remove()}checkAllocationTotal()};
