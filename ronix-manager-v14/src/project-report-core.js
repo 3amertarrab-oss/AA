@@ -21,6 +21,7 @@ const R25Project = ((R, Links) => {
     const actualCashExpenses = R.sum(expenses.filter(row => row.cashEffect !== false));
     const actualCashIn = R.sum(receipts, R.cashReceipt);
     const actualDesignerCash = R.sum(designerPayments);
+    const recordedExpenses = R.sum(expenses);
     const totalCost = linked.cost;
     const currency = R.projectCurrency(project);
     const originalContract = R.originalContract(project);
@@ -40,9 +41,11 @@ const R25Project = ((R, Links) => {
       designerCommitments: linked.designers.fees,
       actualDesignerCash,
       actualCashExpenses,
+      recordedExpenses,
       totalCost,
       expectedMargin: R.delta(project.contract, totalCost),
       currentResult: R.delta(recognizedRevenue, totalCost),
+      actualProfit: R.delta(R.delta(actualCashIn, actualDesignerCash), recordedExpenses),
       cashNet: R.delta(R.delta(actualCashIn, actualDesignerCash), actualCashExpenses),
       warnings: Links.review(d).filter(row => row.code === code)
     };

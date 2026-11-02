@@ -3,7 +3,7 @@ let r25ProjectTimelineFilter='all',r25CashflowMode='month',r25CashflowKind='all'
 
 function r25ProjectMoney(value){return `${R19.formatAmount(Number(value||0))} ج.م`}
 function r25ProjectPhoto(project){const image=cover(project);return image?`<img src="${esc(image.src)}" alt="صورة مشروع ${esc(project.code)}">`:'<span class="r25-photo-empty">لا توجد صورة</span>'}
-function r25ProjectResultLabel(value){return Number(value)<0?'خسارة متوقعة':'مكسب متوقع'}
+function r25ProjectResultLabel(value){return Number(value)<0?'خسارة فعلية حتى اليوم':'مكسب فعلي حتى اليوم'}
 function r25ProjectTable(head,body,empty){return `<div class="tablewrap"><table><thead><tr>${head.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${body||`<tr><td colspan="${head.length}" class="empty">${esc(empty)}</td></tr>`}</tbody></table></div>`}
 
 function r25ProjectTimelinePanel(project){
@@ -16,7 +16,7 @@ function r25SetProjectTimeline(filter){
 }
 
 function r25ProjectDocument(project){
- const m=R25Project.model(data,project.code),image=cover(project),status=typeof r24Status==='function'?r24Status(project).label:(project.state||'نشط'),timeline=R25Project.timeline(data,project.code).slice(0,24),share=`ملف مشروع ${project.code} — ${project.name||''}\nالعميل: ${project.client||'—'}\nالعقد: ${R19.formatAmount(m.contractValue)} ج.م\nالمحصّل الفعلي: ${R19.formatAmount(m.actualCashIn)} ج.م\nالتكلفة: ${R19.formatAmount(m.totalCost)} ج.م\n${r25ProjectResultLabel(m.expectedMargin)}: ${R19.formatAmount(Math.abs(m.expectedMargin))} ج.م`;
+ const m=R25Project.model(data,project.code),image=cover(project),status=typeof r24Status==='function'?r24Status(project).label:(project.state||'نشط'),timeline=R25Project.timeline(data,project.code).slice(0,24),share=`ملف مشروع ${project.code} — ${project.name||''}\nالعميل: ${project.client||'—'}\nالعقد: ${R19.formatAmount(m.contractValue)} ج.م\nالمحصّل الفعلي: ${R19.formatAmount(m.actualCashIn)} ج.م\nالمدفوع للمصممين: ${R19.formatAmount(m.actualDesignerCash)} ج.م\nالساعات والمصروفات: ${R19.formatAmount(m.recordedExpenses)} ج.م\n${r25ProjectResultLabel(m.actualProfit)}: ${R19.formatAmount(Math.abs(m.actualProfit))} ج.م\nمتبقي العقد: ${R19.formatAmount(m.contractRemaining)} ج.م`;
  const itemRows=m.contractItems.map(x=>`<tr><td>${esc(x.description||'—')}</td><td>${esc(x.unit||'—')}</td><td>${fmt(x.quantity||0)}</td><td>${R19.formatAmount(x.unitPrice||0)}</td><td>${R19.formatAmount(x.amount||0)}</td></tr>`).join('');
  const claimRows=m.claims.map(({claim,row})=>`<tr><td>${esc(typeof r19Doc==='function'?r19Doc('claim',claim.id):claim.id)}</td><td>${esc(claim.date||'—')}</td><td>${esc(R14.status(claim))}</td><td>${R19.formatAmount(row.accountingAmount??row.amount??0)}</td><td>${R19.formatAmount(R14.settled(data,claim.id,project.code))}</td><td>${R19.formatAmount(R14.delta(row.amount||0,R14.settled(data,claim.id,project.code)))}</td></tr>`).join('');
  const receiptRows=m.receipts.map(x=>`<tr><td>${esc(x.date||'—')}</td><td>${esc(r19Ref('receipt',x.id,x.ref))}</td><td>${esc(x.method||'—')}</td><td>${R19.formatAmount(x.projectAmount??x.amount)} ${esc(x.projectCurrency||'EGP')}</td><td>${R19.formatAmount(R14.cashReceipt(x))} ج.م</td></tr>`).join('');

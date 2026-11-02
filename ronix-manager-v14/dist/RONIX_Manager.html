@@ -1260,6 +1260,7 @@ const R25Project = ((R, Links) => {
     const actualCashExpenses = R.sum(expenses.filter(row => row.cashEffect !== false));
     const actualCashIn = R.sum(receipts, R.cashReceipt);
     const actualDesignerCash = R.sum(designerPayments);
+    const recordedExpenses = R.sum(expenses);
     const totalCost = linked.cost;
     const currency = R.projectCurrency(project);
     const originalContract = R.originalContract(project);
@@ -1279,9 +1280,11 @@ const R25Project = ((R, Links) => {
       designerCommitments: linked.designers.fees,
       actualDesignerCash,
       actualCashExpenses,
+      recordedExpenses,
       totalCost,
       expectedMargin: R.delta(project.contract, totalCost),
       currentResult: R.delta(recognizedRevenue, totalCost),
+      actualProfit: R.delta(R.delta(actualCashIn, actualDesignerCash), recordedExpenses),
       cashNet: R.delta(R.delta(actualCashIn, actualDesignerCash), actualCashExpenses),
       warnings: Links.review(d).filter(row => row.code === code)
     };
@@ -3238,7 +3241,7 @@ let r25ProjectTimelineFilter='all',r25CashflowMode='month',r25CashflowKind='all'
 
 function r25ProjectMoney(value){return `${R19.formatAmount(Number(value||0))} ج.م`}
 function r25ProjectPhoto(project){const image=cover(project);return image?`<img src="${esc(image.src)}" alt="صورة مشروع ${esc(project.code)}">`:'<span class="r25-photo-empty">لا توجد صورة</span>'}
-function r25ProjectResultLabel(value){return Number(value)<0?'خسارة متوقعة':'مكسب متوقع'}
+function r25ProjectResultLabel(value){return Number(value)<0?'خسارة فعلية حتى اليوم':'مكسب فعلي حتى اليوم'}
 function r25ProjectTable(head,body,empty){return `<div class="tablewrap"><table><thead><tr>${head.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${body||`<tr><td colspan="${head.length}" class="empty">${esc(empty)}</td></tr>`}</tbody></table></div>`}
 
 function r25ProjectTimelinePanel(project){
@@ -3251,7 +3254,7 @@ function r25SetProjectTimeline(filter){
 }
 
 function r25ProjectDocument(project){
- const m=R25Project.model(data,project.code),image=cover(project),status=typeof r24Status==='function'?r24Status(project).label:(project.state||'نشط'),timeline=R25Project.timeline(data,project.code).slice(0,24),share=`ملف مشروع ${project.code} — ${project.name||''}\nالعميل: ${project.client||'—'}\nالعقد: ${R19.formatAmount(m.contractValue)} ج.م\nالمحصّل الفعلي: ${R19.formatAmount(m.actualCashIn)} ج.م\nالتكلفة: ${R19.formatAmount(m.totalCost)} ج.م\n${r25ProjectResultLabel(m.expectedMargin)}: ${R19.formatAmount(Math.abs(m.expectedMargin))} ج.م`;
+ const m=R25Project.model(data,project.code),image=cover(project),status=typeof r24Status==='function'?r24Status(project).label:(project.state||'نشط'),timeline=R25Project.timeline(data,project.code).slice(0,24),share=`ملف مشروع ${project.code} — ${project.name||''}\nالعميل: ${project.client||'—'}\nالعقد: ${R19.formatAmount(m.contractValue)} ج.م\nالمحصّل الفعلي: ${R19.formatAmount(m.actualCashIn)} ج.م\nالمدفوع للمصممين: ${R19.formatAmount(m.actualDesignerCash)} ج.م\nالساعات والمصروفات: ${R19.formatAmount(m.recordedExpenses)} ج.م\n${r25ProjectResultLabel(m.actualProfit)}: ${R19.formatAmount(Math.abs(m.actualProfit))} ج.م\nمتبقي العقد: ${R19.formatAmount(m.contractRemaining)} ج.م`;
  const itemRows=m.contractItems.map(x=>`<tr><td>${esc(x.description||'—')}</td><td>${esc(x.unit||'—')}</td><td>${fmt(x.quantity||0)}</td><td>${R19.formatAmount(x.unitPrice||0)}</td><td>${R19.formatAmount(x.amount||0)}</td></tr>`).join('');
  const claimRows=m.claims.map(({claim,row})=>`<tr><td>${esc(typeof r19Doc==='function'?r19Doc('claim',claim.id):claim.id)}</td><td>${esc(claim.date||'—')}</td><td>${esc(R14.status(claim))}</td><td>${R19.formatAmount(row.accountingAmount??row.amount??0)}</td><td>${R19.formatAmount(R14.settled(data,claim.id,project.code))}</td><td>${R19.formatAmount(R14.delta(row.amount||0,R14.settled(data,claim.id,project.code)))}</td></tr>`).join('');
  const receiptRows=m.receipts.map(x=>`<tr><td>${esc(x.date||'—')}</td><td>${esc(r19Ref('receipt',x.id,x.ref))}</td><td>${esc(x.method||'—')}</td><td>${R19.formatAmount(x.projectAmount??x.amount)} ${esc(x.projectCurrency||'EGP')}</td><td>${R19.formatAmount(R14.cashReceipt(x))} ج.م</td></tr>`).join('');
@@ -3299,11 +3302,12 @@ r25SimplifyNavigation();
 /* V20.4: clearer project output, final account state, and deliberate permanent deletion. */
 const r26ProjectDocumentBase=r25ProjectDocument;
 r25ProjectDocument=function(project){
- const m=R25Project.model(data,project.code),tone=m.expectedMargin<0?'loss':'profit';
+ const m=R25Project.model(data,project.code),tone=m.actualProfit<0?'loss':'profit';
  let html=r26ProjectDocumentBase(project);
- html=html.replace('</header><section class="kpis">',`</header><section class="result-hero ${tone}"><small>${r25ProjectResultLabel(m.expectedMargin)} من العقد بعد التكاليف المسجلة</small><b>${r25ProjectMoney(Math.abs(m.expectedMargin))}</b></section><section class="kpis">`);
+ html=html.replace('</header><section class="kpis">',`</header><section class="result-hero ${tone}"><small>${m.actualProfit<0?'خسارة فعلية حتى اليوم':'مكسب فعلي حتى اليوم'}</small><b>${r25ProjectMoney(Math.abs(m.actualProfit))}</b></section><section class="kpis">`);
  html=html.replace(new RegExp(`<div><small>${r25ProjectResultLabel(m.currentResult)}</small><b class="[^"]+">[^<]+</b></div>`),'');
- html=html.replace('التحصيل هو النقد الداخل فعلًا. الربح الحالي = قيمة الأعمال المطالب بها والمعتمدة ناقص تكلفة المشروع المسجلة. الهامش المتوقع = قيمة العقد ناقص التكلفة المسجلة، وقد يتغير عند تسجيل تكاليف جديدة.','المكسب المتوقع = قيمة العقد ناقص كل التكاليف المسجلة. صافي الحركة النقدية = ما دخل فعليًا ناقص ما خرج فعليًا. وقد يتغير المكسب عند إضافة تكلفة أو تعديل العقد.');
+ html=html.replace('التحصيل هو النقد الداخل فعلًا. الربح الحالي = قيمة الأعمال المطالب بها والمعتمدة ناقص تكلفة المشروع المسجلة. الهامش المتوقع = قيمة العقد ناقص التكلفة المسجلة، وقد يتغير عند تسجيل تكاليف جديدة.','المكسب الفعلي حتى اليوم = دفعات العميل الفعلية ناقص ما دُفع للمصممين وناقص مصروف الساعات وباقي مصروفات المشروع المسجلة. متبقي العقد معروض منفصلًا ولا يدخل في المكسب قبل قبضه.');
+ html=html.replace(`<div><small>إجمالي التكلفة</small><b>${r25ProjectMoney(m.totalCost)}</b></div>`,`<div><small>المدفوع للمصممين</small><b>${r25ProjectMoney(m.actualDesignerCash)}</b></div><div><small>الساعات والمصروفات المسجلة</small><b>${r25ProjectMoney(m.recordedExpenses)}</b></div>`);
  return html
 };
 

@@ -21,6 +21,7 @@ test('project dossier separates contract claims cash costs and profit',()=>{
  assert.equal(m.actualCashIn,2700);
  assert.equal(m.totalCost,1500);
  assert.equal(m.expectedMargin,11500);
+ assert.equal(m.actualProfit,1800);
  assert.equal(m.currentResult,3700);
  assert.equal(m.cashNet,2000);
 });

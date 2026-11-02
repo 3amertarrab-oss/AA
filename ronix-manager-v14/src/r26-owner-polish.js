@@ -1,11 +1,12 @@
 /* V20.4: clearer project output, final account state, and deliberate permanent deletion. */
 const r26ProjectDocumentBase=r25ProjectDocument;
 r25ProjectDocument=function(project){
- const m=R25Project.model(data,project.code),tone=m.expectedMargin<0?'loss':'profit';
+ const m=R25Project.model(data,project.code),tone=m.actualProfit<0?'loss':'profit';
  let html=r26ProjectDocumentBase(project);
- html=html.replace('</header><section class="kpis">',`</header><section class="result-hero ${tone}"><small>${r25ProjectResultLabel(m.expectedMargin)} من العقد بعد التكاليف المسجلة</small><b>${r25ProjectMoney(Math.abs(m.expectedMargin))}</b></section><section class="kpis">`);
+ html=html.replace('</header><section class="kpis">',`</header><section class="result-hero ${tone}"><small>${m.actualProfit<0?'خسارة فعلية حتى اليوم':'مكسب فعلي حتى اليوم'}</small><b>${r25ProjectMoney(Math.abs(m.actualProfit))}</b></section><section class="kpis">`);
  html=html.replace(new RegExp(`<div><small>${r25ProjectResultLabel(m.currentResult)}</small><b class="[^"]+">[^<]+</b></div>`),'');
- html=html.replace('التحصيل هو النقد الداخل فعلًا. الربح الحالي = قيمة الأعمال المطالب بها والمعتمدة ناقص تكلفة المشروع المسجلة. الهامش المتوقع = قيمة العقد ناقص التكلفة المسجلة، وقد يتغير عند تسجيل تكاليف جديدة.','المكسب المتوقع = قيمة العقد ناقص كل التكاليف المسجلة. صافي الحركة النقدية = ما دخل فعليًا ناقص ما خرج فعليًا. وقد يتغير المكسب عند إضافة تكلفة أو تعديل العقد.');
+ html=html.replace('التحصيل هو النقد الداخل فعلًا. الربح الحالي = قيمة الأعمال المطالب بها والمعتمدة ناقص تكلفة المشروع المسجلة. الهامش المتوقع = قيمة العقد ناقص التكلفة المسجلة، وقد يتغير عند تسجيل تكاليف جديدة.','المكسب الفعلي حتى اليوم = دفعات العميل الفعلية ناقص ما دُفع للمصممين وناقص مصروف الساعات وباقي مصروفات المشروع المسجلة. متبقي العقد معروض منفصلًا ولا يدخل في المكسب قبل قبضه.');
+ html=html.replace(`<div><small>إجمالي التكلفة</small><b>${r25ProjectMoney(m.totalCost)}</b></div>`,`<div><small>المدفوع للمصممين</small><b>${r25ProjectMoney(m.actualDesignerCash)}</b></div><div><small>الساعات والمصروفات المسجلة</small><b>${r25ProjectMoney(m.recordedExpenses)}</b></div>`);
  return html
 };
 
