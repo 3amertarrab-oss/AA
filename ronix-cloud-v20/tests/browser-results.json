@@ -1,5 +1,5 @@
 {
-  "passed": 34,
+  "passed": 38,
   "checks": [
     "logged-out page hides all accounting screens",
     "email login opens empty isolated cloud ledger",
@@ -7,6 +7,10 @@
     "cloud stores private file references instead of embedded base64",
     "second device receives all records and matching photos and proofs",
     "mobile layout fits iPhone width",
+    "unified project workspace opens with five focused tabs",
+    "project header highlights balance and collection rate",
+    "project tabs show one workspace section at a time",
+    "single project action offers all common financial movements",
     "iPhone menu opens customer directory and closes after selection",
     "visible mobile back button returns from project detail",
     "mobile payment reaches laptop without duplicated cash",

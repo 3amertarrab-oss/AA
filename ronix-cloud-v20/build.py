@@ -17,7 +17,7 @@ html=html.replace('width=device-width,initial-scale=1','width=device-width,initi
 html=html.replace('</head>','<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#172b45"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="RONIX"><link rel="apple-touch-icon" href="icon.png"><style>'+ (ROOT/'cloud.css').read_text()+'</style></head>',1)
 html=html.replace('V19','V20').replace('*** ','').replace('تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.','استورد أحدث نسخة JSON. بعد الحفظ تُزامن الحسابات والصور مع حسابك الخاص.')
 html+='\n<script src="config.js"></script><script src="supabase.js"></script><script>\n'+(ROOT/'media.js').read_text()+'\n'+(ROOT/'cloud.js').read_text()+'\n</script>'
-html=html.replace('V20.3','V20.7').replace('V20.4','V20.7').replace('V20.5','V20.7').replace('V20.6','V20.7')
+html=html.replace('V20.3','V20.8').replace('V20.4','V20.8').replace('V20.5','V20.8').replace('V20.6','V20.8').replace('V20.7','V20.8')
 (DIST/'index.html').write_text(html)
 shutil.copyfile(ROOT/'config.js',DIST/'config.js');shutil.copyfile(VENDOR/'supabase.js',DIST/'supabase.js');shutil.copyfile(VENDOR/'supabase-LICENSE.txt',DIST/'supabase-LICENSE.txt')
 shutil.copyfile(ROOT.parent/'ronix-manager-v14/src/vendor/fflate-LICENSE.txt',DIST/'fflate-LICENSE.txt')
@@ -47,7 +47,7 @@ with zipfile.ZipFile(ROOT/'RONIX-Cloud-V20.zip','w',zipfile.ZIP_DEFLATED,compres
 # Deployment-only package. The setup utility and instructions are deliberately
 # excluded because an existing installation needs only the application files.
 deploy_names=['_headers','config.js','fflate-LICENSE.txt','icon.png','index.html','manifest.webmanifest','supabase-LICENSE.txt','supabase.js','sw.js']
-with zipfile.ZipFile(ROOT/'RONIX-V20.7-Update.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+with zipfile.ZipFile(ROOT/'RONIX-V20.8-Update.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for name in deploy_names:z.write(DIST/name,name)
 with zipfile.ZipFile(ROOT/'RONIX-Setup.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  z.writestr('RONIX_Setup.html',setup)
