@@ -1,4 +1,4 @@
-const CACHE='ronix-v20-872eef202c83';
+const CACHE='ronix-v20-6090a9899c69';
 const ASSETS=['./','./index.html','./config.js','./supabase.js','./manifest.webmanifest','./icon.png','./setup.html'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('ronix-v20-')&&k!==CACHE).map(k=>caches.delete(k))))));
