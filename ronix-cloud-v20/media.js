@@ -15,16 +15,16 @@ const R20Media=(()=>{
     if(value&&typeof value==='object'){const out={};for(const [k,v] of Object.entries(value))Object.defineProperty(out,k,{value:await walk(v,transform),enumerable:true,writable:true,configurable:true});return out}
     return value;
   }
-  async function pack(snapshot,owner,upload){
+  async function pack(snapshot,owner,upload,onReference=()=>{}){
     const seen=new Map();
     return walk(snapshot,async value=>{
       if(typeof value!=='string'||!value.startsWith('data:'))return;
       if(seen.has(value))return seen.get(value);
       const {mime,bytes}=parse(value),digest=await hash(bytes),path=owner+'/'+digest+'.'+types[mime];
-      await upload(path,bytes,mime);const ref={$ronixBlob:path,mime};seen.set(value,ref);return ref;
+      await upload(path,bytes,mime);const ref={$ronixBlob:path,mime};seen.set(value,ref);onReference(value,ref);return ref;
     });
   }
-  async function unpack(snapshot,owner,download){
+  async function unpack(snapshot,owner,download,onHydrated=()=>{}){
     const seen=new Map();
     return walk(snapshot,async value=>{
       if(!value||typeof value!=='object'||!Object.hasOwn(value,'$ronixBlob'))return;
@@ -32,9 +32,13 @@ const R20Media=(()=>{
       if(typeof path!=='string'||!types[mime]||!path.startsWith(owner+'/')||!new RegExp('^[a-f0-9]{64}\\.'+types[mime]+'$').test(path.slice(owner.length+1)))throw Error('مرجع مستند لا يخص هذا الحساب أو غير صالح');
       if(seen.has(path))return seen.get(path);
       const bytes=new Uint8Array(await download(path));if(bytes.length>5242880||await hash(bytes)!==path.slice(owner.length+1,owner.length+65))throw Error('تعذر التحقق من سلامة المستند');
-      const uri=encode(bytes,mime);seen.set(path,uri);return uri;
+      const uri=encode(bytes,mime);seen.set(path,uri);onHydrated(uri,{$ronixBlob:path,mime});return uri;
     });
   }
-  return {pack,unpack,hash};
+  function compact(snapshot,references){
+    const visit=value=>{if(typeof value==='string'&&references?.has(value))return references.get(value);if(Array.isArray(value))return value.map(visit);if(value&&typeof value==='object'){const out={};for(const [key,item] of Object.entries(value))out[key]=visit(item);return out}return value};
+    return visit(snapshot)
+  }
+  return {pack,unpack,compact,hash};
 })();
 if(typeof module!=='undefined')module.exports=R20Media;

@@ -2,7 +2,7 @@
 const R20Cloud=(()=>{
   const cfg=window.RONIX_CLOUD_CONFIG;
   const client=supabase.createClient(cfg.url,cfg.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'ronix-v20-auth'}});
-  const S={user:null,key:'',disk:null,env:null,ready:false,busy:false,conflict:false,error:'',notice:'',epoch:0};
+  const S={user:null,key:'',disk:null,env:null,refs:new Map(),ready:false,busy:false,conflict:false,error:'',notice:'',epoch:0};
   const bar=document.createElement('div');bar.id='r20CloudBar';bar.innerHTML='<strong>RONIX · متصل بحسابك</strong><span id="r20SyncState" role="status"></span><div class="actions"><button class="btn" id="r20Refresh">تحديث / مزامنة</button><button class="btn" id="r20Backup">نسخة احتياطية</button><button class="btn" id="r20Recovery">نسخ التعارض</button><button class="btn" id="r20Logout">خروج</button></div><div id="r20Conflict" hidden><p>توجد نسخة أحدث من جهاز آخر. تعديلات هذا الجهاز محفوظة ولم تُكتب فوق الحسابات المشتركة.</p><button class="btn" id="r20KeepLocal">تنزيل تعديلاتي</button><button class="btn primary" id="r20UseServer">حفظ نسخة من تعديلاتي وفتح أحدث حسابات</button></div>';
   document.querySelector('.main').prepend(bar);
   const menuButton=document.createElement('button');menuButton.id='r20Menu';menuButton.className='btn r20-mobile-only';menuButton.textContent='☰ الأقسام';menuButton.setAttribute('aria-expanded','false');bar.prepend(menuButton);
@@ -15,15 +15,17 @@ const R20Cloud=(()=>{
   const gate=document.createElement('section');gate.id='r20Gate';gate.innerHTML=`<div class="r20-login"><img src="${R14_LOGO}" alt="RONIX"><h1>حسابات RONIX</h1><p>نفس الحساب على اللابتوب والآيفون</p><form id="r20LoginForm"><label>البريد الإلكتروني<input id="r20Email" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="r20Password" type="password" autocomplete="current-password" required></label><button class="btn primary" type="submit">دخول</button></form><p id="r20LoginStatus" role="status"></p><a href="setup.html" target="_blank" rel="noopener">إعداد المشروع لأول مرة</a><p class="hint">استخدم حساب RONIX الذي أنشأته في Authentication داخل Supabase.</p></div>`;document.body.append(gate);
   function key(uid){return 'ronix-v20-ledger:'+uid}
   function normalize(value){return R19.sync(R18Clients.sync(R14.validate(value)))}
-  function readEnvelope(raw,uid){
+  function mediaStore(mode,path,value){return new Promise((resolve,reject)=>{const request=indexedDB.open('ronix-v20-local',1);request.onupgradeneeded=()=>request.result.createObjectStore('media');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const db=request.result,tx=db.transaction('media',mode),store=tx.objectStore('media'),query=mode==='readonly'?store.get(path):store.put(value,path);query.onsuccess=()=>resolve(query.result);query.onerror=()=>reject(query.error);tx.oncomplete=()=>db.close();tx.onerror=()=>{db.close();reject(tx.error)}}})}
+  async function hydratePayload(packed,owner){return R20Media.unpack(packed,owner,async path=>{const cached=await mediaStore('readonly',path);if(cached)return cached.bytes;const result=await client.storage.from('ronix-files').download(path);if(result.error)throw result.error;const bytes=await result.data.arrayBuffer();await mediaStore('readwrite',path,{bytes,mime:result.data.type||''});return bytes},(uri,ref)=>S.refs.set(uri,ref))}
+  async function readEnvelope(raw,uid){
     if(!raw)return null;const x=JSON.parse(raw);
     if(x.owner!==uid||!Number.isSafeInteger(x.revision)||x.revision<0||typeof x.dirty!=='boolean'||(x.dirty&&typeof x.mutation!=='string'))throw Error('النسخة المحلية لا تخص حساب الدخول أو غير صالحة');
-    x.payload=normalize(x.payload);return x;
+    x.payload=normalize(await hydratePayload(x.payload,uid));return x;
   }
   function adopt(env){S.env=env;data=R14.copy(env.payload);r14Saved=JSON.stringify(data);r14Disk=r14Saved;r14BootIssue=''}
-  function write(env){
+  function write(env,packedPayload=null){
     if(localStorage.getItem(S.key)!==S.disk)throw Error('تغيرت النسخة في نافذة أخرى. اضغط تحديث قبل التسجيل.');
-    const raw=JSON.stringify(env);localStorage.setItem(S.key,raw);S.disk=raw;adopt(env);
+    const cached={...env,payload:packedPayload||R20Media.compact(env.payload,S.refs)},raw=JSON.stringify(cached);localStorage.setItem(S.key,raw);S.disk=raw;adopt(env);
   }
   function status(){
     const el=$('r20SyncState');if(!el)return;
@@ -46,10 +48,8 @@ const R20Cloud=(()=>{
   async function loadRemote(){
     const owner=S.user.id,result=await rpc('ronix_load');
     if(!Number.isSafeInteger(result?.revision)||result.revision<0)throw Error('نسخة الخادم غير صالحة');
-    const payload=result.payload===null?r14Empty():await R20Media.unpack(result.payload,owner,async path=>{
-      const r=await client.storage.from('ronix-files').download(path);if(r.error)throw r.error;return r.data.arrayBuffer();
-    });
-    return {owner,revision:result.revision,payload:normalize(payload),dirty:false,mutation:null};
+    const packed=result.payload===null?r14Empty():result.payload,payload=await hydratePayload(packed,owner);
+    return {env:{owner,revision:result.revision,payload:normalize(payload),dirty:false,mutation:null},packed};
   }
   async function archive(env){
     return new Promise((resolve,reject)=>{
@@ -74,13 +74,13 @@ const R20Cloud=(()=>{
         if(epoch!==S.epoch)throw Error('تغير الحساب');
         const r=await client.storage.from('ronix-files').upload(path,bytes,{contentType:mime,upsert:false});
         if(r.error&&String(r.error.statusCode)!=='409'&&!/already exists|Duplicate/i.test(r.error.message||''))throw r.error;
-      });
+      },(uri,ref)=>S.refs.set(uri,ref));
       if(epoch!==S.epoch)return;
       const result=await rpc('ronix_commit',{expected_revision:env.revision,mutation_id:env.mutation,next_payload:packed});
       if(epoch!==S.epoch)return;
       if(result.status==='conflict'){S.conflict=true;return}
       if(result.status!=='saved'||!Number.isSafeInteger(result.revision)||result.revision<=env.revision)throw Error('استجابة حفظ غير صالحة');
-      write({...env,revision:result.revision,dirty:false,mutation:null});S.notice='';
+      write({...env,revision:result.revision,dirty:false,mutation:null},packed);S.notice='';
     }catch(e){if(epoch===S.epoch)S.error=errorText(e)}finally{if(epoch===S.epoch){S.busy=false;status()}}
   }
   async function refresh(){
@@ -89,7 +89,7 @@ const R20Cloud=(()=>{
     const disk=localStorage.getItem(S.key);
     if(disk!==S.disk){
       if($('overlay').classList.contains('open')){S.error='أغلق نموذج الإدخال ثم اضغط تحديث لتحميل تغيير النافذة الأخرى.';status();return}
-      const env=readEnvelope(disk,S.user.id);S.disk=disk;if(env){adopt(env);S.conflict=false;render()}
+      S.busy=true;status();try{const env=await readEnvelope(disk,S.user.id);S.disk=disk;if(env){adopt(env);S.conflict=false;render()}}finally{S.busy=false;status()}
     }
     if(S.env?.dirty){await flush();return}
     if(!navigator.onLine){status();return}
@@ -98,7 +98,7 @@ const R20Cloud=(()=>{
       const head=await rpc('ronix_head');if(epoch!==S.epoch)return;
       if(head!==S.env?.revision){
         if($('overlay').classList.contains('open')){S.notice='وصلت تعديلات من جهاز آخر؛ حفظ النموذج سيُبقي تعديلك للمراجعة.';return}
-        const env=await loadRemote();if(epoch!==S.epoch)return;write(env);render();
+        const remote=await loadRemote();if(epoch!==S.epoch)return;write(remote.env,remote.packed);render();
       }
     }catch(e){if(epoch===S.epoch)S.error=errorText(e)}finally{if(epoch===S.epoch){S.busy=false;status()}}
   }
@@ -108,7 +108,7 @@ const R20Cloud=(()=>{
     try{
       const remote=await loadRemote();if(epoch!==S.epoch)return;
       await archive(S.env);if(epoch!==S.epoch)return;
-      write(remote);S.conflict=false;S.error='';S.notice='';closeModal();render();notify('حُفظت تعديلاتك في «نسخ التعارض»، وفُتحت أحدث حسابات مشتركة.');
+      write(remote.env,remote.packed);S.conflict=false;S.error='';S.notice='';closeModal();render();notify('حُفظت تعديلاتك في «نسخ التعارض»، وفُتحت أحدث حسابات مشتركة.');
     }catch(e){if(epoch===S.epoch)S.error=errorText(e)}finally{if(epoch===S.epoch){S.busy=false;status()}}
   }
   function persist(next,action='حفظ',details={}){
@@ -125,15 +125,15 @@ const R20Cloud=(()=>{
     }catch(e){r14Failures++;data=JSON.parse(r14Saved);alert('لم تُحفظ الحركة الجديدة: '+(e?.message||e));status();return false}
   }
   function lock(){
-    S.epoch++;S.ready=false;S.busy=false;S.user=null;S.env=null;S.disk=null;S.conflict=false;S.error='';S.notice='';
+    S.epoch++;S.ready=false;S.busy=false;S.user=null;S.env=null;S.disk=null;S.refs=new Map();S.conflict=false;S.error='';S.notice='';
     data=r14Empty();r14Saved=JSON.stringify(data);projectFocus='';designerFocus='';closeModal();setMenu(false);document.body.classList.add('r20-locked');gate.hidden=false;$('r20Password').value='';render();
   }
   async function boot(session){
     if(!session?.user)return;const epoch=++S.epoch;S.user=session.user;S.key=key(session.user.id);S.ready=false;S.error='';S.conflict=false;
     try{
-      S.disk=localStorage.getItem(S.key);const cached=readEnvelope(S.disk,S.user.id);if(cached)adopt(cached);
-      if(!cached){const env=await loadRemote();if(epoch!==S.epoch)return;write(env)}
-      else if(navigator.onLine){const head=await rpc('ronix_head');if(epoch!==S.epoch)return;if(!cached.dirty&&head!==cached.revision){const env=await loadRemote();if(epoch!==S.epoch)return;write(env)}}
+      S.disk=localStorage.getItem(S.key);const cached=await readEnvelope(S.disk,S.user.id);if(cached)adopt(cached);
+      if(!cached){const remote=await loadRemote();if(epoch!==S.epoch)return;write(remote.env,remote.packed)}
+      else if(navigator.onLine){const head=await rpc('ronix_head');if(epoch!==S.epoch)return;if(!cached.dirty&&head!==cached.revision){const remote=await loadRemote();if(epoch!==S.epoch)return;write(remote.env,remote.packed)}}
       if(epoch!==S.epoch)return;S.ready=true;gate.hidden=true;document.body.classList.remove('r20-locked');$('r20Password').value='';
       if(S.env.dirty)await flush();
       // Repair obsolete automatic matches created by older releases. A receipt

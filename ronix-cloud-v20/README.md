@@ -1,6 +1,6 @@
-# RONIX V20.6 cloud edition
+# RONIX V20.7 cloud edition
 
-Adds a shared, authenticated account to the project-finance application. V20.6 rebuilds the project statement and receipt allocation with modern responsive layouts. It retains corrected customer balances, reliable report navigation, financial timelines, clearer claims, designer statements, account closure, permanent deletion, project photos, currencies, work-hour accruals, and reviewable financial statements. Laptop and iPhone use the same authenticated account through the responsive installable web app.
+Adds a shared, authenticated account to the project-finance application. V20.7 moves the large local media cache to IndexedDB so photo-heavy accounts fit Safari storage and still reopen offline. It retains the modern statement and receipt layouts, corrected balances, financial timelines, claims, designer statements, account closure, permanent deletion, currencies, work-hour accruals, and reviewable financial statements. Laptop and iPhone use the same authenticated account through the responsive installable web app.
 
 **Deployment status:** packaged and locally tested. Supabase setup and the initial Cloudflare deployment were completed by the owner; this updated ZIP still needs to be uploaded as a new Cloudflare deployment. No real Safari/iPhone device test has been performed; browser tests use Chromium at 320, 390, and 430 px widths.
 
@@ -9,7 +9,7 @@ Adds a shared, authenticated account to the project-finance application. V20.6 r
 1. Export the latest JSON backup from the existing offline app. Do not seed a live account from an older uploaded backup.
 2. Open `RONIX_Setup.html` from `RONIX-Setup.zip`, or `dist/setup.html`. Enter the intended owner email locally, copy the generated SQL, and run it in the linked Supabase SQL editor. The email is appended locally and is not included in this repository.
 3. In Authentication → Users → Add user → Create new user, create the app user using that email and a password; auto-confirm the user. A Supabase dashboard login is not an app Auth user. Google OAuth is not configured in this release.
-4. For a new installation, upload `RONIX-Cloud-V20.zip` with Cloudflare Pages Direct Upload. For the existing RONIX deployment, upload `RONIX-V20.6-Update.zip` as a new deployment. Both ZIP files have `index.html` at their root. Do not run the cloud app from `file://`.
+4. For a new installation, upload `RONIX-Cloud-V20.zip` with Cloudflare Pages Direct Upload. For the existing RONIX deployment, upload `RONIX-V20.7-Update.zip` as a new deployment. Both ZIP files have `index.html` at their root. Do not run the cloud app from `file://`.
 5. Open the resulting HTTPS site on the laptop, log in, import the latest backup once, and wait for synchronization to finish. Open the same site and account on iPhone in Safari; Share → Add to Home Screen.
 
 The setup page works as a local file and includes clipboard fallback. The application requires HTTPS or localhost. Only the project URL and **publishable** key are included in `config.js`. Never add a secret/service-role key, database password, owner email, or accounting backup to this public repository. Free plans are subject to the providers' limits and availability; this package does not activate billing or guarantee unlimited free hosting.

@@ -3310,7 +3310,7 @@ renderProject=function(){r25RenderProject();const project=getP(projectFocus);if(
 
 r25SimplifyNavigation();
 
-/* V20.6: clearer project output, final account state, and deliberate permanent deletion. */
+/* V20.7: clearer project output, final account state, and deliberate permanent deletion. */
 const r26ProjectDocumentBase=r25ProjectDocument;
 r25ProjectDocument=function(project){
  const m=R25Project.model(data,project.code),tone=m.actualProfit<0?'loss':'profit';
@@ -3345,7 +3345,7 @@ openCustomerReceipt=function(enc='',batchEnc=''){r26OpenReceiptBase(enc,batchEnc
 const r26RefreshReceiptBase=refreshReceiptAllocations;
 refreshReceiptAllocations=function(existing=[]){r26RefreshReceiptBase(existing);for(const input of document.querySelectorAll('.receipt-allocation')){const p=getP(input.dataset.code);if(p?.accountClosedAt&&!existing.some(x=>x.code===p.code))input.closest('tr')?.remove()}checkAllocationTotal()};
 
-/* V20.6 report corrections: true balances, reliable navigation, and useful financial timelines. */
+/* V20.7 report corrections: true balances, reliable navigation, and useful financial timelines. */
 function r27CloseReport(){window.close()}
 
 const r27ClaimDocumentBase=r14ClaimDocument;
@@ -3389,7 +3389,7 @@ function r27PrintDesigner(enc){const name=decodeURIComponent(enc),win=open('','_
 const r27RenderDesignerBase=renderDesigner;
 renderDesigner=function(){r27RenderDesignerBase();const buttons=[...document.querySelectorAll('#content button')],print=buttons.find(x=>x.textContent.trim()==='طباعة');if(print){print.textContent='طباعة كشف المصمم / PDF';print.setAttribute('onclick',`r27PrintDesigner('${r14Encode(designerFocus)}')`)}};
 
-/* V20.6: modern receipt allocation and project statement without wide legacy tables. */
+/* V20.7: modern receipt allocation and project statement without wide legacy tables. */
 function r28ReceiptRow(input){return input?.closest('[data-r28-row]')}
 refreshReceiptAllocations=function(existing=[]){
  const name=val('crClient'),currency=$('crCurrency')?val('crCurrency'):'EGP',rate=$('crRate')?Number(val('crRate')):1,projects=customerProjects(name).filter(p=>!p.accountClosedAt||existing.some(x=>x.code===p.code));
@@ -3427,16 +3427,16 @@ const R20Media=(()=>{
     if(value&&typeof value==='object'){const out={};for(const [k,v] of Object.entries(value))Object.defineProperty(out,k,{value:await walk(v,transform),enumerable:true,writable:true,configurable:true});return out}
     return value;
   }
-  async function pack(snapshot,owner,upload){
+  async function pack(snapshot,owner,upload,onReference=()=>{}){
     const seen=new Map();
     return walk(snapshot,async value=>{
       if(typeof value!=='string'||!value.startsWith('data:'))return;
       if(seen.has(value))return seen.get(value);
       const {mime,bytes}=parse(value),digest=await hash(bytes),path=owner+'/'+digest+'.'+types[mime];
-      await upload(path,bytes,mime);const ref={$ronixBlob:path,mime};seen.set(value,ref);return ref;
+      await upload(path,bytes,mime);const ref={$ronixBlob:path,mime};seen.set(value,ref);onReference(value,ref);return ref;
     });
   }
-  async function unpack(snapshot,owner,download){
+  async function unpack(snapshot,owner,download,onHydrated=()=>{}){
     const seen=new Map();
     return walk(snapshot,async value=>{
       if(!value||typeof value!=='object'||!Object.hasOwn(value,'$ronixBlob'))return;
@@ -3444,10 +3444,14 @@ const R20Media=(()=>{
       if(typeof path!=='string'||!types[mime]||!path.startsWith(owner+'/')||!new RegExp('^[a-f0-9]{64}\\.'+types[mime]+'$').test(path.slice(owner.length+1)))throw Error('مرجع مستند لا يخص هذا الحساب أو غير صالح');
       if(seen.has(path))return seen.get(path);
       const bytes=new Uint8Array(await download(path));if(bytes.length>5242880||await hash(bytes)!==path.slice(owner.length+1,owner.length+65))throw Error('تعذر التحقق من سلامة المستند');
-      const uri=encode(bytes,mime);seen.set(path,uri);return uri;
+      const uri=encode(bytes,mime);seen.set(path,uri);onHydrated(uri,{$ronixBlob:path,mime});return uri;
     });
   }
-  return {pack,unpack,hash};
+  function compact(snapshot,references){
+    const visit=value=>{if(typeof value==='string'&&references?.has(value))return references.get(value);if(Array.isArray(value))return value.map(visit);if(value&&typeof value==='object'){const out={};for(const [key,item] of Object.entries(value))out[key]=visit(item);return out}return value};
+    return visit(snapshot)
+  }
+  return {pack,unpack,compact,hash};
 })();
 if(typeof module!=='undefined')module.exports=R20Media;
 
@@ -3455,7 +3459,7 @@ if(typeof module!=='undefined')module.exports=R20Media;
 const R20Cloud=(()=>{
   const cfg=window.RONIX_CLOUD_CONFIG;
   const client=supabase.createClient(cfg.url,cfg.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'ronix-v20-auth'}});
-  const S={user:null,key:'',disk:null,env:null,ready:false,busy:false,conflict:false,error:'',notice:'',epoch:0};
+  const S={user:null,key:'',disk:null,env:null,refs:new Map(),ready:false,busy:false,conflict:false,error:'',notice:'',epoch:0};
   const bar=document.createElement('div');bar.id='r20CloudBar';bar.innerHTML='<strong>RONIX · متصل بحسابك</strong><span id="r20SyncState" role="status"></span><div class="actions"><button class="btn" id="r20Refresh">تحديث / مزامنة</button><button class="btn" id="r20Backup">نسخة احتياطية</button><button class="btn" id="r20Recovery">نسخ التعارض</button><button class="btn" id="r20Logout">خروج</button></div><div id="r20Conflict" hidden><p>توجد نسخة أحدث من جهاز آخر. تعديلات هذا الجهاز محفوظة ولم تُكتب فوق الحسابات المشتركة.</p><button class="btn" id="r20KeepLocal">تنزيل تعديلاتي</button><button class="btn primary" id="r20UseServer">حفظ نسخة من تعديلاتي وفتح أحدث حسابات</button></div>';
   document.querySelector('.main').prepend(bar);
   const menuButton=document.createElement('button');menuButton.id='r20Menu';menuButton.className='btn r20-mobile-only';menuButton.textContent='☰ الأقسام';menuButton.setAttribute('aria-expanded','false');bar.prepend(menuButton);
@@ -3468,15 +3472,17 @@ const R20Cloud=(()=>{
   const gate=document.createElement('section');gate.id='r20Gate';gate.innerHTML=`<div class="r20-login"><img src="${R14_LOGO}" alt="RONIX"><h1>حسابات RONIX</h1><p>نفس الحساب على اللابتوب والآيفون</p><form id="r20LoginForm"><label>البريد الإلكتروني<input id="r20Email" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="r20Password" type="password" autocomplete="current-password" required></label><button class="btn primary" type="submit">دخول</button></form><p id="r20LoginStatus" role="status"></p><a href="setup.html" target="_blank" rel="noopener">إعداد المشروع لأول مرة</a><p class="hint">استخدم حساب RONIX الذي أنشأته في Authentication داخل Supabase.</p></div>`;document.body.append(gate);
   function key(uid){return 'ronix-v20-ledger:'+uid}
   function normalize(value){return R19.sync(R18Clients.sync(R14.validate(value)))}
-  function readEnvelope(raw,uid){
+  function mediaStore(mode,path,value){return new Promise((resolve,reject)=>{const request=indexedDB.open('ronix-v20-local',1);request.onupgradeneeded=()=>request.result.createObjectStore('media');request.onerror=()=>reject(request.error);request.onsuccess=()=>{const db=request.result,tx=db.transaction('media',mode),store=tx.objectStore('media'),query=mode==='readonly'?store.get(path):store.put(value,path);query.onsuccess=()=>resolve(query.result);query.onerror=()=>reject(query.error);tx.oncomplete=()=>db.close();tx.onerror=()=>{db.close();reject(tx.error)}}})}
+  async function hydratePayload(packed,owner){return R20Media.unpack(packed,owner,async path=>{const cached=await mediaStore('readonly',path);if(cached)return cached.bytes;const result=await client.storage.from('ronix-files').download(path);if(result.error)throw result.error;const bytes=await result.data.arrayBuffer();await mediaStore('readwrite',path,{bytes,mime:result.data.type||''});return bytes},(uri,ref)=>S.refs.set(uri,ref))}
+  async function readEnvelope(raw,uid){
     if(!raw)return null;const x=JSON.parse(raw);
     if(x.owner!==uid||!Number.isSafeInteger(x.revision)||x.revision<0||typeof x.dirty!=='boolean'||(x.dirty&&typeof x.mutation!=='string'))throw Error('النسخة المحلية لا تخص حساب الدخول أو غير صالحة');
-    x.payload=normalize(x.payload);return x;
+    x.payload=normalize(await hydratePayload(x.payload,uid));return x;
   }
   function adopt(env){S.env=env;data=R14.copy(env.payload);r14Saved=JSON.stringify(data);r14Disk=r14Saved;r14BootIssue=''}
-  function write(env){
+  function write(env,packedPayload=null){
     if(localStorage.getItem(S.key)!==S.disk)throw Error('تغيرت النسخة في نافذة أخرى. اضغط تحديث قبل التسجيل.');
-    const raw=JSON.stringify(env);localStorage.setItem(S.key,raw);S.disk=raw;adopt(env);
+    const cached={...env,payload:packedPayload||R20Media.compact(env.payload,S.refs)},raw=JSON.stringify(cached);localStorage.setItem(S.key,raw);S.disk=raw;adopt(env);
   }
   function status(){
     const el=$('r20SyncState');if(!el)return;
@@ -3499,10 +3505,8 @@ const R20Cloud=(()=>{
   async function loadRemote(){
     const owner=S.user.id,result=await rpc('ronix_load');
     if(!Number.isSafeInteger(result?.revision)||result.revision<0)throw Error('نسخة الخادم غير صالحة');
-    const payload=result.payload===null?r14Empty():await R20Media.unpack(result.payload,owner,async path=>{
-      const r=await client.storage.from('ronix-files').download(path);if(r.error)throw r.error;return r.data.arrayBuffer();
-    });
-    return {owner,revision:result.revision,payload:normalize(payload),dirty:false,mutation:null};
+    const packed=result.payload===null?r14Empty():result.payload,payload=await hydratePayload(packed,owner);
+    return {env:{owner,revision:result.revision,payload:normalize(payload),dirty:false,mutation:null},packed};
   }
   async function archive(env){
     return new Promise((resolve,reject)=>{
@@ -3527,13 +3531,13 @@ const R20Cloud=(()=>{
         if(epoch!==S.epoch)throw Error('تغير الحساب');
         const r=await client.storage.from('ronix-files').upload(path,bytes,{contentType:mime,upsert:false});
         if(r.error&&String(r.error.statusCode)!=='409'&&!/already exists|Duplicate/i.test(r.error.message||''))throw r.error;
-      });
+      },(uri,ref)=>S.refs.set(uri,ref));
       if(epoch!==S.epoch)return;
       const result=await rpc('ronix_commit',{expected_revision:env.revision,mutation_id:env.mutation,next_payload:packed});
       if(epoch!==S.epoch)return;
       if(result.status==='conflict'){S.conflict=true;return}
       if(result.status!=='saved'||!Number.isSafeInteger(result.revision)||result.revision<=env.revision)throw Error('استجابة حفظ غير صالحة');
-      write({...env,revision:result.revision,dirty:false,mutation:null});S.notice='';
+      write({...env,revision:result.revision,dirty:false,mutation:null},packed);S.notice='';
     }catch(e){if(epoch===S.epoch)S.error=errorText(e)}finally{if(epoch===S.epoch){S.busy=false;status()}}
   }
   async function refresh(){
@@ -3542,7 +3546,7 @@ const R20Cloud=(()=>{
     const disk=localStorage.getItem(S.key);
     if(disk!==S.disk){
       if($('overlay').classList.contains('open')){S.error='أغلق نموذج الإدخال ثم اضغط تحديث لتحميل تغيير النافذة الأخرى.';status();return}
-      const env=readEnvelope(disk,S.user.id);S.disk=disk;if(env){adopt(env);S.conflict=false;render()}
+      S.busy=true;status();try{const env=await readEnvelope(disk,S.user.id);S.disk=disk;if(env){adopt(env);S.conflict=false;render()}}finally{S.busy=false;status()}
     }
     if(S.env?.dirty){await flush();return}
     if(!navigator.onLine){status();return}
@@ -3551,7 +3555,7 @@ const R20Cloud=(()=>{
       const head=await rpc('ronix_head');if(epoch!==S.epoch)return;
       if(head!==S.env?.revision){
         if($('overlay').classList.contains('open')){S.notice='وصلت تعديلات من جهاز آخر؛ حفظ النموذج سيُبقي تعديلك للمراجعة.';return}
-        const env=await loadRemote();if(epoch!==S.epoch)return;write(env);render();
+        const remote=await loadRemote();if(epoch!==S.epoch)return;write(remote.env,remote.packed);render();
       }
     }catch(e){if(epoch===S.epoch)S.error=errorText(e)}finally{if(epoch===S.epoch){S.busy=false;status()}}
   }
@@ -3561,7 +3565,7 @@ const R20Cloud=(()=>{
     try{
       const remote=await loadRemote();if(epoch!==S.epoch)return;
       await archive(S.env);if(epoch!==S.epoch)return;
-      write(remote);S.conflict=false;S.error='';S.notice='';closeModal();render();notify('حُفظت تعديلاتك في «نسخ التعارض»، وفُتحت أحدث حسابات مشتركة.');
+      write(remote.env,remote.packed);S.conflict=false;S.error='';S.notice='';closeModal();render();notify('حُفظت تعديلاتك في «نسخ التعارض»، وفُتحت أحدث حسابات مشتركة.');
     }catch(e){if(epoch===S.epoch)S.error=errorText(e)}finally{if(epoch===S.epoch){S.busy=false;status()}}
   }
   function persist(next,action='حفظ',details={}){
@@ -3578,15 +3582,15 @@ const R20Cloud=(()=>{
     }catch(e){r14Failures++;data=JSON.parse(r14Saved);alert('لم تُحفظ الحركة الجديدة: '+(e?.message||e));status();return false}
   }
   function lock(){
-    S.epoch++;S.ready=false;S.busy=false;S.user=null;S.env=null;S.disk=null;S.conflict=false;S.error='';S.notice='';
+    S.epoch++;S.ready=false;S.busy=false;S.user=null;S.env=null;S.disk=null;S.refs=new Map();S.conflict=false;S.error='';S.notice='';
     data=r14Empty();r14Saved=JSON.stringify(data);projectFocus='';designerFocus='';closeModal();setMenu(false);document.body.classList.add('r20-locked');gate.hidden=false;$('r20Password').value='';render();
   }
   async function boot(session){
     if(!session?.user)return;const epoch=++S.epoch;S.user=session.user;S.key=key(session.user.id);S.ready=false;S.error='';S.conflict=false;
     try{
-      S.disk=localStorage.getItem(S.key);const cached=readEnvelope(S.disk,S.user.id);if(cached)adopt(cached);
-      if(!cached){const env=await loadRemote();if(epoch!==S.epoch)return;write(env)}
-      else if(navigator.onLine){const head=await rpc('ronix_head');if(epoch!==S.epoch)return;if(!cached.dirty&&head!==cached.revision){const env=await loadRemote();if(epoch!==S.epoch)return;write(env)}}
+      S.disk=localStorage.getItem(S.key);const cached=await readEnvelope(S.disk,S.user.id);if(cached)adopt(cached);
+      if(!cached){const remote=await loadRemote();if(epoch!==S.epoch)return;write(remote.env,remote.packed)}
+      else if(navigator.onLine){const head=await rpc('ronix_head');if(epoch!==S.epoch)return;if(!cached.dirty&&head!==cached.revision){const remote=await loadRemote();if(epoch!==S.epoch)return;write(remote.env,remote.packed)}}
       if(epoch!==S.epoch)return;S.ready=true;gate.hidden=true;document.body.classList.remove('r20-locked');$('r20Password').value='';
       if(S.env.dirty)await flush();
       // Repair obsolete automatic matches created by older releases. A receipt
@@ -3616,9 +3620,9 @@ const R20Cloud=(()=>{
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.ready)refresh()});
   setInterval(()=>{if(!document.hidden&&S.ready&&!S.conflict&&!$('overlay').classList.contains('open'))refresh()},15000);
   client.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'&&S.user)queueMicrotask(lock)});
-  r15Changes=function(){modal('RONIX V20.6 · العملات والقوائم المالية','<p><b>عملة العقد:</b> يُحفظ لكل مشروع سعر التعاقد التاريخي، وتبقى قيمته ثابتة بعد بدء الحركات المالية حتى لا تتغير تكلفة العقد بأثر رجعي.</p><p><b>الدفعات وسعر الصرف:</b> لكل دفعة أجنبية سعر تنفيذ مستقل وتاريخ ومصدر. يحسب النظام المتوسط المرجّح من المبلغ الفعلي بالجنيه والمبلغ المسدد بعملة العقد، مع تمييز الأسعار القديمة التي تحتاج مراجعة.</p><p><b>المطالبات:</b> تجمع المطالبة أكثر من مشروع للعميل نفسه، ولكل بند وحدة وكمية وسعر وإجمالي وصورة مشروع. يمكن إصدارها بعملة العقد أو بالجنيه أو بالعملتين، وتظهر الدفعات في قسم مستقل.</p><p><b>القوائم المالية الختامية:</b> ميزان مراجعة، وقائمة دخل، ومركز مالي، وتدفقات نقدية فعلية للفترة. لا يسمح الإقفال النهائي قبل مراجعة الأرصدة الافتتاحية وأسعار العملات وتواريخ الحركات القديمة، ويحفظ الإقفال ببصمة قابلة للتحقق.</p><p><b>إدارة المشروع:</b> بطاقات بصور واضحة وحالة نشط أو مغلق، وساعات العمل تُسجل تكلفة مستحقة على المشروع من دون خصم النقدية قبل الدفع الفعلي. أضيف أيضًا خط زمني شهري وسنوي للتدفقات النقدية.</p><p><b>الحذف والاستعادة:</b> السجلات المالية تُعكس أو تُؤرشف مع سبب واضح وروابطها المحاسبية، وتظل قابلة للمراجعة والاستعادة حسب نوع الحركة.</p><p>يعمل الحساب نفسه على الكمبيوتر والآيفون مع المزامنة. سعر بنك مصر يُسجل يدويًا بتاريخ التنفيذ، والسعر الآلي مرجع عام للمقارنة.</p><p>للتثبيت على الآيفون: افتح الرابط في Safari ثم مشاركة ← إضافة إلى الشاشة الرئيسية.</p>')};r15Help.textContent='✓ ما الجديد · V20.6';r15Help.onclick=r15Changes;
+  r15Changes=function(){modal('RONIX V20.7 · العملات والقوائم المالية','<p><b>عملة العقد:</b> يُحفظ لكل مشروع سعر التعاقد التاريخي، وتبقى قيمته ثابتة بعد بدء الحركات المالية حتى لا تتغير تكلفة العقد بأثر رجعي.</p><p><b>الدفعات وسعر الصرف:</b> لكل دفعة أجنبية سعر تنفيذ مستقل وتاريخ ومصدر. يحسب النظام المتوسط المرجّح من المبلغ الفعلي بالجنيه والمبلغ المسدد بعملة العقد، مع تمييز الأسعار القديمة التي تحتاج مراجعة.</p><p><b>المطالبات:</b> تجمع المطالبة أكثر من مشروع للعميل نفسه، ولكل بند وحدة وكمية وسعر وإجمالي وصورة مشروع. يمكن إصدارها بعملة العقد أو بالجنيه أو بالعملتين، وتظهر الدفعات في قسم مستقل.</p><p><b>القوائم المالية الختامية:</b> ميزان مراجعة، وقائمة دخل، ومركز مالي، وتدفقات نقدية فعلية للفترة. لا يسمح الإقفال النهائي قبل مراجعة الأرصدة الافتتاحية وأسعار العملات وتواريخ الحركات القديمة، ويحفظ الإقفال ببصمة قابلة للتحقق.</p><p><b>إدارة المشروع:</b> بطاقات بصور واضحة وحالة نشط أو مغلق، وساعات العمل تُسجل تكلفة مستحقة على المشروع من دون خصم النقدية قبل الدفع الفعلي. أضيف أيضًا خط زمني شهري وسنوي للتدفقات النقدية.</p><p><b>الحذف والاستعادة:</b> السجلات المالية تُعكس أو تُؤرشف مع سبب واضح وروابطها المحاسبية، وتظل قابلة للمراجعة والاستعادة حسب نوع الحركة.</p><p>يعمل الحساب نفسه على الكمبيوتر والآيفون مع المزامنة. سعر بنك مصر يُسجل يدويًا بتاريخ التنفيذ، والسعر الآلي مرجع عام للمقارنة.</p><p>للتثبيت على الآيفون: افتح الرابط في Safari ثم مشاركة ← إضافة إلى الشاشة الرئيسية.</p>')};r15Help.textContent='✓ ما الجديد · V20.7';r15Help.onclick=r15Changes;
   r14Help=function(){modal('العمل على حسابك المشترك','<ol><li>على جهازك الأول استورد أحدث JSON من التقارير، وانتظر ظهور «تمت المزامنة» أعلى الشاشة.</li><li>افتح الرابط على الجهاز الآخر وسجّل الدخول بالحساب نفسه. لا تستورد نسخة قديمة هناك.</li><li>تُزامن الحركة والصور بعد حفظها. توجد عملية واحدة معلقة في كل مرة؛ عند انقطاع الإنترنت تبقى محفوظة على الجهاز حتى المزامنة.</li><li>عند التعارض نزّل تعديلك أو احتفظ به في «نسخ التعارض»، ثم افتح أحدث حسابات مشتركة وراجع الفروق.</li><li>نزّل نسخة JSON بعد جلسة العمل. بياناتها وصورها متوافقة مع V19.</li></ol>')};help.onclick=r14Help;
-  document.title='RONIX | حساباتي';document.querySelector('.sublogo').textContent='PROJECT FINANCE · V20.6';document.querySelector('.sidebar-footer').textContent='RONIX V20.6 · حسابات مشتركة';document.querySelector('.footer').textContent='القوائم تعتمد الجنيه عملةً وظيفية؛ راجع أسعار التنفيذ وحالة المزامنة واحتفظ بنسخة احتياطية.';
+  document.title='RONIX | حساباتي';document.querySelector('.sublogo').textContent='PROJECT FINANCE · V20.7';document.querySelector('.sidebar-footer').textContent='RONIX V20.7 · حسابات مشتركة';document.querySelector('.footer').textContent='القوائم تعتمد الجنيه عملةً وظيفية؛ راجع أسعار التنفيذ وحالة المزامنة واحتفظ بنسخة احتياطية.';
   if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
   client.auth.getSession().then(r=>{if(r.data?.session)boot(r.data.session);else if(r.error)$('r20LoginStatus').textContent=errorText(r.error)});
   return {refresh,flush,status,client,state:S};
