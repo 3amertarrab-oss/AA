@@ -1,5 +1,5 @@
 {
-  "passed": 18,
+  "passed": 20,
   "checks": [
     "schema is safely rerunnable and creates private storage",
     "anonymous cannot read ledger or call financial functions",
@@ -9,12 +9,14 @@
     "retrying same mutation is idempotent",
     "stale revision never overwrites newer data",
     "another allowed account sees no other owner ledger",
+    "accountant role reads the manager company ledger",
     "direct update cannot bypass compare and swap",
     "members cannot grant themselves another email",
     "malformed data is rejected before writing",
     "simultaneous writers produce one save and one conflict",
     "old successful mutation stays idempotent after later changes",
     "own private evidence can be read",
+    "accountant can read company private evidence",
     "another user cannot read evidence",
     "cross-account uploads are rejected",
     "evidence cannot be overwritten or deleted through the client role",

@@ -3,8 +3,13 @@ begin;
 create schema if not exists ronix_private;
 revoke all on schema ronix_private from public, anon, authenticated;
 create table if not exists ronix_private.allowed_emails (
-  email text primary key check (email = lower(email))
+  email text primary key check (email = lower(email)),
+  role text not null default 'manager' check (role in ('manager','accountant')),
+  account_owner uuid references auth.users(id) on delete cascade
 );
+alter table ronix_private.allowed_emails add column if not exists role text not null default 'manager';
+alter table ronix_private.allowed_emails add column if not exists account_owner uuid references auth.users(id) on delete cascade;
+update ronix_private.allowed_emails a set account_owner=u.id,role='manager' from auth.users u where lower(u.email)=a.email and a.account_owner is null;
 revoke all on ronix_private.allowed_emails from public, anon, authenticated;
 
 create or replace function public.ronix_allowed() returns boolean
@@ -17,6 +22,17 @@ $$;
 revoke all on function public.ronix_allowed() from public, anon;
 grant execute on function public.ronix_allowed() to authenticated;
 
+create or replace function public.ronix_account_owner() returns uuid
+language sql stable security definer set search_path = '' as $$
+  select coalesce((select account_owner from ronix_private.allowed_emails where email=lower(auth.jwt()->>'email')),auth.uid());
+$$;
+create or replace function public.ronix_role() returns text
+language sql stable security definer set search_path = '' as $$
+  select coalesce((select role from ronix_private.allowed_emails where email=lower(auth.jwt()->>'email')),'');
+$$;
+revoke all on function public.ronix_account_owner(), public.ronix_role() from public, anon;
+grant execute on function public.ronix_account_owner(), public.ronix_role() to authenticated;
+
 create table if not exists public.ronix_ledger (
   owner_id uuid primary key references auth.users(id) on delete cascade,
   revision bigint not null check (revision > 0),
@@ -26,7 +42,7 @@ create table if not exists public.ronix_ledger (
 alter table public.ronix_ledger enable row level security;
 drop policy if exists ronix_read_own on public.ronix_ledger;
 create policy ronix_read_own on public.ronix_ledger for select to authenticated
-  using (owner_id = (select auth.uid()) and (select public.ronix_allowed()));
+  using (owner_id = (select public.ronix_account_owner()) and (select public.ronix_allowed()));
 revoke all on public.ronix_ledger from public, anon, authenticated;
 grant select on public.ronix_ledger to authenticated;
 
@@ -40,27 +56,27 @@ revoke all on ronix_private.mutations from public, anon, authenticated;
 
 create or replace function public.ronix_load() returns jsonb
 language plpgsql security definer set search_path = '' as $$
-declare row_data public.ronix_ledger;
+declare row_data public.ronix_ledger; account_id uuid:=public.ronix_account_owner();
 begin
   if not public.ronix_allowed() then raise exception 'RONIX_ACCESS_DENIED' using errcode='42501'; end if;
-  select * into row_data from public.ronix_ledger where owner_id=auth.uid();
-  if not found then return jsonb_build_object('revision',0,'payload',null); end if;
-  return jsonb_build_object('revision',row_data.revision,'payload',row_data.payload,'updated_at',row_data.updated_at);
+  select * into row_data from public.ronix_ledger where owner_id=account_id;
+  if not found then return jsonb_build_object('revision',0,'payload',null,'account_owner',account_id,'role',public.ronix_role()); end if;
+  return jsonb_build_object('revision',row_data.revision,'payload',row_data.payload,'updated_at',row_data.updated_at,'account_owner',account_id,'role',public.ronix_role());
 end;
 $$;
 create or replace function public.ronix_head() returns bigint
 language plpgsql security definer set search_path = '' as $$
-declare current_revision bigint;
+declare current_revision bigint; account_id uuid:=public.ronix_account_owner();
 begin
   if not public.ronix_allowed() then raise exception 'RONIX_ACCESS_DENIED' using errcode='42501'; end if;
-  select revision into current_revision from public.ronix_ledger where owner_id=auth.uid();
+  select revision into current_revision from public.ronix_ledger where owner_id=account_id;
   return coalesce(current_revision,0);
 end;
 $$;
 
 create or replace function public.ronix_commit(expected_revision bigint, mutation_id uuid, next_payload jsonb)
 returns jsonb language plpgsql security definer set search_path = '' as $$
-declare current_revision bigint; prior_revision bigint; new_revision bigint; uid uuid:=auth.uid();
+declare current_revision bigint; prior_revision bigint; new_revision bigint; uid uuid:=public.ronix_account_owner();
 begin
   if not public.ronix_allowed() then raise exception 'RONIX_ACCESS_DENIED' using errcode='42501'; end if;
   if expected_revision is null or expected_revision < 0 or mutation_id is null or next_payload is null
@@ -97,9 +113,9 @@ insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
 drop policy if exists ronix_files_read on storage.objects;
 drop policy if exists ronix_files_insert on storage.objects;
 create policy ronix_files_read on storage.objects for select to authenticated
-  using(bucket_id='ronix-files' and (storage.foldername(name))[1]=(select auth.uid())::text and (select public.ronix_allowed()));
+  using(bucket_id='ronix-files' and (storage.foldername(name))[1]=(select public.ronix_account_owner())::text and (select public.ronix_allowed()));
 create policy ronix_files_insert on storage.objects for insert to authenticated
-  with check(bucket_id='ronix-files' and (storage.foldername(name))[1]=(select auth.uid())::text and (select public.ronix_allowed()));
+  with check(bucket_id='ronix-files' and (storage.foldername(name))[1]=(select public.ronix_account_owner())::text and (select public.ronix_allowed()));
 -- No update/delete policy: hashes are immutable, so old evidence and recovery snapshots keep working.
 -- The setup page appends the single authorized email below, on your own computer.
 commit;

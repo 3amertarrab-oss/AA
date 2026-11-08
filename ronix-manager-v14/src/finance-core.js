@@ -1,6 +1,6 @@
 /* RONIX V14. Monetary arithmetic in integer piastres; no network or storage. */
 const R14 = (() => {
-  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers','documentNumbers','manualJournals','laborEntries','generalExpenses','accounts','closingRates','fiscalClosings'];
+  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers','documentNumbers','manualJournals','laborEntries','generalExpenses','accounts','closingRates','fiscalClosings','reviews'];
   const copy = v => JSON.parse(JSON.stringify(v));
   const normName = v => String(v || '').trim();
   function cents(v) {
@@ -70,7 +70,16 @@ const R14 = (() => {
   }
   const projectWeightedRate=(d,p)=>projectRateSummary(d,p).weightedRate;
   const originalContract=p=>p?.originalContract??p?.contract??0;
-  const projectSubtotal=p=>sum([{amount:originalContract(p)},...(p.contractExtras||[])]);
+  function projectVariations(p){
+    let running=originalContract(p);return (p?.contractExtras||[]).map(v=>{
+      const type=v.type||'increase',mode=v.mode||'fixed',value=amount(v.value??v.amount);
+      if(!['increase','discount'].includes(type)||!['percent','fixed'].includes(mode)||value<0)throw Error('بند VO غير صالح');
+      const absolute=mode==='percent'?amount((running*value/100).toFixed(2)):value,impact=type==='discount'?-absolute:absolute;
+      running=sum([{amount:running},{amount:impact}]);if(running<0)throw Error('خصومات VO تتجاوز قيمة العقد الحالية');
+      return {...v,type,mode,value,amount:absolute,impact,runningTotal:running};
+    })
+  }
+  const projectSubtotal=p=>projectVariations(p).at(-1)?.runningTotal??originalContract(p);
   function projectTaxAmount(p,t){
     if(!t||!['add','deduct'].includes(t.type)||!['percent','fixed'].includes(t.mode))throw Error('بند ضريبة غير صالح');
     const value=amount(t.value);if(value<0)throw Error('قيمة الضريبة لا تكون سالبة');
@@ -242,7 +251,9 @@ const R14 = (() => {
         else {unique(p.statementItems||[],x=>x.id,'بنود المستخلص');for(const x of p.statementItems||[]){dated(x.date,'تاريخ بند المستخلص');if(!String(x.description||'').trim())add('بيان المستخلص مطلوب');if(!Number.isFinite(Number(x.quantity))||Number(x.quantity)<0)add('كمية المستخلص غير صالحة');monetary(x.unitPrice,'سعر بند المستخلص');monetary(x.amount,'قيمة بند المستخلص');if(cents(x.amount)!==cents(amount((Number(x.quantity)*Number(x.unitPrice)).toFixed(2))))add('قيمة بند المستخلص لا تطابق الكمية والسعر')}}
         if(p.originalContract!=null){
           if(!/^[A-Z]{3}$/.test(projectCurrency(p)))add('عملة مشروع غير صالحة');rate(projectRate(p));if(projectCurrency(p)==='EGP'&&projectRate(p)!==1)add('سعر صرف الجنيه يجب أن يساوي 1');
-          monetary(p.originalContract,'العقد الأصلي');detailRows(p.contractExtras||[],'تعاقد إضافي');
+          monetary(p.originalContract,'العقد الأصلي');
+          if(!Array.isArray(p.contractExtras||[]))add('جدول VO غير صالح');
+          else {unique(p.contractExtras||[],v=>v.id,'VO');for(const v of p.contractExtras||[]){if(!String(v.name||'').trim())add('اسم VO مطلوب');dated(v.date,'VO');if(!['increase','discount'].includes(v.type||'increase')||!['percent','fixed'].includes(v.mode||'fixed'))add('نوع VO غير صالح');monetary(v.value??v.amount,'قيمة VO');if((v.mode||'fixed')==='percent'&&Number(v.value??v.amount)>100)add('نسبة VO تتجاوز 100%')}projectVariations(p)}
           if(!Array.isArray(p.taxItems||[]))add('ضرائب المشروع: جدول غير صالح');
           else {unique(p.taxItems||[],t=>t.id,'ضرائب المشروع');for(const t of p.taxItems||[]){if(!String(t.name||'').trim())add('اسم الضريبة مطلوب');if(!['add','deduct'].includes(t.type)||!['percent','fixed'].includes(t.mode))add('نوع الضريبة غير صالح');monetary(t.value,'قيمة الضريبة');if(t.mode==='percent'&&Number(t.value)>100)add('نسبة الضريبة تتجاوز 100%');projectTaxAmount(p,t)}}
           if(cents(p.contract)!==cents(projectBookTotal(p)))add('إجمالي العقد لا يطابق الأصل والإضافات وسعر الصرف');
@@ -284,6 +295,6 @@ const R14 = (() => {
     const next=copy(d);next.clientReceipts=next.clientReceipts.filter(r=>(r.batchId||r.id)!==batchId).concat(entries);
     validate(next);return next;
   }
-  return {rate,fx,unfx,projectCurrency,projectRate,projectSettlementRate,projectRateSummary,projectWeightedRate,originalContract,projectSubtotal,projectTaxAmount,projectTaxTotal,projectOriginalTotal,projectBookTotal,assignmentTotal,cashReceipt,fxDifference,receivedOriginal,foreignReceiptEdit,arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
+  return {rate,fx,unfx,projectCurrency,projectRate,projectSettlementRate,projectRateSummary,projectWeightedRate,originalContract,projectVariations,projectSubtotal,projectTaxAmount,projectTaxTotal,projectOriginalTotal,projectBookTotal,assignmentTotal,cashReceipt,fxDifference,receivedOriginal,foreignReceiptEdit,arrays,copy,cents,amount,sum,delta,status,active,claimRows,claimAmount,claimClient,receiptClient,totals,settled,usedReceipt,remaining,normalize,dateOK,audit,validate,receiptEdit,normName};
 })();
 if(typeof module!=='undefined')module.exports=R14;

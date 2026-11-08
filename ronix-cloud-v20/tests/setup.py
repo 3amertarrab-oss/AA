@@ -17,12 +17,12 @@ with sync_playwright() as pw:
  p.locator('#copySql').click()
  assert p.locator('#sql').input_value()==''
  checks.append('empty email does not generate an allowlist grant')
- p.locator('#email').fill("Owner+O'Neil@example.com");p.locator('#copySql').click()
+ p.locator('#email').fill("Owner+O'Neil@example.com");p.locator('#accountant').fill('Accountant@example.com');p.locator('#copySql').click()
  p.wait_for_function("document.getElementById('sql').value.includes('insert into ronix_private.allowed_emails')")
  sql=p.locator('#sql').input_value()
- assert "values ('owner+o''neil@example.com')" in sql and sql.startswith('-- RONIX V20:')
+ assert "select 'owner+o''neil@example.com','manager',id" in sql and "select 'accountant@example.com','accountant',id" in sql and sql.startswith('-- RONIX V20:')
  assert p.locator('details').get_attribute('open') is not None
- checks.append('local setup generates full schema and safely quotes lowercase email')
+ checks.append('local setup generates shared manager and accountant roles and safely quotes lowercase email')
  assert p.locator('#sqlLink').get_attribute('href').endswith('/ajmguynkgsrqkxtxewsj/sql/new')
  assert p.locator('#usersLink').get_attribute('href').endswith('/ajmguynkgsrqkxtxewsj/auth/users')
  checks.append('setup links point to the intended project editors')

@@ -5,7 +5,9 @@ from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from functools import partial
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'private-test-artifacts';OUT.mkdir(exist_ok=True)
-users={'owner@example.com':'10000000-0000-4000-8000-000000000001','other@example.com':'10000000-0000-4000-8000-000000000002'}
+users={'owner@example.com':'10000000-0000-4000-8000-000000000001','other@example.com':'10000000-0000-4000-8000-000000000002','accountant@example.com':'10000000-0000-4000-8000-000000000003'}
+def account(uid):return users['owner@example.com'] if uid==users['accountant@example.com'] else uid
+def role(uid):return 'accountant' if uid==users['accountant@example.com'] else 'manager'
 ledgers={};mutations={};files={};mutex=threading.RLock();flags={'drop_commit':False,'deny_storage':False};checks=[];errors=[]
 def check(name,ok):
  assert ok,name
@@ -27,7 +29,7 @@ class Handler(SimpleHTTPRequestHandler):
    u=self.user();return self.respond({'id':u['sub'],'email':u['email'],'aud':'authenticated','role':'authenticated'})
   if self.path.startswith('/supabase/storage/v1/object/'):
    path=urllib.parse.unquote(self.path.split('/ronix-files/',1)[1]);u=self.user()
-   if not u or not path.startswith(u['sub']+'/') or path not in files:return self.respond({'message':'forbidden'},403)
+   if not u or not path.startswith(account(u['sub'])+'/') or path not in files:return self.respond({'message':'forbidden'},403)
    return self.respond(files[path]['bytes'],ctype=files[path]['mime'])
   return super().do_GET()
  def do_POST(self):
@@ -39,7 +41,7 @@ class Handler(SimpleHTTPRequestHandler):
   if '/auth/v1/logout' in path:return self.respond({})
   u=self.user()
   if not u:return self.respond({'message':'Unauthorized'},401)
-  uid=u['sub']
+  uid=account(u['sub'])
   if '/storage/v1/object/ronix-files/' in path:
    name=urllib.parse.unquote(path.split('/ronix-files/',1)[1])
    if flags['deny_storage'] or not name.startswith(uid+'/'):return self.respond({'message':'forbidden','statusCode':'403'},403)
@@ -48,7 +50,7 @@ class Handler(SimpleHTTPRequestHandler):
   d=json.loads(raw or '{}');op=path.rsplit('/',1)[-1]
   with mutex:
    ledger=ledgers.get(uid,{'revision':0,'payload':None})
-   if op=='ronix_load':return self.respond(ledger)
+   if op=='ronix_load':return self.respond({**ledger,'account_owner':uid,'role':role(u['sub'])})
    if op=='ronix_head':return self.respond(ledger['revision'])
    if op=='ronix_commit':
     mid=(uid,d['mutation_id'])
@@ -76,6 +78,12 @@ try:
   check('import saves exact accounting amounts and relationships',p.evaluate('data.projects[0].contract===1000.97&&R14.remaining(data,data.claims[0])===280.5&&data.payments[0].amount===10.25'))
   cloud=ledgers[users['owner@example.com']];check('cloud stores private file references instead of embedded base64',isinstance(cloud['payload']['projects'][0]['photos'][0]['src'],dict) and 'data:image' not in json.dumps(cloud['payload']) and len(files)==1)
   login(q);check('second device receives all records and matching photos and proofs',q.evaluate('data.projects[0].photos[0].src')==PNG and q.evaluate('data.receiptAttachments.R1.data')==PNG and q.evaluate('data.documentNumbers')==p.evaluate('data.documentNumbers'))
+  ac=b.new_context();c=ac.new_page();c.on('dialog',lambda d:d.accept());c.on('pageerror',lambda e:errors.append(str(e)));c.goto(url);login(c,'accountant@example.com')
+  check('accountant opens the same company ledger with accountant role',c.evaluate('R20Cloud.state.role')=='accountant' and c.evaluate('data.projects[0].code')=='P')
+  c.evaluate('r14Change("تعديل اختبار المحاسب",d=>d.projects[0].note="من المحاسب")');synced(c);p.locator('#r20Refresh').click();synced(p)
+  check('accountant change affects reports and enters manager review queue',p.evaluate('data.projects[0].note')=='من المحاسب' and p.evaluate('data.reviews.filter(x=>x.status==="pending").length')==1)
+  p.evaluate('r30Approve(r14Encode(data.reviews[0].id))');synced(p);q.locator('#r20Refresh').click();synced(q)
+  check('manager approval clears the pending review without reverting data',p.evaluate('data.reviews[0].status')=='approved' and p.evaluate('data.projects[0].note')=='من المحاسب');ac.close()
   check('mobile layout fits iPhone width',q.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
   q.evaluate('go("projects");openProject("P")');q.wait_for_timeout(100)
   check('unified project workspace opens with five focused tabs',q.locator('.r29-project-workspace').count()==1 and q.locator('.r29-tab').count()==5 and q.locator('.r29-tab.active').inner_text()=='نظرة عامة')
@@ -132,6 +140,8 @@ try:
    q.screenshot(path=str(OUT/f'iphone-{mobile_page}.png'),full_page=True)
   check('every main screen stays inside the iPhone viewport',True)
   check('financial cards use one non-overlapping column on iPhone',bool(mobile_columns) and all(x['columns']==1 for x in mobile_columns))
+  q.evaluate('editProject(r14Encode("P"))');q.get_by_role('button',name='+ إضافة VO',exact=True).click();q.locator('.r30-vo-name').fill('اختبار نسبة');q.locator('.r30-vo-mode').select_option('percent');q.locator('.r30-vo-value').fill('10');q.locator('.r30-vo-value').dispatch_event('input')
+  check('VO editor supports sequential percentage adjustments on current total',q.evaluate("R14.projectSubtotal({originalContract:Number(val('pcontract')),contractExtras:r30VORead()})") == 1101.07);q.evaluate('closeModal()')
   q.evaluate('editProject()');q.wait_for_timeout(80)
   q.get_by_role('button',name='+ إضافة ضريبة',exact=True).click();q.wait_for_timeout(80)
   check('project tax form fits the iPhone viewport',q.evaluate("()=>{const r=document.querySelector('.modal').getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&document.documentElement.scrollWidth<=innerWidth+1&&document.querySelectorAll('.r20-tax-row').length===1}"));q.screenshot(path=str(OUT/'iphone-project-tax.png'),full_page=True);q.evaluate('closeModal()')

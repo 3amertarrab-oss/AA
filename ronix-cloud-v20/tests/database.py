@@ -12,8 +12,8 @@ def check(name,ok):
  checks.append(name);print('PASS',name,flush=True)
 sql((ROOT/'tests/postgres_bootstrap.sql').read_text())
 schema=(ROOT/'schema.sql').read_text();sql(schema);sql(schema)
-u1='10000000-0000-4000-8000-000000000001';u2='10000000-0000-4000-8000-000000000002';u3='10000000-0000-4000-8000-000000000003'
-sql(f"insert into auth.users values('{u1}','owner@example.com'),('{u2}','other@example.com'),('{u3}','blocked@example.com'); insert into ronix_private.allowed_emails values('owner@example.com'),('other@example.com');")
+u1='10000000-0000-4000-8000-000000000001';u2='10000000-0000-4000-8000-000000000002';u3='10000000-0000-4000-8000-000000000003';u4='10000000-0000-4000-8000-000000000004'
+sql(f"insert into auth.users values('{u1}','owner@example.com'),('{u2}','other@example.com'),('{u3}','blocked@example.com'),('{u4}','accountant@example.com'); insert into ronix_private.allowed_emails(email) values('owner@example.com'),('other@example.com');")
 def as_user(uid,email,query):return "set role authenticated;select set_config('request.jwt.claims',"+"'"+json.dumps({'sub':uid,'email':email})+"',false);"+query
 def one(q):return as_user(u1,'owner@example.com',q)
 payload={'schemaVersion':19,'currency':'EGP','projects':[],'assignments':[],'payments':[]}
@@ -26,6 +26,9 @@ mid=str(uuid.uuid4());r=json.loads(sql(one(commit(0,mid))));check('first atomic 
 r=json.loads(sql(one(commit(0,mid))));check('retrying same mutation is idempotent',r['revision']==1 and r['replayed'])
 check('stale revision never overwrites newer data',json.loads(sql(one(commit(0,str(uuid.uuid4())))))['status']=='conflict' and sql(one('select public.ronix_head();'))=='1')
 check('another allowed account sees no other owner ledger',json.loads(sql(as_user(u2,'other@example.com','select public.ronix_load();')))['revision']==0 and sql(as_user(u2,'other@example.com',f"select count(*) from public.ronix_ledger where owner_id='{u1}';"))=='0')
+sql(f"insert into ronix_private.allowed_emails(email,role,account_owner) values('accountant@example.com','accountant','{u1}');")
+accountant=as_user(u4,'accountant@example.com','select public.ronix_load();');shared=json.loads(sql(accountant))
+check('accountant role reads the manager company ledger',shared['revision']==1 and shared['account_owner']==u1 and shared['role']=='accountant')
 check('direct update cannot bypass compare and swap',sql(one("update public.ronix_ledger set revision=99;"),False))
 check('members cannot grant themselves another email',sql(one("insert into ronix_private.allowed_emails values('intruder@example.com');"),False))
 check('malformed data is rejected before writing',sql(one(commit(1,str(uuid.uuid4()),{'currency':'USD'})),False) and sql(one('select public.ronix_head();'))=='1')
@@ -36,6 +39,7 @@ check('old successful mutation stays idempotent after later changes',json.loads(
 own=f'{u1}/proof.png';other=f'{u2}/proof.png'
 sql(one(f"insert into storage.objects(bucket_id,name) values('ronix-files','{own}');"))
 check('own private evidence can be read',sql(one("select count(*) from storage.objects;"))=='1')
+check('accountant can read company private evidence',sql(as_user(u4,'accountant@example.com',"select count(*) from storage.objects;"))=='1')
 check('another user cannot read evidence',sql(as_user(u2,'other@example.com',"select count(*) from storage.objects;"))=='0')
 check('cross-account uploads are rejected',sql(one(f"insert into storage.objects(bucket_id,name) values('ronix-files','{other}');"),False))
 sql(one("update storage.objects set name='overwrite';delete from storage.objects;"))

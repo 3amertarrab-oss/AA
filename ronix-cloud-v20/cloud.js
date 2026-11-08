@@ -2,7 +2,7 @@
 const R20Cloud=(()=>{
   const cfg=window.RONIX_CLOUD_CONFIG;
   const client=supabase.createClient(cfg.url,cfg.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'ronix-v20-auth'}});
-  const S={user:null,key:'',disk:null,env:null,refs:new Map(),ready:false,busy:false,conflict:false,error:'',notice:'',epoch:0};
+  const S={user:null,role:'',accountOwner:'',key:'',disk:null,env:null,refs:new Map(),ready:false,busy:false,conflict:false,error:'',notice:'',epoch:0};
   const bar=document.createElement('div');bar.id='r20CloudBar';bar.innerHTML='<strong>RONIX · متصل بحسابك</strong><span id="r20SyncState" role="status"></span><div class="actions"><button class="btn" id="r20Refresh">تحديث / مزامنة</button><button class="btn" id="r20Backup">نسخة احتياطية</button><button class="btn" id="r20Recovery">نسخ التعارض</button><button class="btn" id="r20Logout">خروج</button></div><div id="r20Conflict" hidden><p>توجد نسخة أحدث من جهاز آخر. تعديلات هذا الجهاز محفوظة ولم تُكتب فوق الحسابات المشتركة.</p><button class="btn" id="r20KeepLocal">تنزيل تعديلاتي</button><button class="btn primary" id="r20UseServer">حفظ نسخة من تعديلاتي وفتح أحدث حسابات</button></div>';
   document.querySelector('.main').prepend(bar);
   const menuButton=document.createElement('button');menuButton.id='r20Menu';menuButton.className='btn r20-mobile-only';menuButton.textContent='☰ الأقسام';menuButton.setAttribute('aria-expanded','false');bar.prepend(menuButton);
@@ -46,7 +46,7 @@ const R20Cloud=(()=>{
     try{const result=await client.rpc(name,args).abortSignal(controller.signal);if(result.error)throw result.error;return result.data}finally{clearTimeout(timer)}
   }
   async function loadRemote(){
-    const owner=S.user.id,result=await rpc('ronix_load');
+    const result=await rpc('ronix_load'),owner=result?.account_owner||S.accountOwner||S.user.id;S.accountOwner=owner;S.role=result?.role||S.role||'manager';localStorage.setItem('ronix-v20-account:'+S.user.id,JSON.stringify({owner,role:S.role}));
     if(!Number.isSafeInteger(result?.revision)||result.revision<0)throw Error('نسخة الخادم غير صالحة');
     const packed=result.payload===null?r14Empty():result.payload,payload=await hydratePayload(packed,owner);
     return {env:{owner,revision:result.revision,payload:normalize(payload),dirty:false,mutation:null},packed};
@@ -117,7 +117,7 @@ const R20Cloud=(()=>{
       if(S.conflict)throw Error('راجع تعارض الحسابات أولًا');
       if(S.env?.dirty||S.busy)throw Error('توجد عملية بانتظار المزامنة. اضغط تحديث / مزامنة قبل تسجيل حركة أخرى.');
       if(S.error)throw Error('اضغط تحديث قبل حفظ حركة جديدة');
-      const linked=R16.reconcile(next),checked=normalize(linked.data);checked.schemaVersion=19;checked.currency='EGP';
+      const linked=R16.reconcile(next);if(S.role==='accountant'){linked.data.reviews=Array.isArray(linked.data.reviews)?linked.data.reviews:[];linked.data.reviews.push({id:r14Id('REV'),at:new Date().toISOString(),by:S.user.email||'',action,details:R14.copy(details),status:'pending'})}const checked=normalize(linked.data);checked.schemaVersion=19;checked.currency='EGP';
       const before=JSON.parse(r14Saved).claimSettlements||[];
       if(JSON.stringify(before)!==JSON.stringify(checked.claimSettlements))checked.auditTrail.push({id:r14Id('AUD'),at:new Date().toISOString(),action:'تحديث ربط التحصيل بالمطالبات',before,after:R14.copy(checked.claimSettlements)});
       checked.auditTrail.push({id:r14Id('AUD'),at:new Date().toISOString(),action,...details});
@@ -125,14 +125,15 @@ const R20Cloud=(()=>{
     }catch(e){r14Failures++;data=JSON.parse(r14Saved);alert('لم تُحفظ الحركة الجديدة: '+(e?.message||e));status();return false}
   }
   function lock(){
-    S.epoch++;S.ready=false;S.busy=false;S.user=null;S.env=null;S.disk=null;S.refs=new Map();S.conflict=false;S.error='';S.notice='';
+    S.epoch++;S.ready=false;S.busy=false;S.user=null;S.role='';S.accountOwner='';S.env=null;S.disk=null;S.refs=new Map();S.conflict=false;S.error='';S.notice='';
     data=r14Empty();r14Saved=JSON.stringify(data);projectFocus='';designerFocus='';closeModal();setMenu(false);document.body.classList.add('r20-locked');gate.hidden=false;$('r20Password').value='';render();
   }
   async function boot(session){
-    if(!session?.user)return;const epoch=++S.epoch;S.user=session.user;S.key=key(session.user.id);S.ready=false;S.error='';S.conflict=false;
+    if(!session?.user)return;const epoch=++S.epoch;S.user=session.user;S.key=key(session.user.id);S.ready=false;S.error='';S.conflict=false;let remote=null;try{const mapped=JSON.parse(localStorage.getItem('ronix-v20-account:'+session.user.id)||'null');S.accountOwner=mapped?.owner||session.user.id;S.role=mapped?.role||''}catch{S.accountOwner=session.user.id;S.role=''}
     try{
-      S.disk=localStorage.getItem(S.key);const cached=await readEnvelope(S.disk,S.user.id);if(cached)adopt(cached);
-      if(!cached){const remote=await loadRemote();if(epoch!==S.epoch)return;write(remote.env,remote.packed)}
+      if(navigator.onLine)remote=await loadRemote();if(epoch!==S.epoch)return;S.disk=localStorage.getItem(S.key);const cached=await readEnvelope(S.disk,S.accountOwner);if(cached)adopt(cached);
+      if(!cached){if(!remote)throw Error('افتح الحساب مرة واحدة مع اتصال بالإنترنت');write(remote.env,remote.packed)}
+      else if(remote&&!cached.dirty&&remote.env.revision!==cached.revision)write(remote.env,remote.packed)
       else if(navigator.onLine){const head=await rpc('ronix_head');if(epoch!==S.epoch)return;if(!cached.dirty&&head!==cached.revision){const remote=await loadRemote();if(epoch!==S.epoch)return;write(remote.env,remote.packed)}}
       if(epoch!==S.epoch)return;S.ready=true;gate.hidden=true;document.body.classList.remove('r20-locked');$('r20Password').value='';
       if(S.env.dirty)await flush();

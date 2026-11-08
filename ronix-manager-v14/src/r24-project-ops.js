@@ -1,6 +1,6 @@
 /* Project operations: owner-only close/reopen, work-hour costs, and visual project cards. */
 function r24CurrentEmail(){try{return typeof R20Cloud!=='undefined'?String(R20Cloud.state?.user?.email||''):''}catch{return''}}
-function r24CanManageProject(){return R24ProjectOps.canClose(r24CurrentEmail())}
+function r24CanManageProject(){try{if(typeof R20Cloud!=='undefined')return R20Cloud.state?.role==='manager'}catch{}return R24ProjectOps.canClose(r24CurrentEmail())}
 function r24Status(p){return R24ProjectOps.isClosed(p)?{key:'closed',label:'مغلق'}:{key:'active',label:'نشط'}}
 function r24WorkRows(code){return R24ProjectOps.workRows(data.projectExpenses,code).sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.id).localeCompare(String(a.id)))}
 function r24WorkPanel(p){

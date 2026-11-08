@@ -1,11 +1,14 @@
 {
-  "passed": 38,
+  "passed": 42,
   "checks": [
     "logged-out page hides all accounting screens",
     "email login opens empty isolated cloud ledger",
     "import saves exact accounting amounts and relationships",
     "cloud stores private file references instead of embedded base64",
     "second device receives all records and matching photos and proofs",
+    "accountant opens the same company ledger with accountant role",
+    "accountant change affects reports and enters manager review queue",
+    "manager approval clears the pending review without reverting data",
     "mobile layout fits iPhone width",
     "unified project workspace opens with five focused tabs",
     "project header highlights balance and collection rate",
@@ -35,6 +38,7 @@
     "service worker never caches auth or accounting API responses",
     "every main screen stays inside the iPhone viewport",
     "financial cards use one non-overlapping column on iPhone",
+    "VO editor supports sequential percentage adjustments on current total",
     "project tax form fits the iPhone viewport",
     "receipt and evidence form fits the iPhone viewport",
     "all screens fit compact and large iPhone widths",
