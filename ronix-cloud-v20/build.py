@@ -17,7 +17,7 @@ html=html.replace('width=device-width,initial-scale=1','width=device-width,initi
 html=html.replace('</head>','<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#172b45"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="RONIX"><link rel="apple-touch-icon" href="icon.png"><style>'+ (ROOT/'cloud.css').read_text()+'</style></head>',1)
 html=html.replace('V19','V20').replace('*** ','').replace('تُقرأ الملفات على جهازك فقط. لا توجد بيانات عملاء مضمنة في ملف التحديث.','استورد أحدث نسخة JSON. بعد الحفظ تُزامن الحسابات والصور مع حسابك الخاص.')
 html+='\n<script src="config.js"></script><script src="supabase.js"></script><script>\n'+(ROOT/'media.js').read_text()+'\n'+(ROOT/'cloud.js').read_text()+'\n</script>'
-html=html.replace('V20.3','V20.9').replace('V20.4','V20.9').replace('V20.5','V20.9').replace('V20.6','V20.9').replace('V20.7','V20.9').replace('V20.8','V20.9')
+html=html.replace('V20.3','V20.10').replace('V20.4','V20.10').replace('V20.5','V20.10').replace('V20.6','V20.10').replace('V20.7','V20.10').replace('V20.8','V20.10').replace('V20.9','V20.10')
 (DIST/'index.html').write_text(html)
 shutil.copyfile(ROOT/'config.js',DIST/'config.js');shutil.copyfile(VENDOR/'supabase.js',DIST/'supabase.js');shutil.copyfile(VENDOR/'supabase-LICENSE.txt',DIST/'supabase-LICENSE.txt')
 shutil.copyfile(ROOT.parent/'ronix-manager-v14/src/vendor/fflate-LICENSE.txt',DIST/'fflate-LICENSE.txt')
@@ -30,8 +30,8 @@ shutil.copyfile(ROOT/'START-HERE.txt',DIST/'START-HERE.txt')
 revision=hashlib.sha256((html+(ROOT/'config.js').read_text()).encode()).hexdigest()[:12]
 sw="""const CACHE='ronix-v20-REVISION';
 const ASSETS=['./','./index.html','./config.js','./supabase.js','./manifest.webmanifest','./icon.png','./setup.html'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('ronix-v20-')&&k!==CACHE).map(k=>caches.delete(k))))));
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('ronix-v20-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
  const url=new URL(e.request.url);
  if(e.request.method!=='GET'||url.origin!==self.location.origin)return;
@@ -44,10 +44,10 @@ self.addEventListener('fetch',e=>{
 (DIST/'_headers').write_text('/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: no-referrer\n  X-Frame-Options: DENY\n  Permissions-Policy: camera=(), microphone=(), geolocation=()\n/sw.js\n  Cache-Control: no-cache\n/index.html\n  Cache-Control: no-cache\n/config.js\n  Cache-Control: no-cache\n')
 with zipfile.ZipFile(ROOT/'RONIX-Cloud-V20.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for p in sorted(DIST.iterdir()):z.write(p,p.name)
-# Deployment-only package. The setup utility and instructions are deliberately
-# excluded because an existing installation needs only the application files.
+# Direct-upload package. Keep setup.html because it is part of the offline app
+# shell, while the existing database schema remains safely rerunnable.
 deploy_names=['_headers','config.js','fflate-LICENSE.txt','icon.png','index.html','manifest.webmanifest','setup.html','supabase-LICENSE.txt','supabase.js','sw.js']
-with zipfile.ZipFile(ROOT/'RONIX-V20.9-Update.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
+with zipfile.ZipFile(ROOT/'RONIX-V20.10-Update.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  for name in deploy_names:z.write(DIST/name,name)
 with zipfile.ZipFile(ROOT/'RONIX-Setup.zip','w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
  z.writestr('RONIX_Setup.html',setup)

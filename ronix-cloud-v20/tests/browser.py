@@ -4,6 +4,7 @@ from pathlib import Path
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from functools import partial
 from playwright.sync_api import sync_playwright
+from openpyxl import load_workbook
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'private-test-artifacts';OUT.mkdir(exist_ok=True)
 users={'owner@example.com':'10000000-0000-4000-8000-000000000001','other@example.com':'10000000-0000-4000-8000-000000000002','accountant@example.com':'10000000-0000-4000-8000-000000000003'}
 def account(uid):return users['owner@example.com'] if uid==users['accountant@example.com'] else uid
@@ -82,7 +83,8 @@ try:
   check('accountant opens the same company ledger with accountant role',c.evaluate('R20Cloud.state.role')=='accountant' and c.evaluate('data.projects[0].code')=='P')
   c.evaluate('r14Change("تعديل اختبار المحاسب",d=>d.projects[0].note="من المحاسب")');synced(c);p.locator('#r20Refresh').click();synced(p)
   check('accountant change affects reports and enters manager review queue',p.evaluate('data.projects[0].note')=='من المحاسب' and p.evaluate('data.reviews.filter(x=>x.status==="pending").length')==1)
-  p.evaluate('r30Approve(r14Encode(data.reviews[0].id))');synced(p);q.locator('#r20Refresh').click();synced(q)
+  review_button=p.get_by_role('button',name='✓ تمت المراجعة',exact=True);check('manager sees a green reviewed button while accountant cannot approve',review_button.is_visible() and 'rgb(22, 130, 79)' in review_button.evaluate('(x)=>getComputedStyle(x).backgroundColor') and c.locator('.r30-reviewed').count()==0)
+  review_button.click();synced(p);q.locator('#r20Refresh').click();synced(q)
   check('manager approval clears the pending review without reverting data',p.evaluate('data.reviews[0].status')=='approved' and p.evaluate('data.projects[0].note')=='من المحاسب');ac.close()
   check('mobile layout fits iPhone width',q.evaluate('document.documentElement.scrollWidth<=innerWidth+1'))
   q.evaluate('go("projects");openProject("P")');q.wait_for_timeout(100)
@@ -154,6 +156,20 @@ try:
     assert q.evaluate('document.documentElement.scrollWidth<=innerWidth+1'),f'{mobile_page} expands {width}px viewport'
   check('all screens fit compact and large iPhone widths',True)
   q.set_viewport_size({'width':390,'height':844})
+  q.evaluate('go("projects");openProject("P")');check('project header exposes a direct VO action',q.locator('.r31-vo-button').is_visible())
+  q.locator('.r31-vo-button').click();q.locator('#r31VOName').fill('اختبار مباشر');q.locator('#r31VOValue').fill('50');q.get_by_role('button',name='حفظ VO',exact=True).click();synced(q)
+  check('direct VO save updates the contract and remains in project reports',q.evaluate('data.projects[0].contract')==1050.97 and q.evaluate('R14.projectVariations(data.projects[0]).at(-1).name')=='اختبار مباشر')
+  q.locator('.r31-final-close').click();q.locator('#r31CloseReason').fill('انتهاء التعامل وتعذر تحصيل الرصيد');q.locator('#r31CloseConfirm').check();q.get_by_role('button',name='إقفال نهائي',exact=True).click();synced(q)
+  check('manager final close records loss and locks the project',q.evaluate('!!data.projects[0].accountClosedAt&&data.projectWriteOffs.length===1&&R16.project(data,"P").contractBalance===0&&R24ProjectOps.isClosed(data.projects[0])') and q.locator('.r31-closed').is_visible() and q.locator('.r31-vo-button').count()==0)
+  frozen=q.evaluate('JSON.stringify({project:data.projects[0],assignments:data.assignments,payments:data.payments,claims:data.claims,receipts:data.clientReceipts,expenses:data.projectExpenses,photos:data.projects[0].photos})')
+  blocked=q.evaluate('''()=>{const messages=[],old=window.alert;window.alert=m=>messages.push(String(m));try{editProject("P");editAssignment("P");r24OpenWorkHours("P");openClaim(null,"CL1");openReceipt(null,"R1");r15DeletePayment("PAY1");r23Delete("photo","PHOTO","P")}finally{window.alert=old}return messages}''')
+  check('final close blocks every tested editing route without changing history',len(blocked)==7 and all('مقفول نهائيًا' in message for message in blocked) and frozen==q.evaluate('JSON.stringify({project:data.projects[0],assignments:data.assignments,payments:data.payments,claims:data.claims,receipts:data.clientReceipts,expenses:data.projectExpenses,photos:data.projects[0].photos})'))
+  check('closed project visually disables nested edit controls',q.locator('#content.r31-readonly button:disabled').count()>0)
+  check('project PDF states the closing loss explicitly',q.evaluate('r25ProjectDocument(data.projects[0]).includes("خسارة / تسوية الإقفال")'))
+  with q.expect_download() as dl:q.evaluate('projectExcel("P")')
+  report_path=OUT/'closed-project.xlsx';dl.value.save_as(report_path);book=load_workbook(report_path,data_only=True);vo=list(book['VO العقود'].values);closing=list(book['تسويات إقفال المشاريع'].values);overview=dict((row[0],row[1]) for row in book['كشف المشروع'].values if row[0])
+  check('Excel reports retain VO and split final loss from commercial waiver',any(row[1]=='اختبار مباشر' for row in vo[1:]) and bool(closing[1][2]) and closing[1][3]==1015.47 and closing[1][4]==280.5 and closing[1][5]==734.97 and overview['متبقي العقد']==0);book.close()
+  q.evaluate('projectFocus="";go("projects")');check('closed project leaves current projects',q.locator('#projectRows button[onclick*="openProject"]').count()==0);q.locator('.r31-project-tabs button').nth(1).click();check('closed projects screen retains the project for read-only access',q.locator('#projectRows button[onclick*="openProject"]').count()==1);q.screenshot(path=str(OUT/'iphone-closed-projects.png'),full_page=True)
   q.evaluate('go("customerDirectory")');q.wait_for_timeout(80);q.screenshot(path=str(OUT/'iphone-account.png'),full_page=True)
   check('cloud workflows have no script exceptions',not errors)
   result={'passed':len(checks),'checks':checks,'errors':errors,'backend':'Local deterministic Auth/REST/Storage; real bundled Supabase browser SDK'};(ROOT/'tests/browser-results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));b.close()

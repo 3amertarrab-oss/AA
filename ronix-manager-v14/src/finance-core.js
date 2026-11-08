@@ -1,6 +1,6 @@
 /* RONIX V14. Monetary arithmetic in integer piastres; no network or storage. */
 const R14 = (() => {
-  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers','documentNumbers','manualJournals','laborEntries','generalExpenses','accounts','closingRates','fiscalClosings','reviews'];
+  const arrays = ['projects','assignments','payments','claims','clientReceipts','advances','openingBalances','projectExpenses','projectWriteOffs','costAudit','claimSettlements','auditTrail','deletedPayments','trashRecords','archivedDesigners','customers','documentNumbers','manualJournals','laborEntries','generalExpenses','accounts','closingRates','fiscalClosings','reviews'];
   const copy = v => JSON.parse(JSON.stringify(v));
   const normName = v => String(v || '').trim();
   function cents(v) {
@@ -237,6 +237,11 @@ const R14 = (() => {
       monetary(s.amount,'تسوية مطالبة',1);
       if(!c||!r||!active(c)||s.code!==r.code||!claimRows(c).some(x=>x.code===s.code)||claimClient(d,c)!==receiptClient(d,r))add('ربط غير صحيح بين مطالبة وتحصيل');
     }
+    try{
+      unique(d.projectWriteOffs||[],x=>x.id,'شطب إقفال المشروع');
+      for(const x of d.projectWriteOffs||[]){linked(x.code,'شطب إقفال');dated(x.date,'شطب إقفال');monetary(x.amount||0,'خسارة ديون معدومة');monetary(x.commercialDiscount||0,'تنازل تجاري');monetary(x.totalAdjustment,'إجمالي تسوية الإقفال',1);if(!String(x.reason||'').trim())add('سبب شطب الإقفال مطلوب');if(cents(sum(x.claimAllocations||[]))!==cents(x.amount||0))add('توزيع خسارة الإقفال لا يساوي المبلغ المطالب به')}
+      for(const p of d.projects){const rows=(d.projectWriteOffs||[]).filter(x=>x.code===p.code),loss=sum(rows,'amount'),total=sum(rows,x=>x.totalAdjustment??x.amount),claims=sum(d.claims.filter(active),c=>claimAmount(c,p.code)),matched=sum(d.claimSettlements.filter(s=>s.code===p.code));if(cents(loss)>cents(delta(claims,matched)))add('شطب المطالبات يتجاوز الرصيد غير المسدد: '+p.code);const receipts=sum(d.clientReceipts.filter(r=>r.code===p.code));if(cents(total)>cents(delta(p.contract,receipts)))add('تسوية الإقفال تتجاوز متبقي العقد: '+p.code)}
+    }catch(e){add(e.message)}
     try{
       for(const c of d.claims)for(const r of claimRows(c))if(cents(settled(d,c.id,r.code))>cents(r.amount))add('تسوية تتجاوز مبلغ المشروع في المطالبة: '+c.id);
       for(const r of d.clientReceipts)if(cents(usedReceipt(d,r.id))>cents(r.amount))add('تحصيل مستخدم أكثر من مرة: '+r.id);

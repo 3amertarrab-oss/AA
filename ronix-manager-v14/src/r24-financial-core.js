@@ -25,6 +25,7 @@ const R24Financial = ((R) => {
     {id:'5200',code:'5200',name:'مصروفات المشاريع',type:'expense',group:'project-cost'},
     {id:'5300',code:'5300',name:'تكلفة ساعات العمل',type:'expense',group:'project-cost'},
     {id:'6100',code:'6100',name:'مصروفات إدارية وعمومية',type:'expense',group:'operating-expense'},
+    {id:'6250',code:'6250',name:'خسائر ديون غير قابلة للتحصيل',type:'expense',group:'bad-debt'},
     {id:'7100',code:'7100',name:'خسائر فروق العملة',type:'expense',group:'fx-loss'}
   ]);
 
@@ -32,7 +33,7 @@ const R24Financial = ((R) => {
     cash:'1100',receivable:'1200',designerAdvance:'1300',clientAdvance:'2100',
     designerPayable:'2200',wagesPayable:'2250',supplierPayable:'2300',
     revenue:'4100',fxGain:'4200',designerCost:'5100',projectExpense:'5200',
-    laborCost:'5300',adminExpense:'6100',fxLoss:'7100'
+    laborCost:'5300',adminExpense:'6100',badDebt:'6250',fxLoss:'7100'
   });
   // JavaScript's ISO parser does not treat year 0000 consistently.  Keep the
   // default reporting window valid in browsers as well as Node.
@@ -235,6 +236,10 @@ const R24Financial = ((R) => {
     return out;
   }
 
+  function writeOffEntries(data,issues){
+    const out=[];for(const x of data.projectWriteOffs||[]){if(!dateOK(x.date)){issues.push(issue('writeoff-date','شطب مشروع بلا تاريخ صالح','error',x.id));continue}const amount=money(x.amount||0);if(!amount)continue;const dims={code:x.code||'',client:x.client||''};out.push(entry('WRITEOFF:'+x.id,x.date,'خسارة رصيد غير قابل للتحصيل '+(x.code||''),{kind:'project-writeoff',id:x.id},[line(ACCOUNT.badDebt,amount,0,dims),line(ACCOUNT.receivable,0,amount,dims)]))}return out
+  }
+
   function readiness(data,settings,map,entries,issues,to=ISO_MAX){
     if(!data.accountingSettings)issues.push(issue('settings-missing','لم يكتمل إعداد المحاسبة والعملة الوظيفية','error'));
     if(String(settings.baseCurrency||'EGP')!=='EGP')issues.push(issue('base-currency','القوائم الحالية تتطلب أن تكون العملة الوظيفية EGP','error'));
@@ -253,7 +258,7 @@ const R24Financial = ((R) => {
     const entries=[
       ...manualEntries(data,map,issues),...claimEntries(data,issues),...receiptEntries(data,settings,map,issues),
       ...settlementEntries(data,issues),...designerEntries(data,settings,map,issues),...expenseEntries(data,settings,map,issues,to),
-      ...laborEntries(data,settings,map,issues)
+      ...laborEntries(data,settings,map,issues),...writeOffEntries(data,issues)
     ].sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.id).localeCompare(String(b.id)));
     readiness(data,settings,map,entries,issues,to);
     return {accounts:[...map.values()],entries,issues,ready:!issues.some(x=>x.severity==='error')};

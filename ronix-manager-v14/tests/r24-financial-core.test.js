@@ -71,6 +71,18 @@ test('unallocated customer cash remains a liability and is not revenue',()=>{
   assert.equal(report.balanceSheet.balanced,true);
 });
 
+test('project write-off records bad debt without inventing cash or a payable',()=>{
+  const data=base({
+    projects:[{code:'P1',name:'مشروع',client:'عميل',contract:1000,contractCurrency:'EGP',contractRate:1,originalContract:1000}],
+    claims:[{id:'CL1',client:'عميل',date:'2026-01-10',status:'معتمدة',total:1000,projectRows:[{code:'P1',amount:1000,originalAmount:1000,currency:'EGP',claimRate:1,accountingAmount:1000}]}],
+    clientReceipts:[{id:'R1',batchId:'B1',client:'عميل',code:'P1',date:'2026-02-01',amount:600,cashAmount:600}],
+    claimSettlements:[{claimId:'CL1',receiptId:'R1',code:'P1',amount:600}],
+    projectWriteOffs:[{id:'WO1',code:'P1',client:'عميل',date:'2026-03-01',amount:400,commercialDiscount:0,totalAdjustment:400,reason:'تعذر التحصيل',claimAllocations:[{claimId:'CL1',code:'P1',amount:400}]}]
+  });
+  const report=F.report(data,{from:'2026-01-01',to:'2026-12-31'}),badDebt=report.incomeStatement.expenseRows.find(x=>x.id==='6250');
+  assert.equal(badDebt.amount,400);assert.equal(report.incomeStatement.netProfit,600);assert.equal(report.balanceSheet.assets.find(x=>x.id==='1200').amount,0);assert.equal(report.cashFlow.closingCash,600);assert.equal(report.balanceSheet.totalLiabilities,0);assert.equal(report.trialBalance.balanced,true)
+});
+
 test('internal work-hour allocation creates project cost and liability without cash outflow',()=>{
   const data=base({
     projectExpenses:[{id:'H1',code:'P1',date:'2026-02-03',category:'ساعات عمل',expenseType:'work-hours',workHours:10,hourlyRate:20,amount:200,cashEffect:false,paymentStatus:'accrued',accountingReviewed:true,accountId:'5300',payableAccountId:'2250'}]

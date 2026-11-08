@@ -17,9 +17,10 @@ const R16 = ((R) => {
     const contract=R.cents(p.contract||0)/100,received=R.sum(receipts),cash=R.sum(receipts,R.cashReceipt);
     const claims=R.sum(d.claims.filter(R.active),c=>R.claimAmount(c,code));
     const matched=R.sum(d.claimSettlements.filter(s=>s.code===code));
+    const writeOffRows=(d.projectWriteOffs||[]).filter(x=>x.code===code),writeOff=R.sum(writeOffRows,'amount'),commercialDiscount=R.sum(writeOffRows,'commercialDiscount'),closingAdjustment=R.sum(writeOffRows,x=>x.totalAdjustment??x.amount);
     const projectExpenses=d.projectExpenses.filter(x=>x.code===code),expenses=R.sum(projectExpenses),cashExpenses=R.sum(projectExpenses.filter(x=>x.cashEffect!==false));
-    return {code,contract,received,cash,fx:balance(cash,received),contractBalance:balance(contract,received),
-      claims,matched,claimDue:balance(claims,matched),unmatched:balance(received,matched),
+    return {code,contract,received,cash,fx:balance(cash,received),writeOff,commercialDiscount,closingAdjustment,contractBalance:balance(balance(contract,received),closingAdjustment),
+      claims,matched,claimDue:balance(balance(claims,matched),writeOff),unmatched:balance(received,matched),
       designers:ds,expenses,cashExpenses,cost:R.sum([{amount:ds.fees},{amount:expenses}]),
       profit:balance(contract,R.sum([{amount:ds.fees},{amount:expenses}])),
       operatingCash:balance(balance(cash,ds.paid),cashExpenses)};
@@ -27,8 +28,9 @@ const R16 = ((R) => {
   function client(d,name) {
     const t=R.totals(d,name),cs=d.claims.filter(c=>R.active(c)&&R.claimClient(d,c)===name);
     const matched=R.sum(cs,c=>R.settled(d,c.id)),fx=R.fxDifference(d,'',name);
-    return {...t,matched,claimDue:balance(t.claims,matched),unmatched:balance(t.receipts,matched),fx,
-      contractBalance:balance(t.contracts,t.receipts),netBalance:balance(balance(t.contracts,t.receipts),t.unallocated),
+    const clientWriteOffs=(d.projectWriteOffs||[]).filter(x=>R.normName(x.client||d.projects.find(p=>p.code===x.code)?.client)===name),writeOff=R.sum(clientWriteOffs,'amount'),closingAdjustment=R.sum(clientWriteOffs,x=>x.totalAdjustment??x.amount);
+    return {...t,matched,writeOff,claimDue:balance(balance(t.claims,matched),writeOff),unmatched:balance(t.receipts,matched),fx,
+      closingAdjustment,contractBalance:balance(balance(t.contracts,t.receipts),closingAdjustment),netBalance:balance(balance(balance(t.contracts,t.receipts),closingAdjustment),t.unallocated),
       cashDifference:balance(t.cash,R.sum([{amount:t.receipts},{amount:t.unallocated},{amount:fx}]))};
   }
   function reconcile(value,at=new Date().toISOString()) {

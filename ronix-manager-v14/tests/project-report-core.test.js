@@ -42,3 +42,8 @@ test('project dossier rejects unknown projects without mutating data',()=>{
  assert.throws(()=>P.model(source,'MISSING'),/المشروع غير موجود/);
  assert.equal(JSON.stringify(source),before);
 });
+
+test('final close loss clears project balances and appears once on timeline',()=>{
+ const d=fixture();d.projectWriteOffs=[{id:'WO1',code:'P1',client:'عميل',date:'2026-03-01',amount:2600,commercialDiscount:7800,totalAdjustment:10400,reason:'انتهاء التعامل',claimAllocations:[{claimId:'CL1',code:'P1',amount:2600}]}];
+ const m=P.model(d,'P1');assert.equal(m.contractRemaining,0);assert.equal(m.claimDue,0);assert.equal(m.closingLoss,10400);assert.equal(m.actualProfit,-8600);assert.equal(P.timeline(d,'P1').filter(x=>x.category==='writeoff').length,1)
+});

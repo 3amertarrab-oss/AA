@@ -1,5 +1,5 @@
 {
-  "passed": 42,
+  "passed": 52,
   "checks": [
     "logged-out page hides all accounting screens",
     "email login opens empty isolated cloud ledger",
@@ -8,6 +8,7 @@
     "second device receives all records and matching photos and proofs",
     "accountant opens the same company ledger with accountant role",
     "accountant change affects reports and enters manager review queue",
+    "manager sees a green reviewed button while accountant cannot approve",
     "manager approval clears the pending review without reverting data",
     "mobile layout fits iPhone width",
     "unified project workspace opens with five focused tabs",
@@ -42,6 +43,15 @@
     "project tax form fits the iPhone viewport",
     "receipt and evidence form fits the iPhone viewport",
     "all screens fit compact and large iPhone widths",
+    "project header exposes a direct VO action",
+    "direct VO save updates the contract and remains in project reports",
+    "manager final close records loss and locks the project",
+    "final close blocks every tested editing route without changing history",
+    "closed project visually disables nested edit controls",
+    "project PDF states the closing loss explicitly",
+    "Excel reports retain VO and split final loss from commercial waiver",
+    "closed project leaves current projects",
+    "closed projects screen retains the project for read-only access",
     "cloud workflows have no script exceptions"
   ],
   "errors": [],

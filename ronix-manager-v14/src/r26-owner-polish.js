@@ -6,7 +6,7 @@ r25ProjectDocument=function(project){
  html=html.replace('</header><section class="kpis">',`</header><section class="result-hero ${tone}"><small>${m.actualProfit<0?'خسارة فعلية حتى اليوم':'مكسب فعلي حتى اليوم'}</small><b>${r25ProjectMoney(Math.abs(m.actualProfit))}</b></section><section class="kpis">`);
  html=html.replace(new RegExp(`<div><small>${r25ProjectResultLabel(m.currentResult)}</small><b class="[^"]+">[^<]+</b></div>`),'');
  html=html.replace('التحصيل هو النقد الداخل فعلًا. الربح الحالي = قيمة الأعمال المطالب بها والمعتمدة ناقص تكلفة المشروع المسجلة. الهامش المتوقع = قيمة العقد ناقص التكلفة المسجلة، وقد يتغير عند تسجيل تكاليف جديدة.','المكسب الفعلي حتى اليوم = دفعات العميل الفعلية ناقص ما دُفع للمصممين وناقص مصروف الساعات وباقي مصروفات المشروع المسجلة. متبقي العقد معروض منفصلًا ولا يدخل في المكسب قبل قبضه.');
- html=html.replace(`<div><small>إجمالي التكلفة</small><b>${r25ProjectMoney(m.totalCost)}</b></div>`,`<div><small>المدفوع للمصممين</small><b>${r25ProjectMoney(m.actualDesignerCash)}</b></div><div><small>الساعات والمصروفات المسجلة</small><b>${r25ProjectMoney(m.recordedExpenses)}</b></div>`);
+ html=html.replace(`<div><small>إجمالي التكلفة</small><b>${r25ProjectMoney(m.totalCost)}</b></div>`,`<div><small>المدفوع للمصممين</small><b>${r25ProjectMoney(m.actualDesignerCash)}</b></div><div><small>الساعات والمصروفات المسجلة</small><b>${r25ProjectMoney(m.recordedExpenses)}</b></div>${m.closingLoss?`<div><small>خسارة / تسوية الإقفال</small><b class="loss">${r25ProjectMoney(m.closingLoss)}</b></div>`:''}`);
  return html
 };
 

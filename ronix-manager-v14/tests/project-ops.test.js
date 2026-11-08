@@ -23,6 +23,7 @@ test('project close state and owner permission are explicit',()=>{
  assert.equal(R24ProjectOps.isClosed({state:'نشط'}),false);
  assert.equal(R24ProjectOps.isClosed({state:'مغلق'}),true);
  assert.equal(R24ProjectOps.isClosed({state:'نشط',closedAt:'2026-11-01'}),true);
+ assert.equal(R24ProjectOps.isClosed({state:'مقفل نهائيًا',accountClosedAt:'2026-11-08T12:00:00Z'}),true);
  assert.equal(R24ProjectOps.canClose('3AMERTARRAB@GMAIL.COM'),true);
  assert.equal(R24ProjectOps.canClose('other@example.com'),false);
 });

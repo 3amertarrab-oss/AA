@@ -18,11 +18,13 @@ const R25Project = ((R, Links) => {
     const assignments = rows(d.assignments).filter(row => row.code === code);
     const designerPayments = rows(d.payments).filter(row => row.code === code);
     const expenses = rows(d.projectExpenses).filter(row => row.code === code);
+    const writeOffs = rows(d.projectWriteOffs).filter(row => row.code === code);
     const actualCashExpenses = R.sum(expenses.filter(row => row.cashEffect !== false));
     const actualCashIn = R.sum(receipts, R.cashReceipt);
     const actualDesignerCash = R.sum(designerPayments);
     const recordedExpenses = R.sum(expenses);
-    const totalCost = linked.cost;
+    const closingLoss = R.sum(writeOffs,row=>row.totalAdjustment??row.amount),badDebtLoss=R.sum(writeOffs,'amount'),commercialDiscount=R.sum(writeOffs,'commercialDiscount');
+    const totalCost = R.sum([{amount:linked.cost},{amount:closingLoss}]);
     const currency = R.projectCurrency(project);
     const originalContract = R.originalContract(project);
     const contractRate = R.projectRate(project);
@@ -30,7 +32,7 @@ const R25Project = ((R, Links) => {
       project, currency, originalContract, contractRate,
       contractValue: amount(project.contract),
       contractItems: rows(project.contractItems), claims, activeClaims, receipts,
-      assignments, designerPayments, expenses,
+      assignments, designerPayments, expenses, writeOffs, closingLoss, badDebtLoss, commercialDiscount,
       claimValue: linked.claims,
       recognizedRevenue,
       claimPaid: linked.matched,
@@ -45,7 +47,7 @@ const R25Project = ((R, Links) => {
       totalCost,
       expectedMargin: R.delta(project.contract, totalCost),
       currentResult: R.delta(recognizedRevenue, totalCost),
-      actualProfit: R.delta(R.delta(actualCashIn, actualDesignerCash), recordedExpenses),
+      actualProfit: R.delta(R.delta(R.delta(actualCashIn, actualDesignerCash), recordedExpenses),closingLoss),
       cashNet: R.delta(R.delta(actualCashIn, actualDesignerCash), actualCashExpenses),
       warnings: Links.review(d).filter(row => row.code === code)
     };
@@ -66,6 +68,7 @@ const R25Project = ((R, Links) => {
       const work = expense.expenseType === 'work-hours' || expense.category === 'ساعات عمل';
       push({date:dateOK(expense.date) ? expense.date : '', category:work ? 'work' : 'expense', flow:expense.cashEffect === false ? 'neutral' : 'out', title:work ? 'ساعات عمل' : 'مصروف مشروع', detail:work ? `${expense.workHours || 0} ساعة · ${expense.payee || expense.workDescription || ''}` : (expense.category || expense.notes || ''), amount:amount(expense.amount), ref:expense.id || expense.ref || ''});
     }
+    for(const loss of m.writeOffs)push({date:dateOK(loss.date)?loss.date:'',category:'writeoff',flow:'neutral',title:'خسارة / تسوية إقفال',detail:loss.reason||'',amount:amount(loss.totalAdjustment??loss.amount),ref:loss.id||''});
     if (dateOK(p.closedAt)) push({date:p.closedAt, category:'status', title:'إغلاق المشروع', detail:p.closedBy || '', ref:p.code});
     return out.sort((a,b) => String(b.date).localeCompare(String(a.date)) || a.title.localeCompare(b.title));
   }

@@ -1,9 +1,9 @@
 /* Project status and work-hour arithmetic. Pure helpers; no storage or DOM. */
 const R24ProjectOps=(()=>{
   const OWNER_EMAIL='3amertarrab@gmail.com';
-  const closedStates=new Set(['مغلق','منتهي','مكتمل','closed','completed','finished']);
+  const closedStates=new Set(['مغلق','مقفل نهائيًا','منتهي','مكتمل','closed','completed','finished']);
   const normalize=value=>String(value??'').trim().toLowerCase();
-  function isClosed(project){return !!project&&(!!project.closedAt||closedStates.has(normalize(project.state)))}
+  function isClosed(project){return !!project&&(!!project.closedAt||!!project.accountClosedAt||closedStates.has(normalize(project.state)))}
   function canClose(email,owner=OWNER_EMAIL){return normalize(email)===normalize(owner)}
   function scaled(value,places,label){
     const raw=String(value??'').trim();
