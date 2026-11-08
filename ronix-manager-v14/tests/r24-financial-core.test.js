@@ -1,6 +1,7 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const F=require('../src/r24-financial-core.js');
+const R=require('../src/finance-core.js');
 
 function base(overrides={}){
   return {
@@ -81,6 +82,11 @@ test('project write-off records bad debt without inventing cash or a payable',()
   });
   const report=F.report(data,{from:'2026-01-01',to:'2026-12-31'}),badDebt=report.incomeStatement.expenseRows.find(x=>x.id==='6250');
   assert.equal(badDebt.amount,400);assert.equal(report.incomeStatement.netProfit,600);assert.equal(report.balanceSheet.assets.find(x=>x.id==='1200').amount,0);assert.equal(report.cashFlow.closingCash,600);assert.equal(report.balanceSheet.totalLiabilities,0);assert.equal(report.trialBalance.balanced,true)
+});
+
+test('legacy customer credit validates when no project close adjustment exists',()=>{
+ const d=base();d.projects=[{code:'CREDIT',name:'Credit project',client:'Client',contract:100}];d.clientReceipts=[{id:'R-CREDIT',code:'CREDIT',client:'Client',date:'2026-10-10',amount:125}];
+ assert.doesNotThrow(()=>R.validate(R.normalize(d)));
 });
 
 test('internal work-hour allocation creates project cost and liability without cash outflow',()=>{

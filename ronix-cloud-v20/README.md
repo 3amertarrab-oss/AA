@@ -1,6 +1,6 @@
-# RONIX V20.10 cloud edition
+# RONIX V20.11 cloud edition
 
-Adds a shared, authenticated company account to the project-finance application. V20.10 makes VO a direct project action, gives the manager a visible green reviewed button for accountant changes, separates current and finally closed projects, and records uncollectible closing balances without inventing receipts. It retains the unified project workspace, IndexedDB media cache, modern statements, receipts, and accounting controls.
+Adds a shared, authenticated company account to the project-finance application. V20.11 restores compatibility with existing projects that have customer credit balances, so a valid older ledger cannot disappear during startup validation. It retains the direct VO action, green manager review, separate current and closed projects, uncollectible closing balances, unified project workspace, and accounting controls.
 
 **Deployment status:** packaged and locally tested. Supabase setup and the initial Cloudflare deployment were completed by the owner; this updated ZIP still needs to be uploaded as a new Cloudflare deployment. No real Safari/iPhone device test has been performed; browser tests use Chromium at 320, 390, and 430 px widths.
 
@@ -9,7 +9,7 @@ Adds a shared, authenticated company account to the project-finance application.
 1. Export the latest JSON backup from the existing offline app. Do not seed a live account from an older uploaded backup.
 2. In Authentication → Users, keep or create the manager user and create the accountant user with separate passwords; auto-confirm both users.
 3. Open `RONIX_Setup.html` from `RONIX-Setup.zip`, or `dist/setup.html`. Enter both emails locally, copy the generated SQL, and run it in the linked Supabase SQL editor. The emails are appended locally and are not included in this repository.
-4. For a new installation, upload `RONIX-Cloud-V20.zip` with Cloudflare Pages Direct Upload. For the existing RONIX deployment, upload `RONIX-V20.10-Update.zip` as a new deployment. Both ZIP files have `index.html` at their root. Do not run the cloud app from `file://`.
+4. For a new installation, upload `RONIX-Cloud-V20.zip` with Cloudflare Pages Direct Upload. For the existing RONIX deployment, upload `RONIX-V20.11-Update.zip` as a new deployment. Both ZIP files have `index.html` at their root. Do not run the cloud app from `file://`.
 5. Open the resulting HTTPS site on the laptop, log in, import the latest backup once, and wait for synchronization to finish. Open the same site and account on iPhone in Safari; Share → Add to Home Screen.
 
 The setup page works as a local file and includes clipboard fallback. The application requires HTTPS or localhost. Only the project URL and **publishable** key are included in `config.js`. Never add a secret/service-role key, database password, owner email, or accounting backup to this public repository. Free plans are subject to the providers' limits and availability; this package does not activate billing or guarantee unlimited free hosting.
